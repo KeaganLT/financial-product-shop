@@ -1,23 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-    Container,
-    Box,
-    Typography,
-    Button,
-    CircularProgress,
-    Alert,
-    Chip,
-    Divider,
-    Paper,
-} from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useAuth } from '../context/AuthContext';
 import { getProductById } from '../services/productService';
 
 export default function ProductDetailPage() {
-    const { id } = useParams();
+    const {id} = useParams();
     const navigate = useNavigate();
+    const {isLoggedIn} = useAuth();
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -32,86 +21,95 @@ export default function ProductDetailPage() {
 
     if (loading) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                <CircularProgress />
-            </Box>
+            <div className="min-h-screen bg-white flex items-center justify-center">
+                <div className="w-8 h-8 border-4 border-[#1860BF] border-t-transparent rounded-full animate-spin"/>
+            </div>
         );
     }
 
     if (error) {
         return (
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <Alert severity="error" sx={{ mb: 2 }}>
-                    Could not load product: {error}
-                </Alert>
-                <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/products')}>
-                    Back to Products
-                </Button>
-            </Container>
+            <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 gap-4">
+                <p className="text-red-500 text-sm">{error}</p>
+                <button
+                    onClick={() => navigate('/products')}
+                    className="text-[#1860BF] text-sm font-semibold"
+                >
+                    ← Back to Products
+                </button>
+            </div>
         );
     }
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            {/* Back navigation */}
-            <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={() => navigate('/products')}
-                sx={{ mb: 3 }}
-            >
-                Back to Products
-            </Button>
+        <div className="min-h-screen bg-white">
 
+            {/* Back button */}
+            <div className="px-6 pt-12 pb-4">
+                <button
+                    onClick={() => navigate('/products')}
+                    className="flex items-center gap-1 text-[#1860BF] text-[14px] font-semibold"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M15 18l-6-6 6-6" stroke="#1860BF" strokeWidth="2"
+                              strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Back
+                </button>
+            </div>
 
-            <Box
-                component="img"
-                src={product.imageUrl || 'https://placehold.co/800x300?text=No+Image'}
+            {/* Hero image */}
+            <img
+                src={product.imageUrl || 'https://placehold.co/411x220?text=No+Image'}
                 alt={product.name}
-                sx={{
-                    width: '100%',
-                    height: 280,
-                    objectFit: 'cover',
-                    borderRadius: 2,
-                    mb: 3,
-                }}
+                className="w-full object-cover"
+                style={{maxHeight: '220px'}}
             />
 
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                <Typography variant="h4" fontWeight={700}>
-                    {product.name}
-                </Typography>
-                <Typography variant="h5" fontWeight={600} color="primary" sx={{ ml: 2, whiteSpace: 'nowrap' }}>
-                    R {Number(product.price).toFixed(2)}
-                </Typography>
-            </Box>
+            {/* Content */}
+            <div className="px-6 pt-5 pb-24 flex flex-col gap-4">
 
-            <Divider sx={{ mb: 3 }} />
+                {/* Name + price row */}
+                <div className="flex items-start justify-between gap-3">
+                    <h1 className="text-[20px] font-bold text-black leading-tight flex-1">
+                        {product.name}
+                    </h1>
+                    <span className="text-[17px] font-semibold text-[#1860BF] whitespace-nowrap">
+            R {Number(product.price).toFixed(0)} p/m
+          </span>
+                </div>
 
-            <Typography variant="h6" fontWeight={600} gutterBottom>
-                About this product
-            </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 3, lineHeight: 1.7 }}>
-                {product.description}
-            </Typography>
+                {/* Divider */}
+                <div className="h-px bg-gray-100"/>
 
-            <Paper variant="outlined" sx={{ p: 2, mb: 3, borderRadius: 2, bgcolor: 'grey.50' }}>
-                <Typography variant="body2" color="text.secondary">
-                    Eligibility checks are performed when you add this product to your cart.
-                    You'll need to be logged in to proceed.
-                </Typography>
-            </Paper>
+                {/* Description */}
+                <div className="flex flex-col gap-1">
+                    <h2 className="text-[15px] font-semibold text-black">About this product</h2>
+                    <p className="text-[13px] text-gray-500 leading-relaxed">
+                        {product.description}
+                    </p>
+                </div>
 
-            <Button
-                variant="contained"
-                size="large"
-                fullWidth
-                startIcon={<ShoppingCartIcon />}
-                onClick={() => {
-                    navigate('/login');
-                }}
-            >
-                Add to Cart
-            </Button>
-        </Container>
-    );
+                {/* Eligibility note */}
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <p className="text-[12px] text-gray-400 leading-relaxed">
+                        Eligibility checks are performed at checkout. You need to be logged in to proceed.
+                    </p>
+                </div>
+            </div>
+
+            {/* Fixed bottom CTA */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-4">
+                <div className="max-w-[411px] mx-auto">
+                    <button
+                        onClick={() => isLoggedIn ? navigate('/cart') : navigate('/login')}
+                        className="w-full py-3.5 rounded-xl text-white text-[15px] font-semibold"
+                        style={{backgroundColor: '#1860BF'}}
+                    >
+                        {isLoggedIn ? 'Add to Cart' : 'Login to Add to Cart'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
 }

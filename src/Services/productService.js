@@ -16,3 +16,7 @@ export async function getProductById(id){
     }
     return response.json();
 }
+
+
+
+
