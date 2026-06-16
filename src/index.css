@@ -1,13 +1,103 @@
-/* Tailwind v3 directives — these get replaced with actual CSS at build time */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Hide scrollbars on horizontal scroll rows while keeping scroll functionality */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
+/* ─── Design tokens as CSS variables ────────────────────────────────────────
+   These mirror src/tokens.js exactly.
+   Use in Tailwind: bg-[var(--brand-100)]
+   Use in inline styles: style={{ color: 'var(--neutral-600)' }}
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+    /* Brand */
+    --brand-300: #1C2435;
+    --brand-200: #1AAFDE;
+    --brand-100: #1860BF;
+    --gradient-brand: linear-gradient(90deg, #1860BF 0%, #1AAFDE 100%);
+
+    /* Neutrals */
+    --neutral-800: #1C1C1C;
+    --neutral-700: #3A3A3C;
+    --neutral-600: #8E8E93;
+    --neutral-500: #AEAEB2;
+    --neutral-400: #C7C7CC;
+    --neutral-300: #E5E5EA;
+    --neutral-200: #F2F2F7;
+    --neutral-100: #FFFFFF;
+
+    /* Green */
+    --green-400: #168C34;
+    --green-300: #34C759;
+    --green-200: #A1EFB5;
+    --green-100: #DAF4E1;
+
+    /* Yellow */
+    --yellow-400: #E07912;
+    --yellow-300: #FF9F40;
+    --yellow-200: #FFBA75;
+    --yellow-100: #FFEAD6;
+
+    /* Red */
+    --red-400: #C51C13;
+    --red-300: #FF3B30;
+    --red-200: #FF9F9A;
+    --red-100: #FCD0C6;
+
+    /* Blue */
+    --blue-400: #005ABD;
+    --blue-300: #007AFF;
+    --blue-200: #A6D0FF;
+    --blue-100: #E4EFFF;
+
+    /* Border radius */
+    --radius-none:  0px;
+    --radius-xs:    2px;
+    --radius-sm:    4px;
+    --radius-md:    8px;
+    --radius-lg:    12px;
+    --radius-xl:    24px;
+    --radius-round: 50px;
+    --radius-full:  100px;
+
+    /* Spacing */
+    --sp-0:   0px;
+    --sp-0-5: 2px;
+    --sp-1:   4px;
+    --sp-2:   8px;
+    --sp-3:   12px;
+    --sp-4:   16px;
+    --sp-5:   20px;
+    --sp-6:   24px;
+    --sp-7:   28px;
+    --sp-8:   32px;
+    --sp-9:   36px;
+    --sp-10:  40px;
+    --sp-11:  44px;
+    --sp-12:  48px;
+    --sp-13:  52px;
+    --sp-14:  56px;
+    --sp-15:  60px;
 }
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+
+/* ─── Base styles ────────────────────────────────────────────────────────── */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--neutral-100);
+    color: var(--neutral-800);
+    margin: 0;
+}
+
+/* ─── Utility: hide scrollbars on horizontal scroll rows ─────────────────── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Shimmer animation for skeleton loaders ─────────────────────────────── */
+@keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
 }

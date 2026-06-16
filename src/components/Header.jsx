@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import { HiUser } from 'react-icons/hi';
+import { useAuth } from '../context/AuthContext';
+import Logo from './Logo';
 
-// Header changes based on auth state:
-// Guest:     InsureTechGuard logo + "Login" button on the right
-// Logged in: InsureTechGuard logo + user avatar/name on the right
+// Header reads auth state and shows:
+// Guest:     Logo + brand name + "Login" button
+// Logged in: Logo + brand name + user avatar (tap to log out)
 
 export default function Header() {
     const navigate = useNavigate();
@@ -12,47 +12,52 @@ export default function Header() {
 
     return (
         <header
-            className="fixed top-0 left-0 right-0 bg-white z-50"
-            style={{ borderBottom: '1px solid #E5E5EA' }}
+            className="fixed top-0 left-0 right-0 z-50"
+            style={{ backgroundColor: 'var(--neutral-100)', borderBottom: '1px solid var(--neutral-300)' }}
         >
-            <div className="max-w-[411px] mx-auto flex items-center justify-between px-6 py-4">
-
-                {/* Logo — left side */}
+            <div
+                className="max-w-[411px] mx-auto flex items-center justify-between px-6"
+                style={{ height: '64px' }}
+            >
+                {/* Logo + wordmark */}
                 <div className="flex items-center gap-2">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path
-                            d="M12 1C7 1 3 5 3 10c0 3.9 2.3 7.3 5.6 8.9M12 1c5 0 9 4 9 9 0 3.9-2.3 7.3-5.6 8.9M9 11c0-1.7 1.3-3 3-3s3 1.3 3 3c0 2.8-1.2 5.4-3 7.2C10.2 16.4 9 13.8 9 11z"
-                            stroke="#000"
-                            strokeWidth="1.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </svg>
-                    <span className="text-[17px] font-semibold text-black tracking-tight">
-            InsureTechGuard
+                    <Logo size="sm" className="w-8 h-8" />
+                    <span
+                        style={{
+                            fontSize: '17px',
+                            fontWeight: 600,
+                            color: 'var(--neutral-800)',
+                            letterSpacing: '-0.02em',
+                        }}
+                    >
+            InsureTech<strong>Guard</strong>
           </span>
                 </div>
 
-                {/* Right side — changes based on login state */}
+                {/* Right side */}
                 {isLoggedIn ? (
-                    // Logged in: show user avatar circle with first initial
                     <button
                         onClick={logout}
-                        className="w-8 h-8 rounded-full bg-[#1860BF] flex items-center justify-center"
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: 'var(--brand-100)' }}
                         title="Tap to log out"
                     >
-            <span className="text-white text-[13px] font-bold">
-              {user?.firstName?.[0]?.toUpperCase() || 'U'}
+            <span style={{ color: 'var(--neutral-100)', fontSize: '13px', fontWeight: 700 }}>
+              {user?.firstName?.[0]?.toUpperCase() ?? 'U'}
             </span>
                     </button>
                 ) : (
-                    // Guest: show Login button
                     <button
                         onClick={() => navigate('/login')}
-                        className="text-[14px] font-semibold px-4 py-1.5 rounded-full"
+                        className="flex items-center justify-center"
                         style={{
-                            color: '#1860BF',
-                            border: '1.5px solid #1860BF',
+                            fontSize: '14px',
+                            fontWeight: 600,
+                            color: 'var(--brand-100)',
+                            border: '1.5px solid var(--brand-100)',
+                            borderRadius: 'var(--radius-full)',
+                            padding: '6px 16px',
+                            backgroundColor: 'transparent',
                         }}
                     >
                         Login
