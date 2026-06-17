@@ -1,13 +1,3 @@
-// Matches Figma hero slider spec:
-// - Dark cards: #1C1C1C background, border-radius 28
-// - Padding 16px inside card
-// - Item spacing 8px between cards
-// - Padding left/right 26px from screen edge
-// - Offer tag: #1AAFDE, border-radius 4
-// - Title: #F2F2F7, Body 15/Semibold
-// - Subtitle: #F2F2F7, Tagline 11
-// - Button: border 0.5, border-radius 14, text #F2F2F7, Tagline 13
-
 const slides = [
     {
         id: 1,
@@ -29,9 +19,7 @@ const slides = [
 
 export default function HeroSlider() {
     return (
-        // Horizontal scroll container — matches Figma slider wrapper
-        // padding-left 26px, item spacing 8px, padding-bottom 20px
-        <div className="flex gap-2 overflow-x-auto scroll-smooth px-[26px] pb-5 no-scrollbar">
+        <div className="flex gap-2 overflow-x-auto scroll-smooth px-6 pb-5 no-scrollbar">
             {slides.map((slide) => (
                 <div
                     key={slide.id}
@@ -43,40 +31,63 @@ export default function HeroSlider() {
                         borderRadius: '28px',
                     }}
                 >
-                    {/* Background image */}
                     <img
                         src={slide.image}
                         alt={slide.title}
                         className="absolute inset-0 w-full h-full object-cover opacity-70"
                     />
 
-                    {/* Content overlay — padding 16px, item-spacing 8px, bottom-left aligned */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-4 gap-2">
-                        {/* Offer tag — #1AAFDE, border-radius 4 */}
+                    <div className="absolute inset-0 flex flex-col justify-end py-4 px-6 gap-2.5">
                         <span
-                            className="self-start text-white text-[10px] font-semibold px-1.5 py-0.5"
-                            style={{ backgroundColor: '#1AAFDE', borderRadius: '4px' }}
+                            className="self-start inline-block"
+                            style={{
+                                backgroundColor: '#1AAFDE',
+                                borderRadius: '4px',
+                                color: '#F2F2F7',
+                                fontSize: '11px',
+                                lineHeight: '14px',
+                                letterSpacing: '0.41px',
+                                padding: '2px 6px',
+                            }}
                         >
               {slide.tag}
             </span>
 
-                        {/* Title — #F2F2F7, semibold, Body 15 */}
-                        <p className="text-[15px] font-semibold leading-tight" style={{ color: '#F2F2F7' }}>
+                        <p
+                            style={{
+                                color: '#F2F2F7',
+                                fontSize: '17px',
+                                fontWeight: 600,
+                                lineHeight: '22px',
+                                letterSpacing: '0.0035em',
+                            }}
+                        >
                             {slide.title}
                         </p>
 
-                        {/* Subtitle + button row */}
                         <div className="flex items-center justify-between">
-                            <p className="text-[11px]" style={{ color: '#F2F2F7' }}>
+                            <p
+                                style={{
+                                    color: '#F2F2F7',
+                                    fontSize: '13px',
+                                    lineHeight: '18px',
+                                    letterSpacing: '0.41px',
+                                }}
+                            >
                                 {slide.subtitle}
                             </p>
-                            {/* Button — border 0.5, border-radius 14 */}
                             <button
-                                className="text-[13px] px-3 py-1"
+                                className="flex items-center justify-center"
                                 style={{
+                                    height: '25px',
+                                    width: '86px',
                                     color: '#F2F2F7',
                                     border: '0.5px solid #F2F2F7',
                                     borderRadius: '14px',
+                                    fontSize: '13px',
+                                    lineHeight: '18px',
+                                    letterSpacing: '0.41px',
+                                    textAlign: 'center',
                                 }}
                             >
                                 {slide.buttonLabel}
@@ -86,7 +97,6 @@ export default function HeroSlider() {
                 </div>
             ))}
 
-            {/* Narrow peek card — matches Figma second partial card visible on right */}
             <div
                 className="flex-shrink-0"
                 style={{

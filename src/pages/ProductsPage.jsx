@@ -5,6 +5,7 @@ import BottomNav from '../components/BottomNav';
 import HeroSlider from '../components/HeroSlider';
 import SectionRow from '../components/SectionRow';
 import DiscoverSection from '../components/DiscoverSection';
+import { HeroSliderSkeleton, SectionRowSkeleton, DiscoverSectionSkeleton } from '../components/Skeletons';
 import { getProducts } from '../services/productService';
 
 export default function ProductsPage() {
@@ -17,16 +18,12 @@ export default function ProductsPage() {
     useEffect(() => {
         getProducts()
             .then((data) => {
-                // Safety check — make sure we always set an array
-                // Log the raw data so you can see exactly what the API returns
-                console.log('Products from API:', data);
                 setProducts(Array.isArray(data) ? data : []);
             })
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, []);
 
-    // Split products into two sections for the logged-in view
     const half        = Math.ceil(products.length / 2);
     const recommended = products.slice(0, half);
     const newArrivals = products.slice(half);
@@ -37,14 +34,22 @@ export default function ProductsPage() {
 
             <main className="max-w-[411px] mx-auto pt-[73px] pb-[72px]">
 
-                {/* Loading spinner */}
                 {loading && (
-                    <div className="flex justify-center items-center py-20">
-                        <div className="w-8 h-8 border-4 border-[#1860BF] border-t-transparent rounded-full animate-spin" />
-                    </div>
+                    <>
+                        <div className="mt-4">
+                            <HeroSliderSkeleton />
+                        </div>
+                        {isLoggedIn ? (
+                            <>
+                                <SectionRowSkeleton />
+                                <SectionRowSkeleton />
+                            </>
+                        ) : (
+                            <DiscoverSectionSkeleton />
+                        )}
+                    </>
                 )}
 
-                {/* Error message */}
                 {error && (
                     <div className="mx-6 mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
                         <p className="text-sm text-red-600 font-medium">Could not load products</p>
@@ -54,16 +59,13 @@ export default function ProductsPage() {
                     </div>
                 )}
 
-                {/* Main content — only shown when not loading and no error */}
                 {!loading && !error && (
                     <>
-                        {/* Hero slider shown to everyone */}
                         <div className="mt-4">
                             <HeroSlider />
                         </div>
 
                         {isLoggedIn ? (
-                            // ── LOGGED IN: personalised sections ──
                             <>
                                 <div className="px-6 pt-4 pb-1">
                                     <p className="text-[13px] text-gray-400">
@@ -90,7 +92,6 @@ export default function ProductsPage() {
                                     />
                                 )}
 
-                                {/* Empty state */}
                                 {products.length === 0 && (
                                     <div className="flex flex-col items-center py-16 px-6 text-center">
                                         <p className="text-[15px] font-semibold text-black">No products yet</p>
@@ -99,7 +100,6 @@ export default function ProductsPage() {
                                 )}
                             </>
                         ) : (
-                            // ── GUEST: discover layout with filter tabs ──
                             <DiscoverSection products={products} />
                         )}
                     </>
