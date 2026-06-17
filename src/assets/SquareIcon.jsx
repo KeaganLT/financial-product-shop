@@ -1,0 +1,7 @@
+export default function SquareIcon({ width = 15, height = 15, color = '#8E8E93' }) {
+    return (
+        <svg width={width} height={height} viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 0.5H11C12.933 0.5 14.5 2.067 14.5 4V11C14.5 12.933 12.933 14.5 11 14.5H4C2.067 14.5 0.5 12.933 0.5 11V4C0.5 2.067 2.067 0.5 4 0.5Z" stroke={color} />
+        </svg>
+    );
+}

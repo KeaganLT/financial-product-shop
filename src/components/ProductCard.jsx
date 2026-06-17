@@ -1,9 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 
-const PRODUCT_DISCOUNTS = {
-    8: 25,
-};
-
 export default function ProductCard({ product, size = 'default' }) {
     const navigate = useNavigate();
 
@@ -11,34 +7,12 @@ export default function ProductCard({ product, size = 'default' }) {
     const imgHeight  = size === 'small' ? 'h-[120px]' : size === 'grid' ? '' : 'h-[150px]';
     const imgClasses = size === 'grid' ? 'aspect-square' : imgHeight;
 
-    const discountPercent = product.discountPercent ?? PRODUCT_DISCOUNTS[product.id];
-    const hasDiscount = Boolean(discountPercent);
-
     return (
         <div
             className={`${cardWidth} bg-white rounded-xl overflow-hidden cursor-pointer flex flex-col`}
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
             onClick={() => navigate(`/products/${product.id}`)}
         >
-            {hasDiscount && (
-                <div className="px-3 pt-3 pb-2">
-          <span
-              className="inline-block font-normal"
-              style={{
-                  backgroundColor: '#1AAFDE',
-                  borderRadius: '4px',
-                  color: '#F2F2F7',
-                  fontSize: '11px',
-                  lineHeight: '14px',
-                  letterSpacing: '0.41px',
-                  padding: '2px 6px',
-              }}
-          >
-            {discountPercent}% OFF
-          </span>
-                </div>
-            )}
-
             <div className={`relative w-full overflow-hidden ${imgClasses}`}>
                 <img
                     src={product.imageUrl || 'https://placehold.co/300x150?text=No+Image'}

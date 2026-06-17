@@ -1,25 +1,35 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-
-// Temporary login page for testing auth views
-// In Milestone 2 this gets replaced with the real login form + API call
-// For now it just calls login() with a fake user so you can see
-// the difference between the guest and logged-in layouts
+import FormInput from '../components/FormInput.jsx';
 
 export default function LoginPage() {
-    const navigate    = useNavigate();
-    const { login }   = useAuth();
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
-    function handleFakeLogin() {
-        // This fake user object mirrors what the real API will return
-        // In Milestone 2: login() will receive the real user from the auth service
-        login({
-            id: 1,
-            firstName: 'Jesse',
-            lastName: 'Leresche',
-            customerType: 'INDIVIDUAL',
-        });
-        navigate('/products');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setError('');
+
+        if (!username || !password) {
+            setError('Please enter your username and password');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await login(username, password);
+            navigate('/products');
+        } catch (err) {
+            setError(err.message || 'Login failed');
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -34,19 +44,42 @@ export default function LoginPage() {
                         />
                     </svg>
                     <h1 className="text-[22px] font-bold text-black">InsureTechGuard</h1>
-                    <p className="text-[13px] text-gray-400">
-                        This is a temporary login screen — real login coming in Milestone 2
-                    </p>
                 </div>
 
-                {/* Fake login button — just sets auth state and redirects */}
-                <button
-                    onClick={handleFakeLogin}
-                    className="w-full py-3 rounded-xl text-white text-[15px] font-semibold"
-                    style={{ backgroundColor: '#1860BF' }}
-                >
-                    Login as Jesse (test)
-                </button>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-left">
+                    <FormInput
+                        id="username"
+                        label="Username"
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        autoComplete="username"
+                        error={!!error && !username}
+                    />
+
+                    <FormInput
+                        id="password"
+                        label="Password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete="current-password"
+                        error={!!error}
+                    />
+
+                    {error && (
+                        <p className="text-[13px] text-red-500">{error}</p>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-3 rounded-xl text-white text-[15px] font-semibold disabled:opacity-60"
+                        style={{ backgroundColor: '#1860BF' }}
+                    >
+                        {isSubmitting ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
 
                 <button
                     onClick={() => navigate('/products')}
