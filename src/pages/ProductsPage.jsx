@@ -7,11 +7,13 @@ import SectionRow from '../components/SectionRow';
 import DiscoverSection from '../components/DiscoverSection';
 import { HeroSliderSkeleton, SectionRowSkeleton, DiscoverSectionSkeleton } from '../components/Skeletons';
 import { getProducts } from '../services/productService';
+import { getEligibility } from '../services/subscriptionService';
 
 export default function ProductsPage() {
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, auth } = useAuth();
 
     const [products, setProducts] = useState([]);
+    const [eligibleIds, setEligibleIds] = useState(null);
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState(null);
 
@@ -24,9 +26,26 @@ export default function ProductsPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const half        = Math.ceil(products.length / 2);
-    const recommended = products.slice(0, half);
-    const newArrivals = products.slice(half);
+    useEffect(() => {
+        if (!isLoggedIn || products.length === 0) {
+            setEligibleIds(null);
+            return;
+        }
+
+        getEligibility(products.map((p) => p.id), auth.token)
+            .then((results) => {
+                const ids = new Set(results.filter((r) => r.isEligible).map((r) => r.productId));
+                setEligibleIds(ids);
+            })
+            .catch(() => setEligibleIds(null));
+    }, [isLoggedIn, products, auth?.token]);
+
+    const recommended = eligibleIds
+        ? products.filter((p) => eligibleIds.has(p.id))
+        : [];
+    const newArrivals = eligibleIds
+        ? products.filter((p) => !eligibleIds.has(p.id))
+        : products;
 
     return (
         <div className="min-h-screen bg-white">

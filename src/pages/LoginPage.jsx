@@ -10,7 +10,7 @@ const SPLASH_FADE_MS = 400;
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, logout } = useAuth();
 
     const [isSplashVisible, setIsSplashVisible] = useState(true);
     const [stage, setStage] = useState('welcome');
@@ -38,6 +38,11 @@ export default function LoginPage() {
     function handleStartLogin() {
         setStage('form');
         usernameInputRef.current?.focus();
+    }
+
+    function handleContinueAsGuest() {
+        logout();
+        navigate('/products');
     }
 
     async function handleSubmit(e) {
@@ -110,7 +115,7 @@ export default function LoginPage() {
 
                         <button
                             type="button"
-                            onClick={() => navigate('/products')}
+                            onClick={handleContinueAsGuest}
                             className="text-[17px] text-white"
                             style={{ letterSpacing: '0.0035em' }}
                         >

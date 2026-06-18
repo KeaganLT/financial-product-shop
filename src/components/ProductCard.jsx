@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import productPlaceholder from '../assets/product-placeholder.svg';
 
 export default function ProductCard({ product, size = 'default' }) {
     const navigate = useNavigate();
@@ -15,7 +16,7 @@ export default function ProductCard({ product, size = 'default' }) {
         >
             <div className={`relative w-full overflow-hidden ${imgClasses}`}>
                 <img
-                    src={product.imageUrl || 'https://placehold.co/300x150?text=No+Image'}
+                    src={product.imageUrl || productPlaceholder}
                     alt={product.name}
                     className="w-full h-full object-cover"
                 />
