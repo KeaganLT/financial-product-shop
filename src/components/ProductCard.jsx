@@ -1,22 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 
-// Matches Figma product card spec:
-// - White background, rounded corners
-// - Image fills top portion
-// - Optional "25% OFF" badge: #1AAFDE bg, border-radius 4, white text
-// - Product title: black, bold, max 2 lines then truncate
-// - Price: grey, "from R350 p/m" format
-
 export default function ProductCard({ product, size = 'default' }) {
     const navigate = useNavigate();
 
-    const cardWidth = size === 'small' ? 'w-[155px] min-w-[155px]' : 'w-full';
-    const imgHeight = size === 'small' ? 'h-[120px]' : 'h-[150px]';
-
-    const hasDiscount = product.discount || product.discountPercent;
-    const discountLabel = product.discountPercent
-        ? `${product.discountPercent}% OFF`
-        : '25% OFF';
+    const cardWidth  = size === 'small' ? 'w-[155px] min-w-[155px]' : 'w-full';
+    const imgHeight  = size === 'small' ? 'h-[120px]' : size === 'grid' ? '' : 'h-[150px]';
+    const imgClasses = size === 'grid' ? 'aspect-square' : imgHeight;
 
     return (
         <div
@@ -24,20 +13,12 @@ export default function ProductCard({ product, size = 'default' }) {
             style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
             onClick={() => navigate(`/products/${product.id}`)}
         >
-            <div className={`relative ${imgHeight} w-full overflow-hidden`}>
+            <div className={`relative w-full overflow-hidden ${imgClasses}`}>
                 <img
                     src={product.imageUrl || 'https://placehold.co/300x150?text=No+Image'}
                     alt={product.name}
                     className="w-full h-full object-cover"
                 />
-                {hasDiscount && (
-                    <span
-                        className="absolute top-2 left-2 text-white text-[10px] font-semibold px-1.5 py-0.5 leading-tight"
-                        style={{ backgroundColor: '#1AAFDE', borderRadius: '4px' }}
-                    >
-            {discountLabel}
-          </span>
-                )}
             </div>
             <div className="p-3 flex flex-col gap-0.5">
                 <p

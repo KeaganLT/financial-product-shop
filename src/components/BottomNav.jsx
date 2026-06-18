@@ -1,12 +1,14 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { HiHome, HiShoppingCart, HiUser } from 'react-icons/hi';
-import { MdSubscriptions } from 'react-icons/md';
+import HomeIcon from '../assets/HomeIcon';
+import SubscriptionsIcon from '../assets/SubscriptionsIcon';
+import CartIcon from '../assets/CartIcon';
+import AccountIcon from '../assets/AccountIcon';
 
 const NAV_ITEMS = [
-    { label: 'Home',          icon: HiHome,          path: '/products' },
-    { label: 'Subscriptions', icon: MdSubscriptions, path: '/subscriptions' },
-    { label: 'Cart',          icon: HiShoppingCart,  path: '/cart' },
-    { label: 'Account',       icon: HiUser,          path: '/account' },
+    { label: 'Home',          icon: HomeIcon,          path: '/products' },
+    { label: 'Subscriptions', icon: SubscriptionsIcon, path: '/subscriptions' },
+    { label: 'Cart',          icon: CartIcon,          path: '/cart' },
+    { label: 'Account',       icon: AccountIcon,       path: '/login' },
 ];
 
 export default function BottomNav() {
@@ -23,8 +25,8 @@ export default function BottomNav() {
             }}
         >
             <div
-                className="max-w-[411px] mx-auto flex justify-around items-center px-2"
-                style={{ height: '66px' }}
+                className="max-w-[411px] mx-auto flex justify-between items-end px-2"
+                style={{ height: '56px' }}
             >
                 {NAV_ITEMS.map(({ label, icon: Icon, path }) => {
                     const active = pathname === path;
@@ -32,22 +34,19 @@ export default function BottomNav() {
                         <button
                             key={label}
                             onClick={() => navigate(path)}
-                            className="flex flex-col items-center gap-1 flex-1 pt-2 pb-1 relative"
+                            className="flex flex-col items-center justify-between gap-1 flex-1 h-full pb-1 relative"
                         >
-                            {/* Active indicator — blue bar at top */}
-                            {active && (
-                                <span
-                                    className="absolute top-0 left-1/2 -translate-x-1/2 rounded-full"
-                                    style={{
-                                        width: '32px',
-                                        height: '2px',
-                                        backgroundColor: 'var(--brand-100)',
-                                    }}
-                                />
-                            )}
+                            <span
+                                className="w-full"
+                                style={{
+                                    height: '3px',
+                                    backgroundColor: active ? 'var(--brand-100)' : '#FFFFFF',
+                                }}
+                            />
                             <Icon
-                                size={22}
-                                style={{ color: active ? 'var(--brand-100)' : 'var(--neutral-500)' }}
+                                width={22}
+                                height={22}
+                                color={active ? 'var(--brand-100)' : 'var(--neutral-500)'}
                             />
                             <span
                                 style={{
@@ -56,8 +55,8 @@ export default function BottomNav() {
                                     color: active ? 'var(--brand-100)' : 'var(--neutral-500)',
                                 }}
                             >
-                {label}
-              </span>
+                                {label}
+                            </span>
                         </button>
                     );
                 })}
