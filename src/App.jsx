@@ -1,3 +1,4 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext.jsx';
 import ProductsPage from './pages/ProductsPage';
@@ -6,12 +7,10 @@ import LoginPage from './pages/LoginPage';
 
 export default function App() {
     return (
-        // AuthProvider wraps BrowserRouter so auth state is available
-        // everywhere including inside route components
         <AuthProvider>
             <BrowserRouter>
                 <Routes>
-                    <Route path="/"           element={<Navigate to="/products" replace />} />
+                    <Route path="/"           element={<Navigate to="/login" replace />} />
                     <Route path="/products"   element={<ProductsPage />} />
                     <Route path="/products/:id" element={<ProductDetailPage />} />
                     <Route path="/login"      element={<LoginPage />} />

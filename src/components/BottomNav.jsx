@@ -8,7 +8,7 @@ const NAV_ITEMS = [
     { label: 'Home',          icon: HomeIcon,          path: '/products' },
     { label: 'Subscriptions', icon: SubscriptionsIcon, path: '/subscriptions' },
     { label: 'Cart',          icon: CartIcon,          path: '/cart' },
-    { label: 'Account',       icon: AccountIcon,       path: '/account' },
+    { label: 'Account',       icon: AccountIcon,       path: '/login' },
 ];
 
 export default function BottomNav() {

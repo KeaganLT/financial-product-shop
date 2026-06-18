@@ -1,6 +1,7 @@
+// src/components/FormInput.jsx
 import { useState } from 'react';
 import CloseIcon from '../assets/CloseIcon.jsx';
-import ErrorRoundIcon from '../assets/ErrorRoundIcon.jsx';
+import ErrorIcon from '../assets/ErrorIcon.jsx';
 import EyeOpenIcon from '../assets/EyeOpenIcon.jsx';
 import EyeCloseIcon from '../assets/EyeCloseIcon.jsx';
 
@@ -13,6 +14,9 @@ export default function FormInput({
                                       error,
                                       autoComplete,
                                       required,
+                                      onBlur,
+                                      autoFocus,
+                                      inputRef,
                                   }) {
     const [isFocused, setIsFocused] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -20,61 +24,94 @@ export default function FormInput({
     const isPassword = type === 'password';
     const hasValue = value.length > 0;
     const inputType = isPassword && showPassword ? 'text' : type;
+    const showSmallLabel = isFocused || hasValue;
 
-    const borderColor = error
-        ? 'border-red-500'
+    const borderClass = error
+        ? hasValue ? 'border-[3px] border-[#FF3B30]' : 'border border-[#FF3B30]'
         : isFocused
-            ? 'border-black'
-            : 'border-gray-300';
-    const labelColor = error ? 'text-red-500' : 'text-gray-400';
-    const textColor = error ? 'text-red-500' : 'text-black';
+            ? 'border-[3px] border-[#F2F2F7]'
+            : hasValue
+                ? 'border border-[#E5E5EA]'
+                : 'border border-[#C7C7CC]';
+
+    const stateColor = error ? '#FF3B30' : '#F2F2F7';
+    const labelColor = showSmallLabel ? stateColor : (error ? '#FF3B30' : '#C7C7CC');
 
     return (
-        <div className="flex flex-col gap-1">
-            <div className={`relative px-3 pt-1.5 pb-2 rounded-xl border bg-white ${borderColor}`}>
-                <label htmlFor={id} className={`block text-[11px] leading-none mb-1 ${labelColor}`}>
-                    {label}
-                </label>
-                <div className="flex items-center gap-2">
-                    <input
-                        id={id}
-                        type={inputType}
-                        value={value}
-                        onChange={onChange}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        required={required}
-                        autoComplete={autoComplete}
-                        className={`w-full bg-transparent text-[15px] leading-none outline-none ${textColor} placeholder:text-gray-500`}
-                    />
+        <div className="relative h-14 rounded px-4 flex items-center" style={{ backgroundColor: '#1C2435' }}>
+            <div className={`absolute inset-0 rounded pointer-events-none ${borderClass}`} />
 
-                    {error && <ErrorRoundIcon width={20} height={20} color="#EF4444" />}
+            <div className="relative flex-1 min-w-0">
+                {showSmallLabel && (
+                    <label
+                        htmlFor={id}
+                        className="absolute -top-[26px] -left-1 px-1 text-[12px] leading-4"
+                        style={{ backgroundColor: '#1C2435', color: labelColor }}
+                    >
+                        {label}
+                    </label>
+                )}
 
-                    {!error && isPassword && (
-                        <button
-                            type="button"
-                            onClick={() => setShowPassword((v) => !v)}
-                            className="flex-shrink-0"
-                            aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        >
-                            {showPassword
-                                ? <EyeOpenIcon width={20} height={20} color="#9CA3AF" />
-                                : <EyeCloseIcon width={18} height={16} color="#9CA3AF" />}
-                        </button>
-                    )}
+                {!showSmallLabel && (
+                    <label
+                        htmlFor={id}
+                        className="absolute inset-0 flex items-center text-[16px] leading-6"
+                        style={{ color: labelColor, letterSpacing: '0.5px' }}
+                    >
+                        {label}
+                    </label>
+                )}
 
-                    {!error && !isPassword && hasValue && (
-                        <button
-                            type="button"
-                            onClick={() => onChange({ target: { value: '' } })}
-                            className="flex-shrink-0"
-                            aria-label="Clear"
-                        >
-                            <CloseIcon width={18} height={18} color="#9CA3AF" />
-                        </button>
-                    )}
-                </div>
+                <input
+                    ref={inputRef}
+                    id={id}
+                    type={inputType}
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => {
+                        setIsFocused(false);
+                        onBlur?.();
+                    }}
+                    required={required}
+                    autoComplete={autoComplete}
+                    autoFocus={autoFocus}
+                    className="w-full bg-transparent text-[16px] leading-6 outline-none"
+                    style={{ color: '#F2F2F7', letterSpacing: '0.5px', caretColor: stateColor }}
+                />
             </div>
+
+            {error && (
+                <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+                    <ErrorIcon width={24} height={24} color="#FF3B30" />
+                </div>
+            )}
+
+            {!error && isPassword && (
+                <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="w-10 h-10 flex items-center justify-center flex-shrink-0"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                    {showPassword
+                        ? <EyeOpenIcon width={24} height={24} color="#F2F2F7" />
+                        : <EyeCloseIcon width={22} height={19} color="#F2F2F7" />}
+                </button>
+            )}
+
+            {!error && !isPassword && hasValue && (
+                <button
+                    type="button"
+                    onClick={() => onChange({ target: { value: '' } })}
+                    className="w-10 h-10 flex items-center justify-center flex-shrink-0"
+                    aria-label="Clear"
+                >
+                    <span className="w-6 h-6 rounded-full border flex items-center justify-center" style={{ borderColor: '#F2F2F7' }}>
+                        <CloseIcon width={14} height={14} color="#F2F2F7" />
+                    </span>
+                </button>
+            )}
         </div>
     );
 }

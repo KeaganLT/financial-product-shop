@@ -1,9 +1,6 @@
-import { useAuth } from '../context/AuthContext';
 import Logo from './Logo';
 
 export default function Header() {
-    const { isLoggedIn, user, logout } = useAuth();
-
     return (
         <header
             className="fixed top-0 left-0 right-0 z-50"
@@ -27,19 +24,6 @@ export default function Header() {
             InsureTech<strong>Guard</strong>
           </span>
                 </div>
-
-                {isLoggedIn && (
-                    <button
-                        onClick={logout}
-                        className="absolute right-6 w-8 h-8 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: 'var(--brand-100)' }}
-                        title="Tap to log out"
-                    >
-            <span style={{ color: 'var(--neutral-100)', fontSize: '13px', fontWeight: 700 }}>
-              {user?.firstName?.[0]?.toUpperCase() ?? 'U'}
-            </span>
-                    </button>
-                )}
             </div>
         </header>
     );

@@ -9,7 +9,7 @@ import { HeroSliderSkeleton, SectionRowSkeleton, DiscoverSectionSkeleton } from 
 import { getProducts } from '../services/productService';
 
 export default function ProductsPage() {
-    const { isLoggedIn, user } = useAuth();
+    const { isLoggedIn } = useAuth();
 
     const [products, setProducts] = useState([]);
     const [loading, setLoading]   = useState(true);
@@ -32,7 +32,7 @@ export default function ProductsPage() {
         <div className="min-h-screen bg-white">
             <Header />
 
-            <main className="max-w-[411px] mx-auto pt-[73px] pb-[72px]">
+            <main className="max-w-[411px] mx-auto pt-[73px] pb-[88px]">
 
                 {loading && (
                     <>
@@ -67,15 +67,6 @@ export default function ProductsPage() {
 
                         {isLoggedIn ? (
                             <>
-                                <div className="px-6 pt-4 pb-1">
-                                    <p className="text-[13px] text-gray-400">
-                                        Welcome back,{' '}
-                                        <span className="text-black font-semibold">
-                      {user?.firstName || 'there'}
-                    </span>
-                                    </p>
-                                </div>
-
                                 {recommended.length > 0 && (
                                     <SectionRow
                                         title="Recommended for you"
