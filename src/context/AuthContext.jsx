@@ -24,6 +24,7 @@ export function AuthProvider({ children }) {
     const nextAuth = { token, customerId };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAuth));
     setAuth(nextAuth);
+    return nextAuth;
   }
 
   function logout() {

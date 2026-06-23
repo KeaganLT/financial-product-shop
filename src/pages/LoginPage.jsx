@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
@@ -10,12 +10,14 @@ const SPLASH_FADE_MS = 400;
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const { login, logout } = useAuth();
 
+    const emailFromLink = searchParams.get('email') ?? '';
     const [isSplashVisible, setIsSplashVisible] = useState(true);
-    const [stage, setStage] = useState('welcome');
+    const [stage, setStage] = useState(emailFromLink ? 'form' : 'welcome');
     const usernameInputRef = useRef(null);
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState(emailFromLink);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -109,7 +111,14 @@ export default function LoginPage() {
 
                             <p className="text-[17px] text-white" style={{ letterSpacing: '0.0035em' }}>
                                 Don&apos;t have an account?{' '}
-                                <span className="font-semibold underline" style={{ color: 'var(--brand-200)' }}>Sign up</span>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/signup')}
+                                    className="font-semibold underline"
+                                    style={{ color: 'var(--brand-200)' }}
+                                >
+                                    Sign up
+                                </button>
                             </p>
                         </div>
 
@@ -188,7 +197,14 @@ export default function LoginPage() {
             {stage === 'form' && (
                 <p className="absolute bottom-12 text-[15px] text-white">
                     Don&apos;t have an account?{' '}
-                    <span className="font-semibold" style={{ color: 'var(--brand-200)' }}>Sign up</span>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/signup')}
+                        className="font-semibold"
+                        style={{ color: 'var(--brand-200)' }}
+                    >
+                        Sign up
+                    </button>
                 </p>
             )}
         </div>
