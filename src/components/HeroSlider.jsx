@@ -1,3 +1,6 @@
+import heroDevices from '../assets/hero-devices.svg';
+import heroInvestment from '../assets/hero-investment.svg';
+
 const slides = [
     {
         id: 1,
@@ -5,7 +8,7 @@ const slides = [
         title: 'All Mobile Device Contracts',
         subtitle: 'Various models available',
         buttonLabel: 'View offers',
-        image: 'https://placehold.co/300x161/1C1C1C/ffffff?text=Devices',
+        image: heroDevices,
     },
     {
         id: 2,
@@ -13,7 +16,7 @@ const slides = [
         title: 'Short-Term Investment',
         subtitle: 'Start from R2,500 p/m',
         buttonLabel: 'View offers',
-        image: 'https://placehold.co/56x193/888/ffffff?text=+',
+        image: heroInvestment,
     },
 ];
 
@@ -97,16 +100,7 @@ export default function HeroSlider() {
                 </div>
             ))}
 
-            <div
-                className="flex-shrink-0"
-                style={{
-                    width: '56px',
-                    height: '193px',
-                    backgroundColor: '#1C1C1C',
-                    borderRadius: '28px',
-                    opacity: 0.5,
-                }}
-            />
+
         </div>
     );
 }

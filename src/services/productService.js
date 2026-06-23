@@ -1,4 +1,3 @@
-
 const BASE_URL = "/client/v1";
 
 export  async function getProducts(){
@@ -16,7 +15,6 @@ export async function getProductById(id){
     }
     return response.json();
 }
-
 
 
 
