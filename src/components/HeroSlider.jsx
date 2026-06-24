@@ -96,17 +96,6 @@ export default function HeroSlider() {
                     </div>
                 </div>
             ))}
-
-            <div
-                className="flex-shrink-0"
-                style={{
-                    width: '56px',
-                    height: '193px',
-                    backgroundColor: '#1C1C1C',
-                    borderRadius: '28px',
-                    opacity: 0.5,
-                }}
-            />
         </div>
     );
 }
