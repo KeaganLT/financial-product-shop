@@ -6,6 +6,7 @@ import ProductsPage from './pages/ProductsPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import AccountPage from './pages/AccountPage';
 
 export default function App() {
     return (
@@ -18,6 +19,7 @@ export default function App() {
                         <Route path="/products/:id" element={<ProductDetailPage />} />
                         <Route path="/login"      element={<LoginPage />} />
                         <Route path="/signup"     element={<SignUpPage />} />
+                        <Route path="/account"     element={<AccountPage />} />
                         <Route path="*"           element={<Navigate to="/products" replace />} />
                     </Routes>
                 </BrowserRouter>
