@@ -4,9 +4,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import CheckIcon from '../assets/CheckIcon.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
-import KycUploadSheet from '../components/KycUploadSheet.jsx';
+import KycUploadRow from '../components/KycUploadRow.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import {
@@ -23,42 +22,6 @@ import {
 // 1 = Individual, 2 = Sole Prop, 3 = Non-Profit, 4 = CIPC, 5 = System-to-System.
 // This flow only onboards individual customers.
 const DEFAULT_CUSTOMER_TYPE_ID = 1;
-
-function KycUploadRow({ label, status, isUploaded, capture, onSelect }) {
-    const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-    return (
-        <>
-            <button
-                type="button"
-                onClick={() => setIsSheetOpen(true)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-left"
-                style={{ backgroundColor: 'var(--surface-field)' }}
-            >
-                <span className="flex flex-col">
-                    <span className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>
-                    <span className="text-[13px]" style={{ color: isUploaded ? '#34C759' : 'var(--text-secondary)' }}>
-                        {status}
-                    </span>
-                </span>
-                {isUploaded ? (
-                    <CheckIcon width={20} height={20} color="#34C759" />
-                ) : (
-                    <svg width={8} height={14} viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 1L7 7L1 13" stroke="var(--text-secondary)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                )}
-            </button>
-
-            <KycUploadSheet
-                isOpen={isSheetOpen}
-                onClose={() => setIsSheetOpen(false)}
-                onConfirm={onSelect}
-                capture={capture}
-            />
-        </>
-    );
-}
 
 const DOT_POSITIONS = [
     { top: 0, left: 18 },
@@ -278,15 +241,17 @@ export default function SignUpPage() {
             <ThemeToggle className="absolute top-6 right-6" />
 
             <div className="w-full max-w-[363px] flex flex-col items-center gap-8">
-                <div className="flex flex-col items-center gap-6">
-                    <LogoMark size={64} />
-                    <h1
-                        className="text-[24px] font-light -mt-2"
-                        style={{ color: 'var(--text-primary)', fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
-                    >
-                        InsureTech<strong className="font-bold">Guard</strong>
-                    </h1>
-                </div>
+                {stage !== 'kyc' && (
+                    <div className="flex flex-col items-center gap-6">
+                        <LogoMark size={64} />
+                        <h1
+                            className="text-[24px] font-light -mt-2"
+                            style={{ color: 'var(--text-primary)', fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
+                        >
+                            InsureTech<strong className="font-bold">Guard</strong>
+                        </h1>
+                    </div>
+                )}
 
                 {stage === 'email' && (
                     <form onSubmit={handleEmailSubmit} className="w-full flex flex-col gap-6">
@@ -435,7 +400,7 @@ export default function SignUpPage() {
 
                 {stage === 'kyc' && (
                     <form onSubmit={handleKycSubmit} className="w-full flex flex-col items-center gap-6">
-                        <KYCSuccess width={120} height={133} />
+                        <KYCSuccess width={150} height={113} />
 
                         <div className="flex flex-col items-center gap-2">
                             <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>
@@ -480,6 +445,7 @@ export default function SignUpPage() {
                         >
                             Submit
                         </button>
+
                     </form>
                 )}
 

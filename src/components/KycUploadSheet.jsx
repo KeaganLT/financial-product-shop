@@ -1,4 +1,8 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+function isMobileDevice() {
+    return window.matchMedia('(pointer: coarse)').matches;
+}
 
 const CAMERA_TIPS = [
     {
@@ -48,10 +52,49 @@ export default function KycUploadSheet({ isOpen, onClose, onConfirm, capture }) 
     const [view, setView] = useState('options');
     const [pendingFile, setPendingFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [cameraError, setCameraError] = useState('');
 
     const cameraInputRef = useRef(null);
     const photoInputRef = useRef(null);
     const documentInputRef = useRef(null);
+    const videoRef = useRef(null);
+    const streamRef = useRef(null);
+
+    function stopCameraStream() {
+        streamRef.current?.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+    }
+
+    useEffect(() => {
+        if (view !== 'camera') {
+            return;
+        }
+        let cancelled = false;
+        navigator.mediaDevices
+            .getUserMedia({ video: { facingMode: capture === 'user' ? 'user' : 'environment' } })
+            .then((stream) => {
+                if (cancelled) {
+                    stream.getTracks().forEach((track) => track.stop());
+                    return;
+                }
+                streamRef.current = stream;
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                }
+            })
+            .catch((err) => {
+                console.error('Camera access failed:', err.name, err.message);
+                if (!cancelled) {
+                    setCameraError(`${err.name}: ${err.message}`);
+                    setView('prep');
+                }
+            });
+
+        return () => {
+            cancelled = true;
+            stopCameraStream();
+        };
+    }, [view, capture]);
 
     function clearPreview() {
         setPreviewUrl((url) => {
@@ -61,10 +104,44 @@ export default function KycUploadSheet({ isOpen, onClose, onConfirm, capture }) 
     }
 
     function handleClose() {
+        stopCameraStream();
         setView('options');
         setPendingFile(null);
         clearPreview();
         onClose();
+    }
+
+    function handleStartCamera() {
+        setCameraError('');
+        if (isMobileDevice()) {
+            cameraInputRef.current?.click();
+            return;
+        }
+        if (!navigator.mediaDevices?.getUserMedia) {
+            console.error('navigator.mediaDevices.getUserMedia is unavailable (insecure context or unsupported browser)');
+            setCameraError('Camera access requires HTTPS (or localhost). Falling back to file upload.');
+            cameraInputRef.current?.click();
+            return;
+        }
+        setView('camera');
+    }
+
+    function handleCapturePhoto() {
+        const video = videoRef.current;
+        if (!video) {
+            return;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob((blob) => {
+            if (!blob) {
+                return;
+            }
+            stopCameraStream();
+            handleFileChosen(new File([blob], `photo-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+        }, 'image/jpeg');
     }
 
     function handleFileChosen(file) {
@@ -187,14 +264,55 @@ export default function KycUploadSheet({ isOpen, onClose, onConfirm, capture }) 
                             </div>
                         ))}
                     </div>
+                    {cameraError && (
+                        <p className="text-[13px] -mt-2" style={{ color: '#FF3B30' }}>{cameraError}</p>
+                    )}
                     <button
                         type="button"
                         className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
                         style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' }}
-                        onClick={() => cameraInputRef.current?.click()}
+                        onClick={handleStartCamera}
                     >
                         Got it
                     </button>
+                </div>
+            )}
+
+            {view === 'camera' && (
+                <div
+                    className="w-full max-w-[390px] rounded-t-xl px-8 py-6 flex flex-col gap-4"
+                    style={{ backgroundColor: '#FFFFFF' }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        muted
+                        className="w-full max-h-[280px] object-contain rounded-lg"
+                        style={{ backgroundColor: '#000000', transform: capture === 'user' ? 'scaleX(-1)' : 'none' }}
+                    />
+                    <div className="flex flex-col gap-3">
+                        <button
+                            type="button"
+                            className="w-full py-[10px] rounded-full text-[17px] font-semibold"
+                            style={{ backgroundColor: '#000000', color: '#FFFFFF', letterSpacing: '0.0035em' }}
+                            onClick={handleCapturePhoto}
+                        >
+                            Take photo
+                        </button>
+                        <button
+                            type="button"
+                            className="w-full py-[10px] rounded-full text-[17px] font-semibold border"
+                            style={{ borderColor: '#000000', color: '#000000', letterSpacing: '0.0035em' }}
+                            onClick={() => {
+                                stopCameraStream();
+                                setView('prep');
+                            }}
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </div>
             )}
 
