@@ -34,11 +34,11 @@ export default function FormInput({
                 ? 'border border-[#E5E5EA]'
                 : 'border border-[#C7C7CC]';
 
-    const stateColor = error ? '#FF3B30' : '#F2F2F7';
-    const labelColor = showSmallLabel ? stateColor : (error ? '#FF3B30' : '#C7C7CC');
+    const stateColor = error ? '#FF3B30' : 'var(--brand-200)';
+    const labelColor = showSmallLabel ? stateColor : (error ? '#FF3B30' : 'var(--neutral-400)');
 
     return (
-        <div className="relative h-14 rounded px-4 flex items-center" style={{ backgroundColor: '#1C2435' }}>
+        <div className="relative h-14 rounded px-4 flex items-center" style={{ backgroundColor: 'var(--surface-field)' }}>
             <div className={`absolute inset-0 rounded pointer-events-none ${borderClass}`} />
 
             <div className="relative flex-1 min-w-0">
@@ -46,7 +46,7 @@ export default function FormInput({
                     <label
                         htmlFor={id}
                         className="absolute -top-[26px] -left-1 px-1 text-[12px] leading-4"
-                        style={{ backgroundColor: '#1C2435', color: labelColor }}
+                        style={{ backgroundColor: 'var(--surface-field)', color: labelColor }}
                     >
                         {label}
                     </label>
@@ -77,7 +77,7 @@ export default function FormInput({
                     autoComplete={autoComplete}
                     autoFocus={autoFocus}
                     className="w-full bg-transparent text-[16px] leading-6 outline-none"
-                    style={{ color: '#F2F2F7', letterSpacing: '0.5px', caretColor: stateColor }}
+                    style={{ color: 'var(--text-primary)', letterSpacing: '0.5px', caretColor: stateColor }}
                 />
             </div>
 
@@ -95,8 +95,8 @@ export default function FormInput({
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                     {showPassword
-                        ? <EyeOpenIcon width={24} height={24} color="#F2F2F7" />
-                        : <EyeCloseIcon width={22} height={19} color="#F2F2F7" />}
+                        ? <EyeOpenIcon width={24} height={24} color="var(--text-primary)" />
+                        : <EyeCloseIcon width={22} height={19} color="var(--text-primary)" />}
                 </button>
             )}
 
@@ -107,8 +107,8 @@ export default function FormInput({
                     className="w-10 h-10 flex items-center justify-center flex-shrink-0"
                     aria-label="Clear"
                 >
-                    <span className="w-6 h-6 rounded-full border flex items-center justify-center" style={{ borderColor: '#F2F2F7' }}>
-                        <CloseIcon width={14} height={14} color="#F2F2F7" />
+                    <span className="w-6 h-6 rounded-full border flex items-center justify-center" style={{ borderColor: 'var(--text-primary)' }}>
+                        <CloseIcon width={14} height={14} color="var(--text-primary)" />
                     </span>
                 </button>
             )}

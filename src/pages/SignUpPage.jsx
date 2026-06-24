@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
+import CheckIcon from '../assets/CheckIcon.jsx';
+import KYCSuccess from '../assets/KYCSuccess.jsx';
+import KycUploadSheet from '../components/KycUploadSheet.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
+import { checkPasswordPwned } from '../services/passwordService.js';
 import {
     trackEvent,
     uploadKycDocument,
@@ -14,9 +19,76 @@ import {
     completeEmailVerification,
 } from '../services/firebase.js';
 
-// TODO: confirm the real customerTypeId values with the backend team (BRS
-// "Qualifying Customer Types" table) — defaulting to 1 (individual) for now.
+// Per the BRS "Qualifying Customer Types" table:
+// 1 = Individual, 2 = Sole Prop, 3 = Non-Profit, 4 = CIPC, 5 = System-to-System.
+// This flow only onboards individual customers.
 const DEFAULT_CUSTOMER_TYPE_ID = 1;
+
+function KycUploadRow({ label, status, isUploaded, capture, onSelect }) {
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={() => setIsSheetOpen(true)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-left"
+                style={{ backgroundColor: 'var(--surface-field)' }}
+            >
+                <span className="flex flex-col">
+                    <span className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>
+                    <span className="text-[13px]" style={{ color: isUploaded ? '#34C759' : 'var(--text-secondary)' }}>
+                        {status}
+                    </span>
+                </span>
+                {isUploaded ? (
+                    <CheckIcon width={20} height={20} color="#34C759" />
+                ) : (
+                    <svg width={8} height={14} viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 1L7 7L1 13" stroke="var(--text-secondary)" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                )}
+            </button>
+
+            <KycUploadSheet
+                isOpen={isSheetOpen}
+                onClose={() => setIsSheetOpen(false)}
+                onConfirm={onSelect}
+                capture={capture}
+            />
+        </>
+    );
+}
+
+const DOT_POSITIONS = [
+    { top: 0, left: 18 },
+    { top: 13, left: 0 },
+    { top: 13, left: 36 },
+    { top: 33, left: 0 },
+    { top: 33, left: 36 },
+    { top: 46, left: 18 },
+];
+
+function DotLoader() {
+    return (
+        <div className="relative" style={{ width: 49, height: 59 }}>
+            {DOT_POSITIONS.map((pos, index) => (
+                <span
+                    key={index}
+                    className="absolute rounded-full animate-pulse"
+                    style={{
+                        top: pos.top,
+                        left: pos.left,
+                        width: 13,
+                        height: 13,
+                        backgroundColor: index === 0 ? 'var(--brand-200)' : 'var(--neutral-300)',
+                        animationDelay: `${index * 120}ms`,
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
 
 // email -> awaiting-verification -> details -> kyc -> submitting -> done
 export default function SignUpPage() {
@@ -48,6 +120,32 @@ export default function SignUpPage() {
     const hasSpecial = /[^A-Za-z0-9]/.test(password);
     const hasLength = password.length >= 8;
     const isPasswordStepValid = hasLower && hasUpper && hasNumber && hasSpecial && hasLength;
+
+    const [pwnedCount, setPwnedCount] = useState(0);
+    const [isPwnedChecked, setIsPwnedChecked] = useState(false);
+
+    // Soft-warn (don't block) if the password shows up in known breaches.
+    // Debounced so we're not hashing/querying on every keystroke.
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (!isPasswordStepValid) {
+                setPwnedCount(0);
+                setIsPwnedChecked(false);
+                return;
+            }
+            checkPasswordPwned(password)
+                .then((count) => {
+                    setPwnedCount(count);
+                    setIsPwnedChecked(true);
+                })
+                .catch(() => {
+                    setPwnedCount(0);
+                    setIsPwnedChecked(false);
+                });
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [password, isPasswordStepValid]);
 
     const isKycStepValid = selfieFile && proofOfResidenceFile;
 
@@ -94,6 +192,10 @@ export default function SignUpPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Tries to create the account silently. If the email is already taken,
+    // we don't tell the user — we send them a sign-in link instead and show
+    // the exact same "check your email" screen either way, so the response
+    // never reveals whether the account already existed.
     async function handleEmailSubmit(e) {
         e.preventDefault();
         if (!isEmailStepValid || !isPasswordStepValid) {
@@ -171,14 +273,16 @@ export default function SignUpPage() {
     return (
         <div
             className="min-h-screen flex flex-col items-center justify-center px-6"
-            style={{ backgroundColor: 'var(--brand-300)' }}
+            style={{ backgroundColor: 'var(--surface-page)' }}
         >
+            <ThemeToggle className="absolute top-6 right-6" />
+
             <div className="w-full max-w-[363px] flex flex-col items-center gap-8">
                 <div className="flex flex-col items-center gap-6">
                     <LogoMark size={64} />
                     <h1
-                        className="text-[24px] font-light text-white -mt-2"
-                        style={{ fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
+                        className="text-[24px] font-light -mt-2"
+                        style={{ color: 'var(--text-primary)', fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
                     >
                         InsureTech<strong className="font-bold">Guard</strong>
                     </h1>
@@ -208,13 +312,44 @@ export default function SignUpPage() {
                             />
                         </div>
 
-                        <ul className="text-[13px] flex flex-col gap-1" style={{ color: '#8E8E93' }}>
-                            <li style={{ color: hasLower ? '#34C759' : '#8E8E93' }}>One lowercase character</li>
-                            <li style={{ color: hasUpper ? '#34C759' : '#8E8E93' }}>One uppercase character</li>
-                            <li style={{ color: hasNumber ? '#34C759' : '#8E8E93' }}>One number/digit</li>
-                            <li style={{ color: hasSpecial ? '#34C759' : '#8E8E93' }}>One special symbol</li>
-                            <li style={{ color: hasLength ? '#34C759' : '#8E8E93' }}>8 characters</li>
+                        <div className="flex flex-row gap-2">
+                            {[
+                                password.length === 0 ? null : hasLower,
+                                password.length === 0 ? null : hasUpper,
+                                password.length === 0 ? null : hasNumber,
+                                password.length === 0 ? null : hasSpecial,
+                                password.length === 0 ? null : hasLength,
+                                isPwnedChecked ? pwnedCount === 0 : null,
+                            ].map((isMet, index) => (
+                                <div
+                                    key={index}
+                                    className="flex-1 h-[6px] rounded-full"
+                                    style={{
+                                        background:
+                                            isMet === null
+                                                ? 'var(--neutral-400)'
+                                                : isMet
+                                                    ? '#34C759'
+                                                    : '#FF3B30',
+                                    }}
+                                />
+                            ))}
+                        </div>
+
+                        <ul className="text-[13px] flex flex-col gap-1" style={{ color: 'var(--text-secondary)' }}>
+                            <li style={{ color: hasLower ? '#34C759' : 'var(--text-secondary)' }}>One lowercase character</li>
+                            <li style={{ color: hasUpper ? '#34C759' : 'var(--text-secondary)' }}>One uppercase character</li>
+                            <li style={{ color: hasNumber ? '#34C759' : 'var(--text-secondary)' }}>One number/digit</li>
+                            <li style={{ color: hasSpecial ? '#34C759' : 'var(--text-secondary)' }}>One special symbol</li>
+                            <li style={{ color: hasLength ? '#34C759' : 'var(--text-secondary)' }}>8 characters</li>
                         </ul>
+
+                        {pwnedCount > 0 && (
+                            <p className="text-[13px] -mt-2" style={{ color: '#FFD60A' }}>
+                                This password has appeared in {pwnedCount.toLocaleString()} known data
+                                breaches. We recommend choosing a different one.
+                            </p>
+                        )}
 
                         {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
 
@@ -236,10 +371,10 @@ export default function SignUpPage() {
 
                 {stage === 'awaiting-verification' && (
                     <div className="flex flex-col items-center gap-4 text-center">
-                        <p className="text-[17px] text-white">
+                        <p className="text-[17px]" style={{ color: 'var(--text-primary)' }}>
                             We&apos;ve sent a link to <strong>{email}</strong>.
                         </p>
-                        <p className="text-[15px]" style={{ color: '#8E8E93' }}>
+                        <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Open the email and click the link to continue.
                         </p>
                         {error && <p className="text-[13px] text-red-400">{error}</p>}
@@ -299,30 +434,35 @@ export default function SignUpPage() {
                 )}
 
                 {stage === 'kyc' && (
-                    <form onSubmit={handleKycSubmit} className="w-full flex flex-col gap-6">
-                        <p className="text-[15px] text-center" style={{ color: '#8E8E93' }}>
-                            We need to verify your identity. Please upload a selfie and a proof of residence (e.g. a utility bill).
-                        </p>
+                    <form onSubmit={handleKycSubmit} className="w-full flex flex-col items-center gap-6">
+                        <KYCSuccess width={120} height={133} />
 
-                        <div className="flex flex-col gap-4">
-                            <label className="text-[15px] text-white flex flex-col gap-2">
-                                Selfie
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    capture="user"
-                                    onChange={(e) => setSelfieFile(e.target.files?.[0] ?? null)}
-                                />
-                            </label>
+                        <div className="flex flex-col items-center gap-2">
+                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                Identity verification
+                            </h2>
+                            <p className="text-[15px] text-center" style={{ color: 'var(--text-secondary)' }}>
+                                We are committed to providing a safe, secure experience for our
+                                community and therefore your account must be verified by
+                                completing a KYC verification.
+                            </p>
+                        </div>
 
-                            <label className="text-[15px] text-white flex flex-col gap-2">
-                                Proof of residence
-                                <input
-                                    type="file"
-                                    accept="image/*,application/pdf"
-                                    onChange={(e) => setProofOfResidenceFile(e.target.files?.[0] ?? null)}
-                                />
-                            </label>
+                        <div className="w-full flex flex-col gap-2">
+                            <KycUploadRow
+                                label="Proof of residence"
+                                status={proofOfResidenceFile ? 'Uploaded' : 'Proof of identity'}
+                                isUploaded={!!proofOfResidenceFile}
+                                capture="environment"
+                                onSelect={(file) => setProofOfResidenceFile(file)}
+                            />
+                            <KycUploadRow
+                                label="Selfie upload"
+                                status={selfieFile ? 'Uploaded' : 'Proof of identity'}
+                                isUploaded={!!selfieFile}
+                                capture="user"
+                                onSelect={(file) => setSelfieFile(file)}
+                            />
                         </div>
 
                         {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
@@ -344,12 +484,20 @@ export default function SignUpPage() {
                 )}
 
                 {stage === 'submitting' && (
-                    <p className="text-[15px] text-white">Creating your account...</p>
+                    <div className="flex flex-col items-center gap-5">
+                        <DotLoader />
+                        <p
+                            className="text-[17px] font-semibold text-center"
+                            style={{ color: 'var(--text-secondary)', letterSpacing: '0.0035em' }}
+                        >
+                            Completing your profile
+                        </p>
+                    </div>
                 )}
 
                 {stage === 'done' && (
                     <div className="flex flex-col items-center gap-6">
-                        <p className="text-[17px] text-white text-center">
+                        <p className="text-[17px] text-center" style={{ color: 'var(--text-primary)' }}>
                             You&apos;re all set! Your account has been created.
                         </p>
                         <button
