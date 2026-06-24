@@ -76,6 +76,21 @@
     --sp-13:  52px;
     --sp-14:  56px;
     --sp-15:  60px;
+
+    /* Semantic theme tokens — light by default */
+    --surface-page: var(--neutral-100);
+    --surface-field: var(--neutral-200);
+    --text-primary: var(--neutral-800);
+    --text-secondary: var(--neutral-600);
+    --border-default: var(--neutral-400);
+}
+
+:root[data-theme='dark'] {
+    --surface-page: var(--brand-300);
+    --surface-field: #1C2435;
+    --text-primary: var(--neutral-100);
+    --text-secondary: var(--neutral-600);
+    --border-default: var(--neutral-400);
 }
 
 /* ─── Base styles ────────────────────────────────────────────────────────── */

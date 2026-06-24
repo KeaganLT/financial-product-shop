@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 const SPLASH_DISPLAY_MS = 1600;
 const SPLASH_FADE_MS = 400;
@@ -72,12 +73,14 @@ export default function LoginPage() {
         <div
             className="min-h-screen flex flex-col items-center px-6"
             style={{
-                backgroundColor: 'var(--brand-300)',
+                backgroundColor: 'var(--surface-page)',
                 justifyContent: stage === 'welcome' ? 'flex-end' : 'center',
                 paddingBottom: stage === 'welcome' ? '80px' : undefined,
             }}
         >
             <SplashScreen isVisible={isSplashVisible} fadeMs={SPLASH_FADE_MS} />
+
+            <ThemeToggle className="absolute top-6 right-6" />
 
             <div
                 className="w-full max-w-[363px] flex flex-col items-center"
@@ -87,8 +90,8 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center gap-6">
                     <LogoMark size={64} />
                     <h1
-                        className="text-[24px] font-light text-white -mt-2"
-                        style={{ fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
+                        className="text-[24px] font-light -mt-2"
+                        style={{ color: 'var(--text-primary)', fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
                     >
                         InsureTech<strong className="font-bold">Guard</strong>
                     </h1>
@@ -109,7 +112,8 @@ export default function LoginPage() {
                                 Login
                             </button>
 
-                            <p className="text-[17px] text-white" style={{ letterSpacing: '0.0035em' }}>
+                            <p className="text-[17px]" style={{ color: 'var(--text-primary)', letterSpacing:'0.0035em' }}>
+
                                 Don&apos;t have an account?{' '}
                                 <button
                                     type="button"
@@ -125,8 +129,8 @@ export default function LoginPage() {
                         <button
                             type="button"
                             onClick={handleContinueAsGuest}
-                            className="text-[17px] text-white"
-                            style={{ letterSpacing: '0.0035em' }}
+                            className="text-[17px]"
+                            style={{ color: 'var(--text-primary)', letterSpacing: '0.0035em' }}
                         >
                             Continue as guest
                         </button>
@@ -195,7 +199,7 @@ export default function LoginPage() {
             </div>
 
             {stage === 'form' && (
-                <p className="absolute bottom-12 text-[15px] text-white">
+                <p className="absolute bottom-12 text-[15px]" style={{ color: 'var(--text-primary)' }}>
                     Don&apos;t have an account?{' '}
                     <button
                         type="button"
