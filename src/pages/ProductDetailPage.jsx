@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
+import productPlaceholder from '../assets/product-placeholder.svg';
 
 // Dummy data for benefits and requirements per product
 // These will eventually come from Firebase or the API
@@ -50,7 +51,6 @@ const PRODUCT_DETAILS = {
     },
 };
 
-// Pick the right dummy data based on product name keywords
 function getProductDetails(productName = '') {
     const name = productName.toLowerCase();
     if (name.includes('insurance') || name.includes('device') || name.includes('contract')) {
@@ -72,12 +72,8 @@ export default function ProductDetailPage() {
     const [loading, setLoading]     = useState(true);
     const [error, setError]         = useState(null);
     const [expanded, setExpanded]   = useState(false);
-    // expanded controls whether Benefits + Requirements sections are visible
-    // collapsed = show description + "Read more"
-    // expanded  = show description + Benefits + Requirements + "Read less"
 
     useEffect(() => {
-        // Fetch both the current product and all products (for related section)
         Promise.all([
             getProductById(id),
             getProducts(),
@@ -109,10 +105,12 @@ export default function ProductDetailPage() {
     const details      = getProductDetails(product.name);
     const hasDiscount  = product.discount || product.discountPercent;
 
-    // Related products = all products except the current one, max 4
-    const relatedProducts = allProducts
-        .filter((p) => String(p.id) !== String(id))
-        .slice(0, 4);
+    const otherProducts = allProducts.filter((p) => String(p.id) !== String(id));
+    const sameFulfilmentType = otherProducts.filter(
+        (p) => p.fulfilmentType && p.fulfilmentType === product.fulfilmentType
+    );
+    const fallback = otherProducts.filter((p) => !sameFulfilmentType.includes(p));
+    const relatedProducts = [...sameFulfilmentType, ...fallback].slice(0, 4);
 
     return (
         <div className="min-h-screen bg-white">
@@ -163,7 +161,7 @@ export default function ProductDetailPage() {
                 <div className="px-6 pt-4">
                     <div className="relative w-full rounded-[8px] overflow-hidden" style={{ height: '289px' }}>
                         <img
-                            src={product.imageUrl || 'https://placehold.co/364x289/D9D9D9/888?text=No+Image'}
+                            src={product.imageUrl || productPlaceholder}
                             alt={product.name}
                             className="w-full h-full object-cover"
                         />
@@ -398,7 +396,7 @@ export default function ProductDetailPage() {
                                             style={{ height: '120px', borderRadius: '8px', backgroundColor: '#D9D9D9' }}
                                         >
                                             <img
-                                                src={related.imageUrl || 'https://placehold.co/260x120/D9D9D9/888?text=No+Image'}
+                                                src={related.imageUrl || productPlaceholder}
                                                 alt={related.name}
                                                 className="w-full h-full object-cover"
                                             />

@@ -1,21 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 
 const SPLASH_DISPLAY_MS = 1600;
 const SPLASH_FADE_MS = 400;
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const [searchParams] = useSearchParams();
+    const { login, logout } = useAuth();
 
+    const emailFromLink = searchParams.get('email') ?? '';
     const [isSplashVisible, setIsSplashVisible] = useState(true);
-    const [stage, setStage] = useState('welcome');
+    const [stage, setStage] = useState(emailFromLink ? 'form' : 'welcome');
     const usernameInputRef = useRef(null);
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState(emailFromLink);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +41,11 @@ export default function LoginPage() {
     function handleStartLogin() {
         setStage('form');
         usernameInputRef.current?.focus();
+    }
+
+    function handleContinueAsGuest() {
+        logout();
+        navigate('/products');
     }
 
     async function handleSubmit(e) {
@@ -65,12 +73,14 @@ export default function LoginPage() {
         <div
             className="min-h-screen flex flex-col items-center px-6"
             style={{
-                backgroundColor: 'var(--brand-300)',
+                backgroundColor: 'var(--surface-page)',
                 justifyContent: stage === 'welcome' ? 'flex-end' : 'center',
                 paddingBottom: stage === 'welcome' ? '80px' : undefined,
             }}
         >
             <SplashScreen isVisible={isSplashVisible} fadeMs={SPLASH_FADE_MS} />
+
+            <ThemeToggle className="absolute top-6 right-6" />
 
             <div
                 className="w-full max-w-[363px] flex flex-col items-center"
@@ -80,8 +90,8 @@ export default function LoginPage() {
                 <div className="flex flex-col items-center gap-6">
                     <LogoMark size={64} />
                     <h1
-                        className="text-[24px] font-light text-white -mt-2"
-                        style={{ fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
+                        className="text-[24px] font-light -mt-2"
+                        style={{ color: 'var(--text-primary)', fontFamily: '"SF Pro Display", -apple-system, system-ui, sans-serif', letterSpacing: '0.07em' }}
                     >
                         InsureTech<strong className="font-bold">Guard</strong>
                     </h1>
@@ -102,17 +112,25 @@ export default function LoginPage() {
                                 Login
                             </button>
 
-                            <p className="text-[17px] text-white" style={{ letterSpacing: '0.0035em' }}>
+                            <p className="text-[17px]" style={{ color: 'var(--text-primary)', letterSpacing:'0.0035em' }}>
+
                                 Don&apos;t have an account?{' '}
-                                <span className="font-semibold underline" style={{ color: 'var(--brand-200)' }}>Sign up</span>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/signup')}
+                                    className="font-semibold underline"
+                                    style={{ color: 'var(--brand-200)' }}
+                                >
+                                    Sign up
+                                </button>
                             </p>
                         </div>
 
                         <button
                             type="button"
-                            onClick={() => navigate('/products')}
-                            className="text-[17px] text-white"
-                            style={{ letterSpacing: '0.0035em' }}
+                            onClick={handleContinueAsGuest}
+                            className="text-[17px]"
+                            style={{ color: 'var(--text-primary)', letterSpacing: '0.0035em' }}
                         >
                             Continue as guest
                         </button>
@@ -181,9 +199,16 @@ export default function LoginPage() {
             </div>
 
             {stage === 'form' && (
-                <p className="absolute bottom-12 text-[15px] text-white">
+                <p className="absolute bottom-12 text-[15px]" style={{ color: 'var(--text-primary)' }}>
                     Don&apos;t have an account?{' '}
-                    <span className="font-semibold" style={{ color: 'var(--brand-200)' }}>Sign up</span>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/signup')}
+                        className="font-semibold"
+                        style={{ color: 'var(--brand-200)' }}
+                    >
+                        Sign up
+                    </button>
                 </p>
             )}
         </div>
