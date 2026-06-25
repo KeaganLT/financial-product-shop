@@ -1,9 +1,20 @@
 const STORAGE_PREFIX = 'kyc_doc_';
+import { listAll, ref } from 'firebase/storage';
+import { storage } from './firebase.js';
 
-export function getKycStatus(customerId) {
+export async function getKycStatus(customerId) {
+    let items = [];
+    try {
+        const folderRef = ref(storage, `kyc/${customerId}`);
+        ({ items } = await listAll(folderRef));
+    } catch {
+        items = [];
+    }
+
+    const names = items.map((item) => item.name);
     return {
-        proofOfResidence: window.localStorage.getItem(`${STORAGE_PREFIX}${customerId}_proof-of-residence`) === 'true',
-        selfie: window.localStorage.getItem(`${STORAGE_PREFIX}${customerId}_selfie`) === 'true',
+        proofOfResidence: names.some((name) => name.startsWith('proof-of-residence-')),
+        selfie: names.some((name) => name.startsWith('selfie-')),
     };
 }
 

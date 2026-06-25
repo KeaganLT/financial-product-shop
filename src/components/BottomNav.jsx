@@ -8,7 +8,7 @@ const NAV_ITEMS = [
     { label: 'Home',          icon: HomeIcon,          path: '/products' },
     { label: 'Subscriptions', icon: SubscriptionsIcon, path: '/subscriptions' },
     { label: 'Cart',          icon: CartIcon,          path: '/cart' },
-    { label: 'Account',       icon: AccountIcon,       path: '/login' },
+    { label: 'Account',       icon: AccountIcon,       path: '/account' },
 ];
 
 export default function BottomNav() {
@@ -17,7 +17,7 @@ export default function BottomNav() {
 
     return (
         <nav
-            className="fixed bottom-0 left-0 right-0 z-50"
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
             style={{
                 backgroundColor: 'var(--neutral-100)',
                 borderTop: '0.5px solid var(--neutral-400)',

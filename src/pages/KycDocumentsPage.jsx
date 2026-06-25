@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import KycUploadRow from '../components/KycUploadRow.jsx';
+import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
 import { uploadKycDocument, trackEvent } from '../services/firebase.js';
 import { markKycSubmitted } from '../services/kycStatus.js';

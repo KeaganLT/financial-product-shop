@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Header from '../components/Header.jsx';
 import BottomNav from '../components/BottomNav.jsx';
-import KycUploadRow from '../components/KycUploadRow.jsx';
+import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
 import { uploadKycDocument, trackEvent } from '../services/firebase.js';
-import { getKycStatus, markDocumentUploaded } from '../services/kycStatus.js';
+import { getKycStatus } from '../services/kycStatus.js';
 
 export default function AccountPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn, logout } = useAuth();
 
-    const [status, setStatus] = useState(() => (isLoggedIn ? getKycStatus(auth.customerId) : null));
+    const [status, setStatus] = useState(null);
     const [uploadError, setUploadError] = useState('');
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setStatus(null);
+            return;
+        }
+        getKycStatus(auth.customerId).then(setStatus);
+    }, [isLoggedIn, auth?.customerId]);
+
 
     const isVerified = status?.proofOfResidence && status?.selfie;
 
@@ -21,9 +30,8 @@ export default function AccountPage() {
         setUploadError('');
         try {
             await uploadKycDocument(auth.customerId, docType, file);
-            markDocumentUploaded(auth.customerId, docType);
             trackEvent('kyc_document_updated', { docType });
-            setStatus(getKycStatus(auth.customerId));
+            setStatus(await getKycStatus(auth.customerId));
         } catch (err) {
             setUploadError(err.message || 'Failed to upload document');
         }
@@ -62,7 +70,7 @@ export default function AccountPage() {
                     <>
                         <div className="w-full flex flex-col items-center gap-3 text-center">
                             {isVerified ? (
-                                <KYCSuccess width={120} height={90} />
+                                <KYCSuccess width={120} height={90} verified />
                             ) : null}
                             <p className="text-[17px] font-semibold" style={{ color: '#000000' }}>
                                 {isVerified ? 'Identity verified' : 'Identity not verified'}
@@ -78,22 +86,27 @@ export default function AccountPage() {
                             <h2 className="text-[13px] font-semibold uppercase" style={{ color: '#8E8E93', letterSpacing: '0.05em' }}>
                                 Verification documents
                             </h2>
-                            <div className="flex flex-col gap-2">
-                                <KycUploadRow
-                                    label="Proof of residence"
-                                    status={status.proofOfResidence ? 'Uploaded · Tap to update' : 'Not uploaded'}
-                                    isUploaded={status.proofOfResidence}
-                                    capture="environment"
-                                    onSelect={(file) => handleUpload('proof-of-residence', file)}
-                                />
-                                <KycUploadRow
-                                    label="Selfie upload"
-                                    status={status.selfie ? 'Uploaded · Tap to update' : 'Not uploaded'}
-                                    isUploaded={status.selfie}
-                                    capture="user"
-                                    onSelect={(file) => handleUpload('selfie', file)}
-                                />
-                            </div>
+                            {status ? (
+                                <div className="flex flex-col gap-2">
+                                    <KycUploadRow
+                                        label="Proof of residence"
+                                        status={status.proofOfResidence ? 'Uploaded · Tap to update' : 'Not uploaded'}
+                                        isUploaded={status.proofOfResidence}
+                                        capture="environment"
+                                        onSelect={(file) => handleUpload('proof-of-residence', file)}
+                                    />
+                                    <KycUploadRow
+                                        label="Selfie upload"
+                                        status={status.selfie ? 'Uploaded · Tap to update' : 'Not uploaded'}
+                                        isUploaded={status.selfie}
+                                        capture="user"
+                                        onSelect={(file) => handleUpload('selfie', file)}
+                                    />
+                                </div>
+                            ) : (
+                                <p className="text-[15px]" style={{ color: '#8E8E93' }}>Checking document status…</p>
+                            )}
+
                             {uploadError && <p className="text-[13px] text-red-500">{uploadError}</p>}
                         </div>
 

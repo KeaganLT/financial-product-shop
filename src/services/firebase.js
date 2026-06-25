@@ -31,10 +31,7 @@ export async function sendVerificationEmail(email) {
     window.localStorage.setItem(EMAIL_FOR_SIGN_IN_KEY, email);
 }
 
-// Same Firebase email mechanism as sendVerificationEmail, but for an email
-// that's already registered — the link lands on /login instead of /signup.
-// Uses the identical Firebase template, so the email itself doesn't reveal
-// to anyone other than the inbox owner whether the account already existed.
+
 export async function sendExistingAccountEmail(email) {
     const actionCodeSettings = {
         url: `${window.location.origin}/login?email=${encodeURIComponent(email)}`,

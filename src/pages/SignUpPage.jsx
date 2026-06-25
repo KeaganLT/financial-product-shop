@@ -5,7 +5,7 @@ import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
-import KycUploadRow from '../components/KycUploadRow.jsx';
+import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import {
