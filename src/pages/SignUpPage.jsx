@@ -138,25 +138,28 @@ export default function SignUpPage() {
             return;
         }
 
-        const storedEmail = getStoredVerificationEmail();
-        if (!storedEmail) {
-            // Link opened in a different browser/device than it was requested from.
-            setError('Please re-enter your email to finish verifying.');
-            return;
-        }
 
-        setStage('awaiting-verification');
-        completeEmailVerification(storedEmail)
-            .then(() => {
-                setEmail(storedEmail);
-                setStage('details');
-                // Clear the verification params out of the URL.
-                navigate('/signup', { replace: true });
-            })
-            .catch((err) => {
-                setError(err.message || 'Failed to verify email');
-                setStage('email');
-            });
+        queueMicrotask(() => {
+            const storedEmail = getStoredVerificationEmail();
+            if (!storedEmail) {
+                // Link opened in a different browser/device than it was requested from.
+                setError('Please re-enter your email to finish verifying.');
+                return;
+            }
+
+            setStage('awaiting-verification');
+            completeEmailVerification(storedEmail)
+                .then(() => {
+                    setEmail(storedEmail);
+                    setStage('details');
+                    // Clear the verification params out of the URL.
+                    navigate('/signup', { replace: true });
+                })
+                .catch((err) => {
+                    setError(err.message || 'Failed to verify email');
+                    setStage('email');
+                });
+        });
     }, [navigate]);
 
     // Track which stage the user reaches, so we can later see where people drop out.
