@@ -41,7 +41,7 @@ export default function AccountPage() {
         <div className="min-h-screen bg-white">
             <Header />
 
-            <main className="max-w-[411px] mx-auto pt-[73px] pb-[88px] px-6 flex flex-col items-center gap-6">
+            <main className="max-w-[411px] md:max-w-[480px] mx-auto pt-[73px] pb-[88px] md:pb-16 px-6 flex flex-col items-center gap-6">
                 <h1 className="text-[20px] font-semibold mt-6" style={{ color: '#000000' }}>
                     Account
                 </h1>

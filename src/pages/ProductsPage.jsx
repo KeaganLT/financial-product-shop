@@ -51,7 +51,7 @@ export default function ProductsPage() {
         <div className="min-h-screen bg-white">
             <Header />
 
-            <main className="max-w-[411px] mx-auto pt-[73px] pb-[88px]">
+            <main className="max-w-[411px] md:max-w-5xl mx-auto pt-[73px] pb-[88px] md:pb-16">
 
                 {loading && (
                     <>
