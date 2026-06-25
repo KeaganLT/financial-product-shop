@@ -8,7 +8,7 @@ export async function getKycStatus(customerId) {
         const folderRef = ref(storage, `kyc/${customerId}`);
         ({ items } = await listAll(folderRef));
     } catch {
-        items = [];
+        // Treat as "nothing uploaded" if the folder doesn't exist or isn't listable.
     }
 
     const names = items.map((item) => item.name);

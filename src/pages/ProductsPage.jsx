@@ -28,7 +28,7 @@ export default function ProductsPage() {
 
     useEffect(() => {
         if (!isLoggedIn || products.length === 0) {
-            setEligibleIds(null);
+            queueMicrotask(() => setEligibleIds(null));
             return;
         }
 
