@@ -5,7 +5,8 @@ import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
-import KycUploadRow from '../components/KycUploadRow.jsx';
+import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
+import CheckIcon from '../assets/CheckIcon.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import {
@@ -16,6 +17,7 @@ import {
     isEmailVerificationLink,
     getStoredVerificationEmail,
     completeEmailVerification,
+    signInWithGoogle,
 } from '../services/firebase.js';
 
 // Per the BRS "Qualifying Customer Types" table:
@@ -52,6 +54,24 @@ function DotLoader() {
         </div>
     );
 }
+
+function VerifiedDocRow({ label }) {
+    return (
+        <div
+            className="w-full flex items-center justify-between px-4 py-3 rounded-lg"
+            style={{ backgroundColor: 'rgba(52, 199, 89, 0.1)' }}
+        >
+            <span className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>
+            <span
+                className="flex items-center justify-center rounded-full"
+                style={{ width: 22, height: 22, backgroundColor: '#34C759' }}
+            >
+                <CheckIcon width={13} height={13} color="#FFFFFF" />
+            </span>
+        </div>
+    );
+}
+
 
 // email -> awaiting-verification -> details -> kyc -> submitting -> done
 export default function SignUpPage() {
@@ -144,6 +164,21 @@ export default function SignUpPage() {
         trackEvent('registration_stage_view', { stage });
     }, [stage]);
 
+
+    // Once verification is complete, ask for notification permission so we can
+    // alert the user about claim/policy updates going forward.
+    useEffect(() => {
+        if (stage !== 'done') {
+            return;
+        }
+        if (typeof Notification === 'undefined' || Notification.permission !== 'default') {
+            return;
+        }
+        Notification.requestPermission().then((permission) => {
+            trackEvent('notification_permission_responded', { permission });
+        });
+    }, [stage]);
+
     // If the user closes the tab/navigates away mid-flow (before reaching "done"),
     // record that as a drop-off — this is the Milestone 5 analytics requirement.
     useEffect(() => {
@@ -155,10 +190,39 @@ export default function SignUpPage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Tries to create the account silently. If the email is already taken,
-    // we don't tell the user — we send them a sign-in link instead and show
-    // the exact same "check your email" screen either way, so the response
-    // never reveals whether the account already existed.
+    // Google already verifies the email for us, so the backend account just
+    // needs *some* password — the user will always re-enter via Google.
+    function generateRandomPassword() {
+        const bytes = crypto.getRandomValues(new Uint8Array(24));
+        return `${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}Aa1!`;
+    }
+
+    async function handleGoogleSignUp() {
+        setError('');
+        setIsSubmitting(true);
+        try {
+            const googleEmail = await signInWithGoogle();
+            const generatedPassword = generateRandomPassword();
+
+            try {
+                await createUser(googleEmail, generatedPassword);
+            } catch (err) {
+                if (err.status !== 400) {
+                    throw err;
+                }
+                // Account already exists for this Google email — just continue.
+            }
+
+            setEmail(googleEmail);
+            setPassword(generatedPassword);
+            trackEvent('registration_google_signup');
+            setStage('details');
+        } catch (err) {
+            setError(err.message || 'Google sign-in failed');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
     async function handleEmailSubmit(e) {
         e.preventDefault();
         if (!isEmailStepValid || !isPasswordStepValid) {
@@ -240,8 +304,26 @@ export default function SignUpPage() {
         >
             <ThemeToggle className="absolute top-6 right-6" />
 
+            {stage === 'email' && (
+                <>
+                    <div
+                        className="absolute top-3 left-1/2 -translate-x-1/2 rounded-full"
+                        style={{ width: 36, height: 5, backgroundColor: 'var(--neutral-400)' }}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => navigate('/login')}
+                        aria-label="Close"
+                        className="absolute top-4 right-4 text-[20px] leading-none"
+                        style={{ color: 'var(--text-secondary)' }}
+                    >
+                        ×
+                    </button>
+                </>
+            )}
+
             <div className="w-full max-w-[363px] flex flex-col items-center gap-8">
-                {stage !== 'kyc' && (
+                {stage !== 'kyc' && stage !== 'email' && (
                     <div className="flex flex-col items-center gap-6">
                         <LogoMark size={64} />
                         <h1
@@ -254,7 +336,41 @@ export default function SignUpPage() {
                 )}
 
                 {stage === 'email' && (
+                    <div className="flex flex-col items-center gap-2 text-center">
+                        <h1 className="text-[24px] font-bold" style={{ color: 'var(--text-primary)' }}>
+                            Create your account
+                        </h1>
+                        <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
+                            Create a profile, browse and subscribe to our range of products.
+                        </p>
+                    </div>
+                )}
+
+                {stage === 'email' && (
                     <form onSubmit={handleEmailSubmit} className="w-full flex flex-col gap-6">
+                        <button
+                            type="button"
+                            onClick={handleGoogleSignUp}
+                            disabled={isSubmitting}
+                            className="w-full py-[10px] rounded-full text-[17px] font-medium flex items-center justify-center gap-2"
+                            style={{ border: '1px solid var(--neutral-400)', color: 'var(--text-primary)', opacity: isSubmitting ? 0.6 : 1 }}
+                        >
+                            <svg width={18} height={18} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9A8.66 8.66 0 0 0 17.64 9.2Z" fill="#4285F4" />
+                                <path d="M9 18c2.43 0 4.47-.81 5.96-2.18l-2.9-2.26c-.81.55-1.85.87-3.06.87-2.35 0-4.34-1.59-5.05-3.72H.96v2.33A9 9 0 0 0 9 18Z" fill="#34A853" />
+                                <path d="M3.95 10.71a5.41 5.41 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l2.99-2.33Z" fill="#FBBC05" />
+                                <path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.59 8.59 0 0 0 9 0 9 9 0 0 0 .96 4.96l2.99 2.33C4.66 5.17 6.65 3.58 9 3.58Z" fill="#EA4335" />
+                            </svg>
+                            Continue with Google
+                        </button>
+
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
+                            <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>or</span>
+                            <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
+                        </div>
+
+
                         <div className="flex flex-col gap-4">
                             <FormInput
                                 id="email"
@@ -331,6 +447,26 @@ export default function SignUpPage() {
                         >
                             {isSubmitting ? 'Sending...' : 'Next'}
                         </button>
+
+                        <p className="text-[15px] text-center" style={{ color: 'var(--text-primary)' }}>
+                            Already have an account?{' '}
+                            <button
+                                type="button"
+                                onClick={() => navigate('/login')}
+                                className="font-semibold underline"
+                                style={{ color: 'var(--brand-200)' }}
+                            >
+                                Log in
+                            </button>
+                        </p>
+
+                        <p className="text-[12px] text-center" style={{ color: 'var(--text-secondary)' }}>
+                            By continuing, you agree to our{' '}
+                            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Terms of Service</span>{' '}
+                            and acknowledge that you have read our{' '}
+                            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Privacy Policy</span>{' '}
+                            to learn how we collect, use, and share your data.
+                        </p>
                     </form>
                 )}
 
@@ -466,13 +602,30 @@ export default function SignUpPage() {
                         <p className="text-[17px] text-center" style={{ color: 'var(--text-primary)' }}>
                             You&apos;re all set! Your account has been created.
                         </p>
+
+                        <KYCSuccess width={150} height={113} verified />
+
+                        <div className="flex flex-col items-center gap-2">
+                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                                Identity verification successful
+                            </h2>
+                            <p className="text-[15px] text-center" style={{ color: 'var(--text-secondary)' }}>
+                                Your documents have been submitted and your identity has been verified.
+                            </p>
+                        </div>
+
+                        <div className="w-full flex flex-col gap-2">
+                            <VerifiedDocRow label="Proof of residence" />
+                            <VerifiedDocRow label="Selfie upload" />
+                        </div>
+
                         <button
                             type="button"
                             onClick={() => navigate('/products')}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
                             style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' }}
                         >
-                            Continue
+                            Continue to Home
                         </button>
                     </div>
                 )}

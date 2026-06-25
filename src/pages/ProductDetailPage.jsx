@@ -158,7 +158,7 @@ export default function ProductDetailPage() {
 
                 {/* ── Product image ──────────────────────────────────────────────────── */}
                 {/* Figma: width 364px, height 289px, border-radius 8px, mx 24px */}
-                <div className="px-6 pt-4">
+                <div className="px-6 pt-4 md:max-w-2xl">
                     <div className="relative w-full rounded-[8px] overflow-hidden" style={{ height: '289px' }}>
                         <img
                             src={product.imageUrl || productPlaceholder}
@@ -197,7 +197,7 @@ export default function ProductDetailPage() {
 
                 {/* ── Product title + description ────────────────────────────────────── */}
                 {/* Figma: padding 24px sides, gap 24px between sections */}
-                <div className="px-6 pt-6 flex flex-col gap-6">
+                <div className="px-6 pt-6 flex flex-col gap-6 md:max-w-2xl">
 
                     {/* Title block */}
                     <div className="flex flex-col gap-4">

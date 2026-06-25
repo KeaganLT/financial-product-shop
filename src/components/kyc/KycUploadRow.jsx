@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import CheckIcon from '../assets/CheckIcon.jsx';
+import CheckIcon from '../../assets/CheckIcon.jsx';
 import KycUploadSheet from './KycUploadSheet.jsx';
 
 export default function KycUploadRow({ label, status, isUploaded, capture, onSelect }) {

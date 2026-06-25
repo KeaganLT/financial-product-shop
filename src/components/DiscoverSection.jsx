@@ -66,7 +66,7 @@ export default function DiscoverSection({ products }) {
                     <p className="text-[13px] text-gray-400 mt-1">Try a different filter</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 gap-4 px-6 pb-5 pt-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6 pb-5 pt-4">
                     {filtered.map((product) => (
                         <ProductCard key={product.id} product={product} size="grid" />
                     ))}

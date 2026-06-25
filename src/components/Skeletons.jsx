@@ -83,7 +83,7 @@ export function DiscoverSectionSkeleton() {
                     />
                 ))}
             </div>
-            <div className="grid grid-cols-2 gap-4 px-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-6">
                 {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="bg-white rounded-xl overflow-hidden"
                          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
