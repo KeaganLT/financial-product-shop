@@ -73,9 +73,14 @@ export async function signInWithGoogle() {
 }
 
 // Analytics only works in a real browser (not SSR/Node), so guard it
-export const analyticsPromise = isAnalyticsSupported().then((supported) =>
-    supported ? getAnalytics(firebaseApp) : null
-);
+export const analyticsPromise = isAnalyticsSupported().then((supported) => {
+    if (!supported) return null;
+    const analytics = getAnalytics(firebaseApp);
+    if (import.meta.env.DEV) {
+        window.gtag?.('set', { debug_mode: true });
+    }
+    return analytics;
+});
 
 // Fire-and-forget analytics event. Safe to call even if Analytics didn't load.
 export async function trackEvent(eventName, params) {
@@ -88,7 +93,8 @@ export async function trackEvent(eventName, params) {
 // Uploads a KYC document for a given customer and returns its public download URL.
 // docType is e.g. 'selfie' or 'proof-of-residence'.
 export async function uploadKycDocument(customerUsername, docType, file) {
-    const path = `kyc/${customerUsername}/${docType}-${Date.now()}-${file.name}`;
+    const ext = file.name.includes('.') ? `.${file.name.split('.').pop()}` : '';
+    const path = `kyc/${customerUsername}/${docType}${ext}`;
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);

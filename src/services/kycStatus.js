@@ -13,8 +13,8 @@ export async function getKycStatus(customerId) {
 
     const names = items.map((item) => item.name);
     return {
-        proofOfResidence: names.some((name) => name.startsWith('proof-of-residence-')),
-        selfie: names.some((name) => name.startsWith('selfie-')),
+        proofOfResidence: names.some((name) => name.startsWith('proof-of-residence')),
+        selfie: names.some((name) => name.startsWith('selfie')),
     };
 }
 

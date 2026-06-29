@@ -10,6 +10,7 @@ import CheckIcon from '../assets/CheckIcon.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
+import { validateSAId } from '../services/saIdValidator.js';
 import {
     trackEvent,
     uploadKycDocument,
@@ -80,6 +81,7 @@ export default function SignUpPage() {
     const { login } = useAuth();
 
     const [stage, setStage] = useState('email');
+    const stageRef = useRef('email');
     const emailInputRef = useRef(null);
 
     const [email, setEmail] = useState('');
@@ -95,8 +97,9 @@ export default function SignUpPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isEmailStepValid = email.includes('@');
+    const isIdNumberValid = validateSAId(idNumber);
     const isDetailsStepValid =
-        firstName.trim().length > 0 && lastName.trim().length > 0 && idNumber.trim().length > 0;
+        firstName.trim().length > 0 && lastName.trim().length > 0 && isIdNumberValid;
 
     const hasLower = /[a-z]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
@@ -163,8 +166,9 @@ export default function SignUpPage() {
         });
     }, [navigate]);
 
-    // Track which stage the user reaches, so we can later see where people drop out.
+    // Keep a ref in sync so the unmount cleanup can read the latest stage.
     useEffect(() => {
+        stageRef.current = stage;
         trackEvent('registration_stage_view', { stage });
     }, [stage]);
 
@@ -184,14 +188,13 @@ export default function SignUpPage() {
     }, [stage]);
 
     // If the user closes the tab/navigates away mid-flow (before reaching "done"),
-    // record that as a drop-off — this is the Milestone 5 analytics requirement.
+    // record that as a drop-off. Uses a ref so we always report the actual last stage.
     useEffect(() => {
         return () => {
-            if (stage !== 'done') {
-                trackEvent('registration_abandoned', { last_stage: stage });
+            if (stageRef.current !== 'done') {
+                trackEvent('registration_abandoned', { last_stage: stageRef.current });
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Google already verifies the email for us, so the backend account just
@@ -255,7 +258,9 @@ export default function SignUpPage() {
             }
             setStage('awaiting-verification');
         } catch (err) {
-            setError(err.message || 'Failed to send verification email');
+            const message = err.message || 'Failed to send verification email';
+            setError(message);
+            trackEvent('registration_error', { stage: 'email', error: message });
         } finally {
             setIsSubmitting(false);
         }
@@ -302,7 +307,9 @@ export default function SignUpPage() {
             trackEvent('registration_completed');
             setStage('done');
         } catch (err) {
-            setError(err.message || 'Registration failed');
+            const message = err.message || 'Registration failed';
+            setError(message);
+            trackEvent('registration_error', { stage: 'kyc', error: message });
             setStage('kyc');
         } finally {
             setIsSubmitting(false);
@@ -527,8 +534,14 @@ export default function SignUpPage() {
                                 label="ID number"
                                 type="text"
                                 value={idNumber}
-                                onChange={(e) => setIdNumber(e.target.value)}
+                                onChange={(e) => setIdNumber(e.target.value.replace(/\D/g, '').slice(0, 13))}
+                                inputMode="numeric"
                             />
+                            {idNumber.length > 0 && !isIdNumberValid && (
+                                <p className="text-[13px] -mt-2" style={{ color: '#FF3B30' }}>
+                                    Please enter a valid 13-digit South African ID number.
+                                </p>
+                            )}
                         </div>
 
                         <button
