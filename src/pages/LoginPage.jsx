@@ -5,6 +5,8 @@ import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import { signInWithGoogle } from '../services/firebase.js';
+import { legacyLogin } from '../services/credentialVault.js';
 
 const SPLASH_DISPLAY_MS = 1600;
 const SPLASH_FADE_MS = 400;
@@ -12,7 +14,7 @@ const SPLASH_FADE_MS = 400;
 export default function LoginPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const { login, logout } = useAuth();
+    const { login, loginWithSession, logout } = useAuth();
 
     const emailFromLink = searchParams.get('email') ?? '';
     const [isSplashVisible, setIsSplashVisible] = useState(true);
@@ -46,6 +48,21 @@ export default function LoginPage() {
     function handleContinueAsGuest() {
         logout();
         navigate('/products');
+    }
+
+    async function handleGoogleLogin() {
+        setError('');
+        setIsSubmitting(true);
+        try {
+            await signInWithGoogle();
+            const session = await legacyLogin();
+            loginWithSession(session);
+            navigate('/products');
+        } catch (err) {
+            setError(err.message || 'Google sign-in failed');
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     async function handleSubmit(e) {
@@ -140,6 +157,28 @@ export default function LoginPage() {
                 {stage === 'form' && (
                     <>
                         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+                            <button
+                                type="button"
+                                onClick={handleGoogleLogin}
+                                disabled={isSubmitting}
+                                className="w-full py-[10px] rounded-full text-[17px] font-medium flex items-center justify-center gap-2"
+                                style={{ border: '1px solid var(--neutral-400)', color: 'var(--text-primary)', opacity: isSubmitting ? 0.6 : 1 }}
+                            >
+                                <svg width={18} height={18} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9A8.66 8.66 0 0 0 17.64 9.2Z" fill="#4285F4" />
+                                    <path d="M9 18c2.43 0 4.47-.81 5.96-2.18l-2.9-2.26c-.81.55-1.85.87-3.06.87-2.35 0-4.34-1.59-5.05-3.72H.96v2.33A9 9 0 0 0 9 18Z" fill="#34A853" />
+                                    <path d="M3.95 10.71a5.41 5.41 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l2.99-2.33Z" fill="#FBBC05" />
+                                    <path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A8.59 8.59 0 0 0 9 0 9 9 0 0 0 .96 4.96l2.99 2.33C4.66 5.17 6.65 3.58 9 3.58Z" fill="#EA4335" />
+                                </svg>
+                                Continue with Google
+                            </button>
+
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
+                                <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>or</span>
+                                <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
+                            </div>
+
                             <div className="flex flex-col gap-4">
                                 <FormInput
                                     id="username"

@@ -9,6 +9,7 @@ import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import CheckIcon from '../assets/CheckIcon.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
+import { vaultLegacyCredentials } from '../services/credentialVault.js';
 import {
     trackEvent,
     uploadKycDocument,
@@ -207,6 +208,7 @@ export default function SignUpPage() {
             const googleEmail = await signInWithGoogle();
             const generatedPassword = generateRandomPassword();
 
+            let isNewAccount = true;
             try {
                 await createUser(googleEmail, generatedPassword);
             } catch (err) {
@@ -214,6 +216,13 @@ export default function SignUpPage() {
                     throw err;
                 }
                 // Account already exists for this Google email — just continue.
+                isNewAccount = false;
+            }
+
+            if (isNewAccount) {
+                // Only vault on the password we actually just set on the legacy
+                // account — never overwrite with a guess for a pre-existing one.
+                await vaultLegacyCredentials(googleEmail, generatedPassword);
             }
 
             setEmail(googleEmail);
@@ -305,7 +314,7 @@ export default function SignUpPage() {
             className="min-h-screen flex flex-col items-center justify-center px-6"
             style={{ backgroundColor: 'var(--surface-page)' }}
         >
-            <ThemeToggle className="absolute top-6 right-6" />
+            {stage !== 'email' && <ThemeToggle className="absolute top-6 right-6" />}
 
             {stage === 'email' && (
                 <>
@@ -339,7 +348,7 @@ export default function SignUpPage() {
                 )}
 
                 {stage === 'email' && (
-                    <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="flex flex-col items-center gap-2 text-center mt-6">
                         <h1 className="text-[24px] font-bold" style={{ color: 'var(--text-primary)' }}>
                             Create your account
                         </h1>
