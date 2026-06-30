@@ -2,12 +2,12 @@ function SelfieCamera({ videoRef, onCapture, onCancel }) {
     return (
         <div
             className="w-full max-w-[390px] relative flex flex-col items-center md:rounded-xl md:overflow-hidden"
-            style={{ backgroundColor: '#1C1C1C', height: '844px', maxHeight: '100vh' }}
+            style={{ backgroundColor: '#1C1C1C', height: '100dvh', maxHeight: '844px' }}
             onClick={(e) => e.stopPropagation()}
         >
             <button
                 type="button"
-                className="absolute"
+                className="absolute z-10"
                 style={{ left: '24px', top: '64px' }}
                 onClick={onCancel}
                 aria-label="Close"
@@ -17,10 +17,13 @@ function SelfieCamera({ videoRef, onCapture, onCancel }) {
                 </svg>
             </button>
 
-            <div className="absolute flex flex-col items-center gap-6" style={{ width: '319px', left: '36px', top: '110px' }}>
+            <div
+                className="flex flex-col items-center gap-6 w-full h-full"
+                style={{ paddingTop: '110px', paddingBottom: '48px', paddingLeft: '36px', paddingRight: '36px' }}
+            >
                 <div
-                    className="overflow-hidden"
-                    style={{ width: '319px', height: '441px', borderRadius: '50%', border: '2px solid #F2F2F7', backgroundColor: '#000000' }}
+                    className="overflow-hidden w-full flex-shrink-0"
+                    style={{ aspectRatio: '319 / 441', borderRadius: '50%', border: '2px solid #F2F2F7', backgroundColor: '#000000', maxHeight: '60%' }}
                 >
                     <video
                         ref={videoRef}
@@ -31,20 +34,21 @@ function SelfieCamera({ videoRef, onCapture, onCancel }) {
                         style={{ transform: 'scaleX(-1)' }}
                     />
                 </div>
+
                 <p className="text-[17px] font-semibold text-center" style={{ color: '#F2F2F7', letterSpacing: '0.0035em' }}>
                     Move into the frame, check the lighting, then tap the shutter
                 </p>
-            </div>
 
-            <button
-                type="button"
-                className="absolute rounded-full"
-                style={{ width: '70px', height: '70px', left: 'calc(50% - 35px)', top: '714px', border: '4px solid #FFFFFF' }}
-                onClick={onCapture}
-                aria-label="Take photo"
-            >
-                <span className="block rounded-full" style={{ width: '58px', height: '58px', margin: '2px', backgroundColor: '#FFFFFF' }} />
-            </button>
+                <button
+                    type="button"
+                    className="rounded-full flex-shrink-0 mt-auto"
+                    style={{ width: '70px', height: '70px', border: '4px solid #FFFFFF' }}
+                    onClick={onCapture}
+                    aria-label="Take photo"
+                >
+                    <span className="block rounded-full" style={{ width: '58px', height: '58px', margin: '2px', backgroundColor: '#FFFFFF' }} />
+                </button>
+            </div>
         </div>
     );
 }

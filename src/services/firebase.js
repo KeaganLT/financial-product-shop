@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAnalytics, isSupported as isAnalyticsSupported, logEvent } from 'firebase/analytics';
 import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,6 +17,7 @@ const firebaseConfig = {
 export const firebaseApp = initializeApp(firebaseConfig);
 export const storage = getStorage(firebaseApp);
 export const auth = getAuth(firebaseApp);
+export const functions = getFunctions(firebaseApp);
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
 
@@ -71,9 +73,14 @@ export async function signInWithGoogle() {
 }
 
 // Analytics only works in a real browser (not SSR/Node), so guard it
-export const analyticsPromise = isAnalyticsSupported().then((supported) =>
-    supported ? getAnalytics(firebaseApp) : null
-);
+export const analyticsPromise = isAnalyticsSupported().then((supported) => {
+    if (!supported) return null;
+    const analytics = getAnalytics(firebaseApp);
+    if (import.meta.env.DEV) {
+        window.gtag?.('set', { debug_mode: true });
+    }
+    return analytics;
+});
 
 // Fire-and-forget analytics event. Safe to call even if Analytics didn't load.
 export async function trackEvent(eventName, params) {
@@ -86,7 +93,8 @@ export async function trackEvent(eventName, params) {
 // Uploads a KYC document for a given customer and returns its public download URL.
 // docType is e.g. 'selfie' or 'proof-of-residence'.
 export async function uploadKycDocument(customerUsername, docType, file) {
-    const path = `kyc/${customerUsername}/${docType}-${Date.now()}-${file.name}`;
+    const ext = file.name.includes('.') ? `.${file.name.split('.').pop()}` : '';
+    const path = `kyc/${customerUsername}/${docType}${ext}`;
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);

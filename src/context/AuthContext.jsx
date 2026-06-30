@@ -21,7 +21,17 @@ export function AuthProvider({ children }) {
 
   async function login(username, password) {
     const { token, customerId } = await loginRequest(username, password);
-    const nextAuth = { token, customerId };
+    return applySession({ token, customerId });
+  }
+
+  // Used when a session was obtained some other way (e.g. the legacy
+  // credential vault replaying a Google sign-in), so we already have a
+  // token/customerId and don't need to call the legacy login endpoint again.
+  function loginWithSession({ token, customerId }) {
+    return applySession({ token, customerId });
+  }
+
+  function applySession(nextAuth) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(nextAuth));
     setAuth(nextAuth);
     return nextAuth;
@@ -35,7 +45,7 @@ export function AuthProvider({ children }) {
   const isLoggedIn = auth !== null;
 
   return (
-      <AuthContext.Provider value={{ auth, isLoggedIn, login, logout }}>
+      <AuthContext.Provider value={{ auth, isLoggedIn, login, loginWithSession, logout }}>
         {children}
       </AuthContext.Provider>
   );

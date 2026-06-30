@@ -163,6 +163,7 @@ export default function KycUploadSheet({ isOpen, onClose, onConfirm, capture }) 
                 type="file"
                 accept="image/*"
                 className="hidden"
+                onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleFileChosen(e.target.files?.[0] ?? null, 'library')}
             />
             <input
@@ -170,6 +171,7 @@ export default function KycUploadSheet({ isOpen, onClose, onConfirm, capture }) 
                 type="file"
                 accept="image/*,application/pdf"
                 className="hidden"
+                onClick={(e) => e.stopPropagation()}
                 onChange={(e) => handleFileChosen(e.target.files?.[0] ?? null, 'document')}
             />
 
