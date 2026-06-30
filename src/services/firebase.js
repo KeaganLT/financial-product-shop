@@ -20,16 +20,21 @@ export const auth = getAuth(firebaseApp);
 export const functions = getFunctions(firebaseApp);
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
+const PASSWORD_FOR_SIGN_IN_KEY = 'passwordForSignIn';
 
 // Sends a real "click to verify" email via Firebase's own infrastructure.
 // The link sends the user back to /signup, where we detect and complete it.
-export async function sendVerificationEmail(email) {
+// The link click reloads the page (fresh React state), so we also stash the
+// legacy-account password the user just chose — otherwise it's lost and the
+// later /v1/token login during KYC submit fails with Bad credentials.
+export async function sendVerificationEmail(email, password) {
     const actionCodeSettings = {
         url: `${window.location.origin}/signup`,
         handleCodeInApp: true,
     };
     await sendSignInLinkToEmail(auth, email, actionCodeSettings);
     window.localStorage.setItem(EMAIL_FOR_SIGN_IN_KEY, email);
+    window.localStorage.setItem(PASSWORD_FOR_SIGN_IN_KEY, password);
 }
 
 // Same Firebase email mechanism as sendVerificationEmail, but for an email
@@ -52,6 +57,10 @@ export function getStoredVerificationEmail() {
     return window.localStorage.getItem(EMAIL_FOR_SIGN_IN_KEY);
 }
 
+export function getStoredVerificationPassword() {
+    return window.localStorage.getItem(PASSWORD_FOR_SIGN_IN_KEY);
+}
+
 // Completes the passwordless sign-in started by sendVerificationEmail().
 // Returns the verified email address.
 export async function completeEmailVerification(email) {
@@ -60,6 +69,7 @@ export async function completeEmailVerification(email) {
     }
     await signInWithEmailLink(auth, email, window.location.href);
     window.localStorage.removeItem(EMAIL_FOR_SIGN_IN_KEY);
+    window.localStorage.removeItem(PASSWORD_FOR_SIGN_IN_KEY);
     return email;
 }
 

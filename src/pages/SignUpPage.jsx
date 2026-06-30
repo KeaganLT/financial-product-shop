@@ -18,6 +18,7 @@ import {
     sendExistingAccountEmail,
     isEmailVerificationLink,
     getStoredVerificationEmail,
+    getStoredVerificationPassword,
     completeEmailVerification,
     signInWithGoogle,
 } from '../services/firebase.js';
@@ -151,10 +152,13 @@ export default function SignUpPage() {
                 return;
             }
 
+            const storedPassword = getStoredVerificationPassword();
+
             setStage('awaiting-verification');
             completeEmailVerification(storedEmail)
                 .then(() => {
                     setEmail(storedEmail);
+                    setPassword(storedPassword || '');
                     setStage('details');
                     // Clear the verification params out of the URL.
                     navigate('/signup', { replace: true });
@@ -249,7 +253,7 @@ export default function SignUpPage() {
         try {
             try {
                 await createUser(email, password);
-                await sendVerificationEmail(email);
+                await sendVerificationEmail(email, password);
             } catch (err) {
                 if (err.status !== 400) {
                     throw err;
