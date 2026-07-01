@@ -259,6 +259,9 @@ export default function SignUpPage() {
                     throw err;
                 }
                 await sendExistingAccountEmail(email);
+                setError('An account with this email already exists. Please log in instead.');
+                trackEvent('registration_error', { stage: 'email', error: 'account_exists' });
+                return;   // ← stop here, don't advance to awaiting-verification
             }
             setStage('awaiting-verification');
         } catch (err) {
