@@ -113,3 +113,70 @@ export const legacyLogin = onCall(
         return { token, customerId: decodeCustomerId(token) };
     }
 );
+
+// Dev-only endpoint explorer — hits every known backend endpoint and returns
+// the full response from each. Only works in the emulator (blocked in prod).
+export const debugEndpoints = onCall(
+    { secrets: [LEGACY_BACKEND_URL] },
+    async (request) => {
+        if (process.env.FUNCTIONS_EMULATOR !== 'true') {
+            throw new HttpsError('permission-denied', 'Only available in the emulator.');
+        }
+
+        const base = LEGACY_BACKEND_URL.value();
+        const { username, password } = request.data ?? {};
+
+        async function hit(label, url, options = {}) {
+            try {
+                const res = await fetch(url, options);
+                let body;
+                try { body = await res.json(); } catch { body = await res.text(); }
+                return { label, url, status: res.status, ok: res.ok, body };
+            } catch (err) {
+                return { label, url, error: err.message };
+            }
+        }
+
+        const results = {};
+
+        // ── No-auth endpoints ────────────────────────────────────────────────
+        results.products        = await hit('GET /client/v1/products',    `${base}/client/v1/products`);
+        results.productById     = await hit('GET /client/v1/products/1',  `${base}/client/v1/products/1`);
+        results.customerTypes   = await hit('GET /client/v1/types',       `${base}/client/v1/types`);
+
+        // ── Auth: get a token ────────────────────────────────────────────────
+        if (!username || !password) {
+            results._note = 'Pass { username, password } in request data to test authenticated endpoints.';
+            return results;
+        }
+
+        const tokenRes = await hit(
+            'POST /v1/token',
+            `${base}/v1/token`,
+            { method: 'POST', headers: { Authorization: `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}` } }
+        );
+        results.token = tokenRes;
+
+        if (!tokenRes.ok) {
+            results._note = 'Login failed — authenticated endpoints skipped.';
+            return results;
+        }
+
+        const jwt = tokenRes.body?.loginAccessKey;
+        const authHeader = { Authorization: `Bearer ${jwt}` };
+
+        // ── Authenticated endpoints ──────────────────────────────────────────
+        results.profile      = await hit('GET /client/v1/profile',              `${base}/client/v1/profile`,              { headers: authHeader });
+        results.accounts     = await hit('GET /client/v1/profile/accounts',     `${base}/client/v1/profile/accounts`,     { headers: authHeader });
+        results.documents    = await hit('GET /client/v1/profile/documents',    `${base}/client/v1/profile/documents`,    { headers: authHeader });
+        results.subscriptions = await hit('GET /client/v1/subscriptions',       `${base}/client/v1/subscriptions`,        { headers: authHeader });
+
+        results.eligibility  = await hit(
+            'POST /client/v1/subscriptions/eligibility',
+            `${base}/client/v1/subscriptions/eligibility`,
+            { method: 'POST', headers: { ...authHeader, 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: [1, 2, 3, 4, 5, 6, 7, 8, 9] }) }
+        );
+
+        return results;
+    }
+);
