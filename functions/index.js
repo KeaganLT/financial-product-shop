@@ -117,7 +117,7 @@ export const legacyLogin = onCall(
 // Dev-only endpoint explorer — hits every known backend endpoint and returns
 // the full response from each. Only works in the emulator (blocked in prod).
 export const debugEndpoints = onCall(
-    { secrets: [LEGACY_BACKEND_URL] },
+    { secrets: [LEGACY_BACKEND_URL], timeoutSeconds: 300 },
     async (request) => {
         if (process.env.FUNCTIONS_EMULATOR !== 'true') {
             throw new HttpsError('permission-denied', 'Only available in the emulator.');
