@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
 import productPlaceholder from '../assets/product-placeholder.svg';
@@ -63,9 +64,10 @@ function getProductDetails(productName = '') {
 }
 
 export default function ProductDetailPage() {
-    const { id }         = useParams();
-    const navigate       = useNavigate();
-    const { isLoggedIn } = useAuth();
+    const { id }              = useParams();
+    const navigate            = useNavigate();
+    const { isLoggedIn }      = useAuth();
+    const { addItem, isInCart } = useCart();
 
     const [product, setProduct]     = useState(null);
     const [allProducts, setAllProducts] = useState([]);
@@ -485,7 +487,10 @@ export default function ProductDetailPage() {
                         onClick={() => {
                             if (!isLoggedIn) {
                                 navigate('/login');
+                            } else if (isInCart(product.id)) {
+                                navigate('/cart');
                             } else {
+                                addItem(product);
                                 navigate('/cart');
                             }
                         }}
@@ -506,7 +511,7 @@ export default function ProductDetailPage() {
                             cursor: isLoggedIn ? 'pointer' : 'default',
                         }}
                     >
-                        {isLoggedIn ? 'Add to cart' : 'Add to cart'}
+                        {isLoggedIn && isInCart(product.id) ? 'View cart' : 'Add to cart'}
                     </button>
                 </div>
             </div>
