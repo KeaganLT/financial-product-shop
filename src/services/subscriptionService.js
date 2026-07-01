@@ -15,6 +15,21 @@ export async function getEligibility(productIds, token) {
     return response.json();
 }
 
+export async function takeUpProducts(productIds, token) {
+    const response = await fetch(`${BASE_URL}/subscriptions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productIds }),
+    });
+    const data = await response.json();
+    if (response.status === 422) return { success: false, fulfilmentResultList: data.fulfilmentResultList };
+    if (!response.ok) throw new Error(data?.message || 'Take-up failed');
+    return { success: true, fulfilmentResultList: data.fulfilmentResultList ?? [] };
+}
+
 export async function getSubscription(id, token) {
     const response = await fetch(`${BASE_URL}/subscriptions/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
