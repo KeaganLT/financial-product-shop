@@ -10,7 +10,12 @@ import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import AccountPage from './pages/AccountPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import CheckoutResultPage from './pages/CheckoutResultPage';
+import KycDocumentsPage from './pages/KycDocumentsPage';
 
+// Syncs cart state with the currently logged-in user.
+// Sits inside both providers so it can read both contexts without coupling them.
 function AuthCartBridge() {
     const { auth } = useAuth();
     const { initCart } = useCart();
@@ -30,14 +35,17 @@ export default function App() {
                     <BrowserRouter>
                         <AuthCartBridge />
                         <Routes>
-                            <Route path="/"             element={<Navigate to="/login" replace />} />
-                            <Route path="/products"     element={<ProductsPage />} />
-                            <Route path="/products/:id" element={<ProductDetailPage />} />
-                            <Route path="/login"        element={<LoginPage />} />
-                            <Route path="/signup"       element={<SignUpPage />} />
-                            <Route path="/account"      element={<AccountPage />} />
-                            <Route path="/cart"         element={<CartPage />} />
-                            <Route path="*"             element={<Navigate to="/products" replace />} />
+                            <Route path="/"              element={<Navigate to="/login" replace />} />
+                            <Route path="/products"      element={<ProductsPage />} />
+                            <Route path="/products/:id"  element={<ProductDetailPage />} />
+                            <Route path="/login"         element={<LoginPage />} />
+                            <Route path="/signup"        element={<SignUpPage />} />
+                            <Route path="/account"       element={<AccountPage />} />
+                            <Route path="/cart"          element={<CartPage />} />
+                            <Route path="/checkout"      element={<CheckoutPage />} />
+                            <Route path="/checkout/result" element={<CheckoutResultPage />} />
+                            <Route path="/kyc"           element={<KycDocumentsPage />} />
+                            <Route path="*"              element={<Navigate to="/products" replace />} />
                         </Routes>
                     </BrowserRouter>
                 </CartProvider>
