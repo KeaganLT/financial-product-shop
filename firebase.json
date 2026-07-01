@@ -21,13 +21,13 @@
     },
     "ui": {
       "enabled": true,
-      "port": 4000
+      "port": 4010
     },
     "hub": {
-      "port": 4400
+      "port": 4410
     },
     "logging": {
-      "port": 4500
+      "port": 4510
     }
   }
 }
