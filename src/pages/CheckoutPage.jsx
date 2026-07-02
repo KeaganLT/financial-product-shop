@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { takeUpProducts } from '../services/subscriptionService';
+import productPlaceholder from '../assets/product-placeholder.svg';
 
 // ── Card brand logos (inline SVG approximations) ────────────────────────────
 
@@ -174,8 +175,6 @@ function StatusBadge({ fulfilmentType }) {
         </span>
     );
 }
-
-import productPlaceholder from '../assets/product-placeholder.svg';
 
 function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay, loading, error }) {
     return (

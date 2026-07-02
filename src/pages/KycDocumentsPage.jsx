@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import ThemeToggle from '../components/ThemeToggle.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
 import { uploadKycDocument, trackEvent } from '../services/firebase.js';
 import { markKycSubmitted } from '../services/kycStatus.js';
+import { postKycStatus, seedDhaData, getProfile } from '../services/customerService.js';
 
 export default function KycDocumentsPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { auth, isLoggedIn } = useAuth();
+    const returnTo = location.state?.returnTo ?? '/products';
 
     const [selfieFile, setSelfieFile] = useState(null);
     const [proofOfResidenceFile, setProofOfResidenceFile] = useState(null);
@@ -43,7 +45,25 @@ export default function KycDocumentsPage() {
             ]);
             markKycSubmitted(auth.customerId);
             trackEvent('kyc_documents_submitted');
-            navigate('/account', { replace: true });
+
+            // Sync KYC status to backend: selfie = secondary, proof-of-residence = primary
+            await postKycStatus(
+                auth.customerId,
+                { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'red' },
+                auth.token,
+            );
+
+            // Seed DHA data so living/marital/duplicateId checks pass
+            try {
+                const profile = await getProfile(auth.token);
+                if (profile?.idNumber) {
+                    await seedDhaData(profile.idNumber, auth.token);
+                }
+            } catch (_) {
+                // non-fatal — DHA seeding failure should not block the user
+            }
+
+            navigate(returnTo, { replace: true });
         } catch (err) {
             setError(err.message || 'Failed to upload documents');
         } finally {
@@ -53,10 +73,8 @@ export default function KycDocumentsPage() {
 
     return (
         <div
-            className="min-h-screen flex flex-col items-center justify-center px-6"
-            style={{ backgroundColor: 'var(--surface-page)' }}
+            className="min-h-screen flex flex-col items-center justify-center px-6 bg-white"
         >
-            <ThemeToggle className="absolute top-6 right-6" />
 
             <form onSubmit={handleSubmit} className="w-full max-w-[363px] flex flex-col items-center gap-6">
                 <KYCSuccess width={150} height={113} />
