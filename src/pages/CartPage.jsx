@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { getKycStatus } from '../services/kycStatus';
+import { getEligibility } from '../services/subscriptionService';
 import productPlaceholder from '../assets/product-placeholder.svg';
 
 const EmptyCartIllustration = () => (
@@ -89,58 +92,33 @@ function CartItemCard({ product, onRemove }) {
                         />
                     </div>
 
-                    {/* Details + stepper */}
-                    <div className="flex flex-col gap-[21px] flex-1 min-w-0">
-                        {/* Name + price */}
-                        <div className="flex flex-col gap-1">
-                            <p
-                                className="font-semibold text-black leading-[22px]"
-                                style={{ fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
-                            >
-                                {product.name}
-                            </p>
-                            <p
-                                className="text-[#8E8E93]"
-                                style={{ fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}
-                            >
-                                from R{Number(product.price).toFixed(0)} p/m
-                            </p>
-                        </div>
+                    {/* Details */}
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                        <p
+                            className="font-semibold text-black leading-[22px]"
+                            style={{ fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
+                        >
+                            {product.name}
+                        </p>
+                        <p
+                            className="text-[#8E8E93]"
+                            style={{ fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}
+                        >
+                            from R{Number(product.price).toFixed(0)} p/m
+                        </p>
 
-                        {/* Quantity stepper — qty fixed at 1; pressing − removes the item */}
-                        <div className="flex items-center" style={{ width: 64, height: 18 }}>
-                            <button
-                                onClick={() => onRemove(product.id)}
-                                className="w-4 h-4 flex items-center justify-center"
-                                aria-label={`Remove ${product.name}`}
-                            >
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <rect x="0.5" y="0.5" width="15" height="15" rx="7.5" stroke="#1C1C1C" />
-                                    <rect x="4" y="7.5" width="8" height="1" fill="#1C1C1C" />
-                                </svg>
-                            </button>
-
-                            <div className="flex-1 flex items-center justify-center">
-                                <span
-                                    className="text-black text-center"
-                                    style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}
-                                >
-                                    1
-                                </span>
-                            </div>
-
-                            <button
-                                disabled
-                                className="w-4 h-4 flex items-center justify-center opacity-30"
-                                aria-label="Cannot increase quantity"
-                            >
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <rect x="0.5" y="0.5" width="15" height="15" rx="7.5" stroke="#1C1C1C" />
-                                    <rect x="4" y="7.5" width="8" height="1" fill="#1C1C1C" />
-                                    <rect x="7.5" y="4" width="1" height="8" fill="#1C1C1C" />
-                                </svg>
-                            </button>
-                        </div>
+                        {/* Desktop-only remove button */}
+                        <button
+                            onClick={() => onRemove(product.id)}
+                            className="hidden md:flex items-center gap-1 mt-2 text-[#C51C13]"
+                            style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}
+                            aria-label={`Remove ${product.name}`}
+                        >
+                            <svg width="16" height="16" viewBox="0 0 32 32" fill="none">
+                                <path d="M10 12h12M14 12V10h4v2M13 12l1 10h6l1-10" stroke="#C51C13" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Remove
+                        </button>
                     </div>
                 </div>
             </div>
@@ -158,9 +136,39 @@ function needsVerification(item) {
 export default function CartPage() {
     const navigate = useNavigate();
     const { items, removeItem } = useCart();
+    const { auth } = useAuth();
     const isEmpty = items.length === 0;
 
-    const requiresVerification = items.some(needsVerification);
+    const hasProductsNeedingVerification = items.some(needsVerification);
+    const [kycDone, setKycDone]           = useState(true);
+    const [needsAccount, setNeedsAccount] = useState(false); // eligibility failed due to account type
+
+    useEffect(() => {
+        if (!hasProductsNeedingVerification || !auth?.customerId) return;
+        getKycStatus(auth.customerId).then(({ proofOfResidence, selfie }) => {
+            setKycDone(proofOfResidence && selfie);
+        });
+    }, [hasProductsNeedingVerification, auth?.customerId]);
+
+    useEffect(() => {
+        if (!auth?.token || items.length === 0) return;
+        getEligibility(items.map((i) => i.id), auth.token)
+            .then((results) => {
+                if (!Array.isArray(results)) return;
+                const anyAccountIssue = results.some((r) => {
+                    if (r.isEligible) return false;
+                    const checks = r.checks ?? r.checkResults ?? [];
+                    return checks.some((c) => {
+                        const name = (c.name ?? c.checkName ?? c.type ?? '').toLowerCase();
+                        return !c.passed && (name.includes('account') || name.includes('product'));
+                    });
+                });
+                setNeedsAccount(anyAccountIssue);
+            })
+            .catch(() => {});
+    }, [items, auth?.token]);
+
+    const requiresVerification = hasProductsNeedingVerification && !kycDone;
     const monthlyTotal = items.reduce((sum, p) => sum + Number(p.price || 0), 0);
     const onceOffTotal = items.reduce((sum, p) => sum + Number(p.onceOffPrice || 0), 0);
     const grandTotal = monthlyTotal;
@@ -234,10 +242,30 @@ export default function CartPage() {
                                     In order to complete your purchase, please complete the identity verification process.
                                 </p>
                                 <button
-                                    onClick={() => navigate('/kyc')}
+                                    onClick={() => navigate('/kyc', { state: { returnTo: '/cart' } })}
                                     style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, lineHeight: '18px', letterSpacing: '0.41px', textDecoration: 'underline', color: '#1860BF', textAlign: 'left' }}
                                 >
                                     Verify now
+                                </button>
+                            </div>
+                        )}
+
+                        {needsAccount && (
+                            <div
+                                className="flex flex-col gap-2 rounded-[8px] px-6 py-3"
+                                style={{ background: '#FFF8E4', border: '1px solid #FFD980' }}
+                            >
+                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: '#1C1C1C' }}>
+                                    Account type required
+                                </p>
+                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: '#1C1C1C' }}>
+                                    One or more products require a specific account type. Add the required account to proceed.
+                                </p>
+                                <button
+                                    onClick={() => navigate('/account')}
+                                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, lineHeight: '18px', letterSpacing: '0.41px', textDecoration: 'underline', color: '#1860BF', textAlign: 'left' }}
+                                >
+                                    Manage accounts →
                                 </button>
                             </div>
                         )}

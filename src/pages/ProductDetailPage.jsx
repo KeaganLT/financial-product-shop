@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
+import { getEligibility } from '../services/subscriptionService';
 import productPlaceholder from '../assets/product-placeholder.svg';
-
 
 // Dummy data for benefits and requirements per product
 // These will eventually come from Firebase or the API
@@ -65,15 +65,17 @@ function getProductDetails(productName = '') {
 }
 
 export default function ProductDetailPage() {
-    const { id }         = useParams();
-    const navigate       = useNavigate();
-    const { isLoggedIn } = useAuth();
+    const { id }              = useParams();
+    const navigate            = useNavigate();
+    const { isLoggedIn }      = useAuth();
     const { addItem, isInCart } = useCart();
-    const [product, setProduct]     = useState(null);
+
+    const [product, setProduct]         = useState(null);
     const [allProducts, setAllProducts] = useState([]);
-    const [loading, setLoading]     = useState(true);
-    const [error, setError]         = useState(null);
-    const [expanded, setExpanded]   = useState(false);
+    const [loading, setLoading]         = useState(true);
+    const [error, setError]             = useState(null);
+    const [expanded, setExpanded]       = useState(false);
+    const [eligibility, setEligibility] = useState(null); // null = not loaded yet
 
     useEffect(() => {
         Promise.all([
@@ -87,6 +89,16 @@ export default function ProductDetailPage() {
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [id]);
+
+    useEffect(() => {
+        if (!isLoggedIn || !id) return;
+        getEligibility([Number(id)], auth.token)
+            .then((results) => {
+                const result = Array.isArray(results) ? results.find((r) => String(r.productId) === String(id)) : null;
+                setEligibility(result ?? null);
+            })
+            .catch(() => setEligibility(null));
+    }, [isLoggedIn, id, auth?.token]);
 
     if (loading) return <ProductDetailSkeleton />;
 
@@ -332,6 +344,48 @@ export default function ProductDetailPage() {
                                 </ul>
                             </div>
 
+                            {/* ── Eligibility status (logged-in only) ─────────────────── */}
+                            {isLoggedIn && eligibility !== null && (
+                                <>
+                                    <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
+                                    <div className="flex flex-col gap-2">
+                                        <h3 style={{ fontFamily: 'Roboto, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '28px', letterSpacing: '0.35px', color: '#000000' }}>
+                                            Your eligibility
+                                        </h3>
+                                        <div
+                                            className="flex items-center gap-2 mb-1"
+                                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: '15px', fontWeight: 600, color: eligibility.isEligible ? '#168C34' : '#C51C13' }}
+                                        >
+                                            {eligibility.isEligible ? (
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#168C34" /><path d="M5 9l3 3 5-5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                            ) : (
+                                                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#C51C13" /><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                                            )}
+                                            {eligibility.isEligible ? 'You qualify for this product' : 'You do not currently qualify'}
+                                        </div>
+                                        {/* Per-check breakdown if the API returns checks */}
+                                        {Array.isArray(eligibility.checks) && eligibility.checks.map((check, i) => (
+                                            <div key={i} className="flex items-center gap-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: '15px', color: '#8E8E93' }}>
+                                                {check.passed ? (
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#168C34" /><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                                                ) : (
+                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#FF9500" /><path d="M8 5v3M8 10.5v.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                                                )}
+                                                <span style={{ color: check.passed ? '#1C1C1C' : '#8E8E93' }}>{check.name ?? check.checkName ?? check.type}</span>
+                                            </div>
+                                        ))}
+                                        {!eligibility.isEligible && (
+                                            <button
+                                                onClick={() => navigate('/account')}
+                                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline', textAlign: 'left' }}
+                                            >
+                                                Manage your account →
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+
                             {/* Read less — Figma: Roboto Regular 20px #1860BF */}
                             <div className="flex flex-col gap-3">
                                 <button
@@ -351,6 +405,23 @@ export default function ProductDetailPage() {
                                 <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
                             </div>
                         </>
+                    )}
+
+                    {/* Compact eligibility badge when collapsed */}
+                    {!expanded && isLoggedIn && eligibility !== null && (
+                        <div
+                            className="flex items-center gap-2 px-3 py-2 rounded-[8px]"
+                            style={{ background: eligibility.isEligible ? '#F0FFF4' : '#FFF5F5', border: `1px solid ${eligibility.isEligible ? '#A3E9B8' : '#FFB3B3'}` }}
+                        >
+                            {eligibility.isEligible ? (
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#168C34" /><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            ) : (
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#C51C13" /><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
+                            )}
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: eligibility.isEligible ? '#168C34' : '#C51C13' }}>
+                                {eligibility.isEligible ? 'You qualify for this product' : 'You do not currently qualify — tap Read more for details'}
+                            </span>
+                        </div>
                     )}
 
                     {/* Divider above related (always shown) */}
