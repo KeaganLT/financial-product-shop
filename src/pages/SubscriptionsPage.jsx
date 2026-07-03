@@ -38,7 +38,7 @@ function EmptyIllustration() {
     );
 }
 
-function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
+function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     // product is returned as an array — take the first item
@@ -86,16 +86,30 @@ function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
                     <StatusBadge fulfilmentType={fulfilType} />
                 </div>
 
-                {/* Cancel flow */}
-                {!confirmOpen ? (
+                {/* Contract + Cancel row */}
+                <div className="flex items-center gap-4 mt-1">
+                    <button
+                        onClick={() => onContract({ id: productId, name, price })}
+                        className="flex items-center gap-1"
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF' }}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2v6h6M16 13H8M16 17H8" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        Contract
+                    </button>
+                    <span style={{ color: '#C7C7CC' }}>·</span>
+                    {!confirmOpen ? (
                     <button
                         onClick={() => setConfirmOpen(true)}
-                        className="self-start mt-1"
                         style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13', textDecoration: 'underline' }}
                     >
                         Cancel subscription
                     </button>
-                ) : (
+                    ) : null}
+                </div>
+                {confirmOpen && (
                     <div
                         className="flex flex-col gap-2 mt-1 px-3 py-2 rounded-[8px]"
                         style={{ background: '#FFF5F5', border: '1px solid #FFB3B3' }}
@@ -206,6 +220,11 @@ export default function SubscriptionsPage() {
         }
     }
 
+    function handleContract(product) {
+        const bankDetails = getBankDetails(auth?.customerId);
+        navigate('/contract', { state: { product, bankDetails } });
+    }
+
     function handleView(productId) {
         navigate(`/products/${productId}`);
     }
@@ -302,6 +321,7 @@ export default function SubscriptionsPage() {
                                     onCancel={handleCancel}
                                     cancelling={cancellingId === subId}
                                     onView={handleView}
+                                    onContract={handleContract}
                                 />
                             );
                         })}

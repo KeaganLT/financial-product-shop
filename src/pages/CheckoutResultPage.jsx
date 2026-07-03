@@ -102,6 +102,19 @@ export default function CheckoutResultPage() {
                 <div className="max-w-[480px] mx-auto px-6 pt-4 pb-6 flex flex-col gap-3">
                     {isSubscription && (
                         <button
+                            onClick={() => navigate('/contract', { state: { product, bankDetails } })}
+                            className="w-full h-[46px] rounded-[100px] font-semibold flex items-center justify-center gap-2"
+                            style={{ background: '#168C34', fontFamily: 'Roboto, sans-serif', fontSize: 16, color: 'white' }}
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            Sign your contract
+                        </button>
+                    )}
+                    {isSubscription && (
+                        <button
                             onClick={() => navigate('/subscriptions')}
                             className="w-full h-[46px] rounded-[100px] font-semibold"
                             style={{

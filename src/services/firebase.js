@@ -109,3 +109,11 @@ export async function uploadKycDocument(customerUsername, docType, file) {
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);
 }
+
+// Uploads a signed contract PDF blob for a given customer + product.
+export async function uploadSignedContract(customerId, productId, blob) {
+    const path = `contracts/${customerId}/${productId}_signed.pdf`;
+    const fileRef = ref(storage, path);
+    await uploadBytes(fileRef, blob, { contentType: 'application/pdf' });
+    return getDownloadURL(fileRef);
+}

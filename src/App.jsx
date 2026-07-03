@@ -13,6 +13,7 @@ import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import CheckoutResultPage from './pages/CheckoutResultPage';
 import SubscribeCheckoutPage from './pages/SubscribeCheckoutPage';
+import ContractPage from './pages/ContractPage';
 import KycDocumentsPage from './pages/KycDocumentsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Footer from './components/Footer';
@@ -48,6 +49,7 @@ export default function App() {
                             <Route path="/checkout"      element={<CheckoutPage />} />
                             <Route path="/checkout/result" element={<CheckoutResultPage />} />
                             <Route path="/checkout/subscribe/:productId" element={<SubscribeCheckoutPage />} />
+                            <Route path="/contract" element={<ContractPage />} />
                             <Route path="/kyc"           element={<KycDocumentsPage />} />
                             <Route path="/subscriptions" element={<SubscriptionsPage />} />
                             <Route path="*"              element={<Navigate to="/products" replace />} />
