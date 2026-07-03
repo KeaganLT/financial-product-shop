@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
 import { getEligibility, probeEligibilityDetails } from '../services/subscriptionService';
+import { getProfile } from '../services/customerService';
 import productPlaceholder from '../assets/product-placeholder.svg';
 
 // Dummy data for benefits and requirements per product
@@ -53,6 +54,26 @@ const PRODUCT_DETAILS = {
     },
 };
 
+const PRODUCT_CUSTOMER_TYPES = {
+    'Retail Short Term Insurance':    ['INDIVIDUAL'],
+    'Retail Long-Term Insurance':     ['INDIVIDUAL'],
+    'Commercial Short Term Insurance':['SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Commercial Long-Term Insurance': ['SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Device Contract':                ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Short-Term Investment Product':  ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Long-Term investment Product':   ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Islamic Investment Product':     ['INDIVIDUAL', 'NON-PROFIT'],
+    'VIP Investment Product':         ['INDIVIDUAL'],
+};
+
+function getRequiredCustomerTypes(productName = '') {
+    const entry = Object.entries(PRODUCT_CUSTOMER_TYPES).find(([key]) =>
+        productName.toLowerCase().includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(productName.toLowerCase())
+    );
+    return entry ? entry[1] : null;
+}
+
 function getProductDetails(productName = '') {
     const name = productName.toLowerCase();
     if (name.includes('insurance') || name.includes('device') || name.includes('contract')) {
@@ -77,6 +98,7 @@ export default function ProductDetailPage() {
     const [expanded, setExpanded]       = useState(false);
     const [eligibility, setEligibility] = useState(null); // null = not loaded yet
     const [failedChecks, setFailedChecks] = useState([]);
+    const [customerTypeIssue, setCustomerTypeIssue] = useState(null); // { required, current }
 
     useEffect(() => {
         Promise.all([
@@ -93,17 +115,36 @@ export default function ProductDetailPage() {
 
     useEffect(() => {
         if (!isLoggedIn || !id) return;
-        getEligibility([Number(id)], auth.token)
-            .then(async (results) => {
+        Promise.all([
+            getEligibility([Number(id)], auth.token),
+            getProfile(auth.token),
+        ])
+            .then(async ([results, profile]) => {
                 const result = Array.isArray(results) ? results.find((r) => String(r.productId) === String(id)) : null;
                 setEligibility(result ?? null);
-                if (result && !result.isEligible) {
-                    const checks = await probeEligibilityDetails(Number(id), auth.token);
-                    setFailedChecks(checks);
+
+                if (result && !result.isEligible && product) {
+                    const required = getRequiredCustomerTypes(product.name);
+                    const currentTypeName = (profile?.customerType?.name ?? '').toUpperCase();
+                    if (required) {
+                        const normalised = required.map((t) => t.toUpperCase());
+                        if (!currentTypeName) {
+                            setCustomerTypeIssue({ required, current: null });
+                        } else if (!normalised.includes(currentTypeName)) {
+                            setCustomerTypeIssue({ required, current: profile.customerType.name });
+                        } else {
+                            setCustomerTypeIssue(null);
+                            const checks = await probeEligibilityDetails(Number(id), auth.token);
+                            setFailedChecks(checks);
+                        }
+                    } else {
+                        const checks = await probeEligibilityDetails(Number(id), auth.token);
+                        setFailedChecks(checks);
+                    }
                 }
             })
             .catch(() => setEligibility(null));
-    }, [isLoggedIn, id, auth?.token]);
+    }, [isLoggedIn, id, auth?.token, product]);
 
     if (loading) return <ProductDetailSkeleton />;
 
@@ -369,8 +410,28 @@ export default function ProductDetailPage() {
                                             {eligibility.isEligible ? 'You qualify for this product' : 'You do not currently qualify'}
                                         </div>
 
-                                        {/* Per-check breakdown from takeUpProducts 422 */}
-                                        {!eligibility.isEligible && failedChecks.length > 0 && (
+                                        {/* Customer type mismatch — shown as primary reason */}
+                                        {!eligibility.isEligible && customerTypeIssue && (
+                                            <div className="flex flex-col gap-2 px-3 py-3 rounded-[8px]" style={{ background: '#FFF8E4', border: '1px solid #FFD980' }}>
+                                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1C1C1C' }}>
+                                                    {customerTypeIssue.current
+                                                        ? `Your customer type (${customerTypeIssue.current}) does not qualify for this product.`
+                                                        : 'You need to set a customer type to qualify for this product.'}
+                                                </p>
+                                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: '#8E8E93' }}>
+                                                    Required: {customerTypeIssue.required.join(', ')}
+                                                </p>
+                                                <button
+                                                    onClick={() => navigate('/account')}
+                                                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline', textAlign: 'left' }}
+                                                >
+                                                    {customerTypeIssue.current ? 'Manage account →' : 'Set customer type →'}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* Per-check breakdown from takeUpProducts 422 — only shown when customer type is fine */}
+                                        {!eligibility.isEligible && !customerTypeIssue && failedChecks.length > 0 && (
                                             <div className="flex flex-col gap-2">
                                                 {failedChecks.map((check, i) => {
                                                     const name = check.name ?? check.checkName ?? check.type ?? '';
@@ -386,7 +447,7 @@ export default function ProductDetailPage() {
                                                                 <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#FF9500" /><path d="M8 5v3M8 10.5v.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
                                                             )}
                                                             <div className="flex flex-col gap-0.5">
-                                                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px', fontWeight: 500, color: passed ? '#1C1C1C' : '#1C1C1C' }}>
+                                                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px', fontWeight: 500, color: '#1C1C1C' }}>
                                                                     {name}
                                                                 </span>
                                                                 {!passed && (isKyc || isAccount) && (
@@ -404,13 +465,13 @@ export default function ProductDetailPage() {
                                             </div>
                                         )}
 
-                                        {!eligibility.isEligible && failedChecks.length === 0 && (
+                                        {!eligibility.isEligible && !customerTypeIssue && failedChecks.length === 0 && (
                                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: '#8E8E93' }}>
                                                 Complete your profile and identity verification to qualify.
                                             </p>
                                         )}
 
-                                        {!eligibility.isEligible && (
+                                        {!eligibility.isEligible && !customerTypeIssue && (
                                             <button
                                                 onClick={() => navigate('/account')}
                                                 className="self-start px-4 py-2 rounded-full text-white text-[13px] font-semibold"
