@@ -1,33 +1,122 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#2D1B69"/>
-      <stop offset="100%" stop-color="#5B21B6"/>
+      <stop offset="0%" stop-color="#1A0533"/>
+      <stop offset="55%" stop-color="#2D0B5E"/>
+      <stop offset="100%" stop-color="#4A1080"/>
     </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
-      <stop offset="0%" stop-color="#F6D365"/>
-      <stop offset="100%" stop-color="#C9A84C"/>
+    <linearGradient id="crownGold" x1="200" y1="80" x2="200" y2="195" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFE57F"/>
+      <stop offset="50%" stop-color="#FFB300"/>
+      <stop offset="100%" stop-color="#E65100" stop-opacity="0.7"/>
     </linearGradient>
+    <radialGradient id="crownGlow" cx="200" cy="145" r="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB300" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#FFB300" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="gemRed" cx="50%" cy="30%" r="70%" fx="50%" fy="30%">
+      <stop offset="0%" stop-color="#FF8A80"/>
+      <stop offset="100%" stop-color="#B71C1C"/>
+    </radialGradient>
+    <radialGradient id="gemBlue" cx="50%" cy="30%" r="70%" fx="50%" fy="30%">
+      <stop offset="0%" stop-color="#82B1FF"/>
+      <stop offset="100%" stop-color="#1565C0"/>
+    </radialGradient>
+    <radialGradient id="gemGreen" cx="50%" cy="30%" r="70%" fx="50%" fy="30%">
+      <stop offset="0%" stop-color="#B9F6CA"/>
+      <stop offset="100%" stop-color="#1B5E20"/>
+    </radialGradient>
+    <filter id="crownGlowFilter"><feGaussianBlur stdDeviation="12"/></filter>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="sparkle"><feGaussianBlur stdDeviation="2"/></filter>
   </defs>
+
   <rect width="400" height="289" fill="url(#bg)"/>
-  <circle cx="200" cy="144" r="110" fill="white" fill-opacity="0.04"/>
-  <circle cx="200" cy="144" r="75" fill="white" fill-opacity="0.04"/>
-  <!-- Crown -->
-  <!-- Base bar -->
-  <rect x="152" y="170" width="96" height="14" rx="3" fill="#C9A84C" fill-opacity="0.9"/>
+
+  <!-- Crown glow behind -->
+  <ellipse cx="200" cy="155" rx="95" ry="60" fill="url(#crownGlow)" filter="url(#softBlur)"/>
+
+  <!-- Decorative concentric circles -->
+  <circle cx="200" cy="144" r="130" stroke="white" stroke-width="0.3" stroke-opacity="0.08"/>
+  <circle cx="200" cy="144" r="105" stroke="white" stroke-width="0.3" stroke-opacity="0.08"/>
+  <circle cx="200" cy="144" r="80" stroke="#FFB300" stroke-width="0.4" stroke-opacity="0.12"/>
+
+  <!-- Star field -->
+  <circle cx="55" cy="45" r="1.5" fill="white" fill-opacity="0.6"/>
+  <circle cx="100" cy="22" r="1" fill="white" fill-opacity="0.4"/>
+  <circle cx="155" cy="38" r="1.5" fill="#FFE57F" fill-opacity="0.5"/>
+  <circle cx="245" cy="28" r="1.5" fill="white" fill-opacity="0.5"/>
+  <circle cx="305" cy="18" r="1" fill="white" fill-opacity="0.4"/>
+  <circle cx="355" cy="42" r="1.5" fill="#FFE57F" fill-opacity="0.5"/>
+  <circle cx="38" cy="120" r="1" fill="white" fill-opacity="0.3"/>
+  <circle cx="362" cy="115" r="1" fill="white" fill-opacity="0.3"/>
+  <circle cx="70" cy="200" r="1.5" fill="white" fill-opacity="0.25"/>
+  <circle cx="330" cy="205" r="1.5" fill="white" fill-opacity="0.25"/>
+
+  <!-- Sparkle crosses -->
+  <g transform="translate(80, 65)" opacity="0.5">
+    <line x1="-6" y1="0" x2="6" y2="0" stroke="#FFE57F" stroke-width="1.2"/>
+    <line x1="0" y1="-6" x2="0" y2="6" stroke="#FFE57F" stroke-width="1.2"/>
+    <line x1="-4" y1="-4" x2="4" y2="4" stroke="#FFE57F" stroke-width="0.6"/>
+    <line x1="4" y1="-4" x2="-4" y2="4" stroke="#FFE57F" stroke-width="0.6"/>
+  </g>
+  <g transform="translate(320, 75)" opacity="0.5">
+    <line x1="-6" y1="0" x2="6" y2="0" stroke="#FFE57F" stroke-width="1.2"/>
+    <line x1="0" y1="-6" x2="0" y2="6" stroke="#FFE57F" stroke-width="1.2"/>
+    <line x1="-4" y1="-4" x2="4" y2="4" stroke="#FFE57F" stroke-width="0.6"/>
+    <line x1="4" y1="-4" x2="-4" y2="4" stroke="#FFE57F" stroke-width="0.6"/>
+  </g>
+  <g transform="translate(145, 220)" opacity="0.35">
+    <line x1="-5" y1="0" x2="5" y2="0" stroke="#FFE57F" stroke-width="1"/>
+    <line x1="0" y1="-5" x2="0" y2="5" stroke="#FFE57F" stroke-width="1"/>
+  </g>
+  <g transform="translate(258, 220)" opacity="0.35">
+    <line x1="-5" y1="0" x2="5" y2="0" stroke="#FFE57F" stroke-width="1"/>
+    <line x1="0" y1="-5" x2="0" y2="5" stroke="#FFE57F" stroke-width="1"/>
+  </g>
+
+  <!-- Crown shadow/glow -->
+  <path d="M148 195 L148 138 L170 165 L200 95 L230 165 L252 138 L252 195 Z"
+        fill="#FFB300" fill-opacity="0.3" filter="url(#crownGlowFilter)" transform="translate(0,6)"/>
+
   <!-- Crown body -->
-  <path d="M156 170 L156 140 L175 158 L200 120 L225 158 L244 140 L244 170 Z" fill="#C9A84C" fill-opacity="0.9"/>
-  <!-- Gem dots on crown points -->
-  <circle cx="156" cy="138" r="5" fill="#F6D365"/>
-  <circle cx="200" cy="118" r="6" fill="#F6D365"/>
-  <circle cx="244" cy="138" r="5" fill="#F6D365"/>
-  <!-- Center gem -->
-  <circle cx="200" cy="152" r="7" fill="#E8B4D8" fill-opacity="0.9"/>
-  <!-- Stars -->
-  <circle cx="150" cy="100" r="2" fill="#F6D365" fill-opacity="0.7"/>
-  <circle cx="260" cy="90" r="2.5" fill="#F6D365" fill-opacity="0.7"/>
-  <circle cx="140" cy="180" r="1.5" fill="#F6D365" fill-opacity="0.5"/>
-  <circle cx="265" cy="175" r="1.5" fill="#F6D365" fill-opacity="0.5"/>
-  <!-- VIP text -->
-  <text x="200" y="218" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" fill="white" fill-opacity="0.8" font-weight="500" letter-spacing="2">VIP INVESTMENT</text>
+  <path d="M148 195 L148 138 L170 165 L200 95 L230 165 L252 138 L252 195 Z"
+        fill="url(#crownGold)"/>
+
+  <!-- Crown highlight edge -->
+  <path d="M148 138 L170 165 L200 95 L230 165 L252 138"
+        stroke="#FFE57F" stroke-width="1.5" stroke-linejoin="round" fill="none" stroke-opacity="0.8"/>
+
+  <!-- Crown base bar -->
+  <rect x="140" y="193" width="120" height="18" rx="4" fill="url(#crownGold)"/>
+  <rect x="140" y="193" width="120" height="5" rx="2" fill="#FFE57F" fill-opacity="0.5"/>
+
+  <!-- Gem on left point -->
+  <circle cx="148" cy="136" r="10" fill="url(#gemBlue)"/>
+  <circle cx="148" cy="136" r="10" stroke="#FFE57F" stroke-width="1" stroke-opacity="0.7"/>
+  <circle cx="145" cy="133" r="3" fill="white" fill-opacity="0.4"/>
+
+  <!-- Gem on top peak -->
+  <circle cx="200" cy="93" r="13" fill="url(#gemRed)"/>
+  <circle cx="200" cy="93" r="13" stroke="#FFE57F" stroke-width="1.5" stroke-opacity="0.8"/>
+  <circle cx="196" cy="89" r="4" fill="white" fill-opacity="0.4"/>
+
+  <!-- Gem on right point -->
+  <circle cx="252" cy="136" r="10" fill="url(#gemGreen)"/>
+  <circle cx="252" cy="136" r="10" stroke="#FFE57F" stroke-width="1" stroke-opacity="0.7"/>
+  <circle cx="249" cy="133" r="3" fill="white" fill-opacity="0.4"/>
+
+  <!-- Small gems on base -->
+  <circle cx="163" cy="202" r="5" fill="#FFE57F" fill-opacity="0.8"/>
+  <circle cx="180" cy="202" r="5" fill="#FFE57F" fill-opacity="0.6"/>
+  <circle cx="200" cy="202" r="6" fill="#FF8A80" fill-opacity="0.9"/>
+  <circle cx="220" cy="202" r="5" fill="#FFE57F" fill-opacity="0.6"/>
+  <circle cx="237" cy="202" r="5" fill="#FFE57F" fill-opacity="0.8"/>
+
+  <!-- VIP text above crown -->
+  <text x="200" y="68" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="22" fill="#FFE57F" fill-opacity="0.3" font-weight="900" letter-spacing="8">VIP</text>
+
+  <!-- Label -->
+  <rect x="0" y="255" width="400" height="34" fill="black" fill-opacity="0.4"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="12" fill="#FFE57F" fill-opacity="0.9" font-weight="600" letter-spacing="3">VIP INVESTMENT</text>
 </svg>
