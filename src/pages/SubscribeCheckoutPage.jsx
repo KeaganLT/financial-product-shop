@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getProductById } from '../services/productService';
 import { takeUpProducts } from '../services/subscriptionService';
 import { getBankDetails, saveBankDetails } from '../services/bankingService';
+import { useToast } from '../context/ToastContext';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 const BANKS = [
@@ -462,6 +463,7 @@ export default function SubscribeCheckoutPage() {
     const navigate      = useNavigate();
     const { auth, isLoggedIn } = useAuth();
 
+    const { showToast } = useToast();
     const [product, setProduct]           = useState(null);
     const [loading, setLoading]           = useState(true);
     const [step, setStep]                 = useState(1); // 1–4
@@ -491,6 +493,7 @@ export default function SubscribeCheckoutPage() {
             saveBankDetails(auth.customerId, bankDetails);
             const result = await takeUpProducts([Number(productId)], auth.token);
             if (result.success) {
+                showToast(`${product.name} activated successfully!`, 'success');
                 navigate('/checkout/result?type=subscription', { state: { product, bankDetails } });
             } else {
                 setSubmitError('Activation failed. Please check your eligibility and try again.');

@@ -5,18 +5,21 @@ import Header from '../components/Header.jsx';
 import BottomNav from '../components/BottomNav.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
-import { uploadKycDocument, trackEvent, changePassword, changeEmail, getSignInProvider, auth as firebaseAuth } from '../services/firebase.js';
+import { uploadKycDocument, trackEvent, changePassword, changeEmail, getSignInProvider, auth as firebaseAuth, resetPassword } from '../services/firebase.js';
 import { getKycStatus } from '../services/kycStatus.js';
 import { getProfile, getTypes, updateCustomerType, addAccount, removeAccount, postKycStatus, seedDhaData } from '../services/customerService.js';
+import { useToast } from '../context/ToastContext.jsx';
 
 // ─── Change Password form ──────────────────────────────────────────────────────
-function ChangePasswordForm({ isGoogleUser, onDone, onCancel }) {
-    const [current, setCurrent]   = useState('');
-    const [next, setNext]         = useState('');
-    const [confirm, setConfirm]   = useState('');
-    const [saving, setSaving]     = useState(false);
-    const [error, setError]       = useState('');
-    const [success, setSuccess]   = useState(false);
+function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onSuccess }) {
+    const [current, setCurrent]       = useState('');
+    const [next, setNext]             = useState('');
+    const [confirm, setConfirm]       = useState('');
+    const [saving, setSaving]         = useState(false);
+    const [error, setError]           = useState('');
+    const [success, setSuccess]       = useState(false);
+    const [resetSent, setResetSent]   = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -28,7 +31,8 @@ function ChangePasswordForm({ isGoogleUser, onDone, onCancel }) {
         try {
             await changePassword(isGoogleUser ? null : current, next);
             setSuccess(true);
-            setTimeout(onDone, 1500);
+            onSuccess?.('Password updated successfully.');
+            setTimeout(onDone, 800);
         } catch (err) {
             if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
                 setError('Current password is incorrect.');
@@ -64,15 +68,44 @@ function ChangePasswordForm({ isGoogleUser, onDone, onCancel }) {
                 </div>
             )}
             {!isGoogleUser && (
-                <input
-                    type="password"
-                    value={current}
-                    onChange={(e) => setCurrent(e.target.value)}
-                    placeholder="Current password"
-                    autoComplete="current-password"
-                    className="w-full h-[44px] rounded-[10px] px-3 border"
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: '#C7C7CC', outline: 'none' }}
-                />
+                <div className="flex flex-col gap-1">
+                    <input
+                        type="password"
+                        value={current}
+                        onChange={(e) => setCurrent(e.target.value)}
+                        placeholder="Current password"
+                        autoComplete="current-password"
+                        className="w-full h-[44px] rounded-[10px] px-3 border"
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: '#C7C7CC', outline: 'none' }}
+                    />
+                    {!resetSent ? (
+                        <button
+                            type="button"
+                            disabled={resetLoading}
+                            onClick={async () => {
+                                const email = firebaseAuth.currentUser?.email;
+                                if (!email) return;
+                                setResetLoading(true);
+                                try {
+                                    await resetPassword(email);
+                                    setResetSent(true);
+                                } catch {
+                                    setError('Could not send reset email. Try again.');
+                                } finally {
+                                    setResetLoading(false);
+                                }
+                            }}
+                            className="self-start text-left"
+                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#1860BF', opacity: resetLoading ? 0.5 : 1 }}
+                        >
+                            {resetLoading ? 'Sending…' : 'Forgot your password? Send reset email'}
+                        </button>
+                    ) : (
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#168C34' }}>
+                            ✓ Reset link sent to your email
+                        </p>
+                    )}
+                </div>
             )}
             <input
                 type="password"
@@ -116,7 +149,7 @@ function ChangePasswordForm({ isGoogleUser, onDone, onCancel }) {
 }
 
 // ─── Change Email form ─────────────────────────────────────────────────────────
-function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, onCancel }) {
+function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, onCancel, onSuccess }) {
     const [current, setCurrent]   = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [saving, setSaving]     = useState(false);
@@ -133,6 +166,7 @@ function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, onCancel }) {
         try {
             await changeEmail(isGoogleUser ? null : current, newEmail);
             setSent(true);
+            onSuccess?.(`Verification sent to ${newEmail} — click the link to confirm.`);
         } catch (err) {
             if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
                 setError('Current password is incorrect.');
@@ -224,6 +258,7 @@ function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, onCancel }) {
 export default function AccountPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn, logout } = useAuth();
+    const { showToast } = useToast();
 
     const [status, setStatus]             = useState(null);
     const [uploadError, setUploadError]   = useState('');
@@ -419,6 +454,7 @@ export default function AccountPage() {
                                         isGoogleUser={isGoogleUser}
                                         onDone={() => setEditingCredential(null)}
                                         onCancel={() => setEditingCredential(null)}
+                                        onSuccess={(msg) => showToast(msg, 'success')}
                                     />
                                 )}
                             </div>
@@ -450,6 +486,7 @@ export default function AccountPage() {
                                         isGoogleUser={isGoogleUser}
                                         onDone={() => setEditingCredential(null)}
                                         onCancel={() => setEditingCredential(null)}
+                                        onSuccess={(msg) => showToast(msg, 'success')}
                                     />
                                 )}
                             </div>
@@ -460,6 +497,28 @@ export default function AccountPage() {
                                 </p>
                             )}
                         </div>
+
+                        {/* ── KYC incomplete banner ── */}
+                        {!isVerified && status !== null && (
+                            <div
+                                className="w-full flex items-start gap-3 px-4 py-3 rounded-[12px]"
+                                style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}
+                            >
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
+                                    <circle cx="10" cy="10" r="10" fill="#F5A623" />
+                                    <rect x="9" y="5" width="2" height="6" rx="1" fill="white" />
+                                    <circle cx="10" cy="14" r="1" fill="white" />
+                                </svg>
+                                <div className="flex-1">
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: '#7A4F00' }}>
+                                        Your account is incomplete
+                                    </p>
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#7A4F00', marginTop: 2 }}>
+                                        Upload your proof of residence and selfie below to unlock all products.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
 
                         {/* ── KYC section ── */}
                         <div className="w-full flex flex-col items-center gap-3 text-center">

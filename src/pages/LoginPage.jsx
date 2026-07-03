@@ -5,7 +5,7 @@ import FormInput from '../components/FormInput.jsx';
 import LogoMark from '../components/LogoMark.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import { signInWithGoogle } from '../services/firebase.js';
+import { signInWithGoogle, resetPassword } from '../services/firebase.js';
 import { legacyLogin } from '../services/credentialVault.js';
 
 const SPLASH_DISPLAY_MS = 1600;
@@ -26,6 +26,8 @@ export default function LoginPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [usernameTouched, setUsernameTouched] = useState(false);
     const [passwordTouched, setPasswordTouched] = useState(false);
+    const [resetSent, setResetSent] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
 
     const isUsernameInvalid = !username.includes('@');
     const isPasswordInvalid = password.length === 0;
@@ -223,13 +225,36 @@ export default function LoginPage() {
                                     {isSubmitting ? 'Logging in...' : 'Login'}
                                 </button>
 
-                                <button
-                                    type="button"
-                                    className="text-[13px] text-center"
-                                    style={{ color: 'var(--neutral-500)' }}
-                                >
-                                    Forgot password?
-                                </button>
+                                {!resetSent ? (
+                                    <button
+                                        type="button"
+                                        disabled={resetLoading}
+                                        onClick={async () => {
+                                            if (!username.includes('@')) {
+                                                setError('Enter your email above first, then tap Forgot password.');
+                                                return;
+                                            }
+                                            setResetLoading(true);
+                                            setError('');
+                                            try {
+                                                await resetPassword(username);
+                                                setResetSent(true);
+                                            } catch {
+                                                setError('Could not send reset email. Check the address and try again.');
+                                            } finally {
+                                                setResetLoading(false);
+                                            }
+                                        }}
+                                        className="text-[13px] text-center"
+                                        style={{ color: 'var(--neutral-500)', opacity: resetLoading ? 0.5 : 1 }}
+                                    >
+                                        {resetLoading ? 'Sending…' : 'Forgot password?'}
+                                    </button>
+                                ) : (
+                                    <p className="text-[13px] text-center" style={{ color: '#168C34' }}>
+                                        ✓ Reset link sent to {username}
+                                    </p>
+                                )}
                             </div>
                         </form>
 

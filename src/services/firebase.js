@@ -13,6 +13,7 @@ import {
     EmailAuthProvider,
     updatePassword,
     verifyBeforeUpdateEmail,
+    sendPasswordResetEmail,
 } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
 import { getFirestore } from 'firebase/firestore';
@@ -122,6 +123,11 @@ export async function uploadKycDocument(customerUsername, docType, file) {
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);
+}
+
+// Sends a Firebase password reset email to the given address.
+export async function resetPassword(email) {
+    await sendPasswordResetEmail(auth, email);
 }
 
 // ─── Credential management ────────────────────────────────────────────────────
