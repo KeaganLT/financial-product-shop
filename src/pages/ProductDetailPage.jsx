@@ -7,7 +7,6 @@ import { getProducts, getProductById } from '../services/productService';
 import { getEligibility } from '../services/subscriptionService';
 import { getProfile } from '../services/customerService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
-import { getKycStatus } from '../services/kycStatus.js';
 import { getKycBackendStatus } from '../services/customerService';
 
 // Dummy data for benefits and requirements per product
@@ -131,10 +130,9 @@ export default function ProductDetailPage() {
 
                 // Fetch KYC data using numeric profile ID
                 const numericId = profile?.id;
-                const [kycStorage, kycBackend] = await Promise.all([
-                    numericId ? getKycStatus(numericId) : Promise.resolve({ proofOfResidence: false, selfie: false }),
-                    numericId ? getKycBackendStatus(numericId, auth.token) : Promise.resolve(null),
-                ]);
+                const kycBackend = numericId
+                    ? await getKycBackendStatus(numericId, auth.token)
+                    : null;
 
                 // Customer type check
                 const required = getRequiredCustomerTypes(product.name);
@@ -147,9 +145,9 @@ export default function ProductDetailPage() {
                 const taxStatus = (kycBackend?.taxCompliance ?? '').toLowerCase();
                 const taxPass = taxStatus === 'amber' || taxStatus === 'green';
 
-                // KYC document checks (Firebase Storage)
-                const porPass = kycStorage.proofOfResidence;
-                const selfiePass = kycStorage.selfie;
+                // KYC document checks — use backend indicators set when docs were uploaded
+                const porPass = kycBackend?.primaryIndicator === true;
+                const selfiePass = kycBackend?.secondaryIndicator === true;
 
                 // Account check — must have at least one account
                 const accounts = profile?.customerAccounts ?? profile?.accounts ?? [];
