@@ -21,3 +21,8 @@ export async function getKycStatus(customerId) {
 export function markDocumentUploaded(customerId, docType) {
     window.localStorage.setItem(`${STORAGE_PREFIX}${customerId}_${docType}`, 'true');
 }
+
+export function markKycSubmitted(customerId) {
+    markDocumentUploaded(customerId, 'selfie');
+    markDocumentUploaded(customerId, 'proof-of-residence');
+}

@@ -54,7 +54,7 @@ function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
             className="w-full rounded-[12px] overflow-hidden border"
             style={{ borderColor: '#E5E5EA' }}
         >
-            {/* Product image strip — tappable */}
+             {/* Product image strip — tappable */}
             <button
                 className="w-full overflow-hidden bg-[#D9D9D9] block"
                 style={{ height: 120 }}
