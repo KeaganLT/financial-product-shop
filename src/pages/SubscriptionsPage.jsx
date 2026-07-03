@@ -79,11 +79,6 @@ function SubscriptionCard({ subscription, onCancel, cancelling }) {
                     <StatusBadge fulfilmentType={fulfilType} />
                 </div>
 
-                {/* Subscription ID */}
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#C7C7CC', letterSpacing: '0.41px' }}>
-                    Ref: #{subId}
-                </p>
-
                 {/* Cancel flow */}
                 {!confirmOpen ? (
                     <button
