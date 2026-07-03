@@ -175,7 +175,7 @@ function StatusBadge({ fulfilmentType }) {
     );
 }
 
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay, loading, error }) {
     return (
@@ -186,7 +186,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                     {items.map((product) => (
                         <div key={product.id} className="flex items-start gap-4">
                             <div className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[#D9D9D9]" style={{ width: 72, height: 62 }}>
-                                <img src={product.imageUrl || productPlaceholder} alt={product.name} className="w-full h-full object-cover" />
+                                <img src={product.imageUrl || getProductPlaceholder(product.name)} alt={product.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 flex flex-col gap-1">
                                 <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: '#000' }}>{product.name}</p>

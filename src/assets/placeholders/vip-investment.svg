@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2D1B69"/>
+      <stop offset="100%" stop-color="#5B21B6"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#F6D365"/>
+      <stop offset="100%" stop-color="#C9A84C"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="289" fill="url(#bg)"/>
+  <circle cx="200" cy="144" r="110" fill="white" fill-opacity="0.04"/>
+  <circle cx="200" cy="144" r="75" fill="white" fill-opacity="0.04"/>
+  <!-- Crown -->
+  <!-- Base bar -->
+  <rect x="152" y="170" width="96" height="14" rx="3" fill="#C9A84C" fill-opacity="0.9"/>
+  <!-- Crown body -->
+  <path d="M156 170 L156 140 L175 158 L200 120 L225 158 L244 140 L244 170 Z" fill="#C9A84C" fill-opacity="0.9"/>
+  <!-- Gem dots on crown points -->
+  <circle cx="156" cy="138" r="5" fill="#F6D365"/>
+  <circle cx="200" cy="118" r="6" fill="#F6D365"/>
+  <circle cx="244" cy="138" r="5" fill="#F6D365"/>
+  <!-- Center gem -->
+  <circle cx="200" cy="152" r="7" fill="#E8B4D8" fill-opacity="0.9"/>
+  <!-- Stars -->
+  <circle cx="150" cy="100" r="2" fill="#F6D365" fill-opacity="0.7"/>
+  <circle cx="260" cy="90" r="2.5" fill="#F6D365" fill-opacity="0.7"/>
+  <circle cx="140" cy="180" r="1.5" fill="#F6D365" fill-opacity="0.5"/>
+  <circle cx="265" cy="175" r="1.5" fill="#F6D365" fill-opacity="0.5"/>
+  <!-- VIP text -->
+  <text x="200" y="218" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" fill="white" fill-opacity="0.8" font-weight="500" letter-spacing="2">VIP INVESTMENT</text>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0A6640"/>
+      <stop offset="100%" stop-color="#168C34"/>
+    </linearGradient>
+    <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="white" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="white" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="289" fill="url(#bg)"/>
+  <circle cx="320" cy="50" r="90" fill="white" fill-opacity="0.04"/>
+  <circle cx="80" cy="250" r="100" fill="white" fill-opacity="0.04"/>
+  <!-- Chart bars -->
+  <rect x="132" y="160" width="22" height="46" rx="4" fill="white" fill-opacity="0.35"/>
+  <rect x="164" y="138" width="22" height="68" rx="4" fill="white" fill-opacity="0.5"/>
+  <rect x="196" y="112" width="22" height="94" rx="4" fill="white" fill-opacity="0.65"/>
+  <rect x="228" y="86" width="22" height="120" rx="4" fill="white" fill-opacity="0.85"/>
+  <!-- Trend line -->
+  <path d="M143 155 L175 132 L207 108 L239 82" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="none"/>
+  <!-- Arrow tip -->
+  <path d="M232 76 L239 82 L233 90" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Baseline -->
+  <line x1="122" y1="210" x2="278" y2="210" stroke="white" stroke-width="1.5" stroke-opacity="0.4"/>
+  <!-- Rand sign -->
+  <text x="200" y="66" text-anchor="middle" font-family="Roboto, sans-serif" font-size="22" fill="white" fill-opacity="0.5" font-weight="700">R</text>
+  <text x="200" y="242" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" fill="white" fill-opacity="0.8" font-weight="500" letter-spacing="2">INVESTMENT PRODUCT</text>
+</svg>

@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getKycStatus } from '../services/kycStatus';
 import { getEligibility } from '../services/subscriptionService';
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 const EmptyCartIllustration = () => (
     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -86,7 +86,7 @@ function CartItemCard({ product, onRemove }) {
                         style={{ width: 125, height: 107 }}
                     >
                         <img
-                            src={product.imageUrl || productPlaceholder}
+                            src={product.imageUrl || getProductPlaceholder(product.name)}
                             alt={product.name}
                             className="w-full h-full object-cover"
                         />

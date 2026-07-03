@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1860BF"/>
+      <stop offset="100%" stop-color="#1AB0DE"/>
+    </linearGradient>
+    <linearGradient id="shield" x1="200" y1="60" x2="200" y2="229" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="289" fill="url(#bg)"/>
+  <!-- Subtle circles -->
+  <circle cx="340" cy="40" r="80" fill="white" fill-opacity="0.05"/>
+  <circle cx="60" cy="240" r="100" fill="white" fill-opacity="0.05"/>
+  <!-- Shield body -->
+  <path d="M200 55 L255 78 L255 145 C255 182 228 212 200 224 C172 212 145 182 145 145 L145 78 Z" fill="url(#shield)" stroke="white" stroke-width="2" stroke-opacity="0.6"/>
+  <!-- Person icon inside shield -->
+  <circle cx="200" cy="122" r="18" fill="white" fill-opacity="0.9"/>
+  <path d="M170 172 C170 155 183 145 200 145 C217 145 230 155 230 172" fill="white" fill-opacity="0.9"/>
+  <!-- Label -->
+  <text x="200" y="254" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" fill="white" fill-opacity="0.8" font-weight="500" letter-spacing="2">RETAIL INSURANCE</text>
+</svg>

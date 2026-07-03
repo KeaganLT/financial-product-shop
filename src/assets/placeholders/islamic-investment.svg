@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D4F3C"/>
+      <stop offset="100%" stop-color="#1A7A5A"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="289" fill="url(#bg)"/>
+  <!-- Geometric diamond pattern (subtle) -->
+  <path d="M200 20 L380 144 L200 268 L20 144 Z" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <path d="M200 55 L345 144 L200 233 L55 144 Z" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <!-- Crescent moon -->
+  <circle cx="200" cy="126" r="52" fill="none" stroke="white" stroke-width="2.5" stroke-opacity="0.85"/>
+  <circle cx="220" cy="112" r="44" fill="url(#bg)"/>
+  <!-- Star (8-pointed) -->
+  <g transform="translate(248 88)">
+    <polygon points="0,-10 2.5,-2.5 10,0 2.5,2.5 0,10 -2.5,2.5 -10,0 -2.5,-2.5" fill="white" fill-opacity="0.9"/>
+    <polygon points="0,-10 2.5,-2.5 10,0 2.5,2.5 0,10 -2.5,2.5 -10,0 -2.5,-2.5" fill="white" fill-opacity="0.9" transform="rotate(45)"/>
+  </g>
+  <!-- Small accent stars -->
+  <circle cx="155" cy="100" r="2" fill="white" fill-opacity="0.6"/>
+  <circle cx="245" cy="155" r="2" fill="white" fill-opacity="0.6"/>
+  <circle cx="165" cy="160" r="1.5" fill="white" fill-opacity="0.4"/>
+  <!-- Gold accent line -->
+  <line x1="140" y1="192" x2="260" y2="192" stroke="#C9A84C" stroke-width="1.5" stroke-opacity="0.7"/>
+  <text x="200" y="218" text-anchor="middle" font-family="Roboto, sans-serif" font-size="13" fill="white" fill-opacity="0.8" font-weight="500" letter-spacing="2">ISLAMIC INVESTMENT</text>
+</svg>

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 function StatusBadge({ fulfilmentType }) {
     const isImmediate = (fulfilmentType || '').toLowerCase().includes('immediate');
@@ -61,7 +61,7 @@ function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
                 onClick={() => productId && onView(productId)}
             >
                 <img
-                    src={imageUrl || productPlaceholder}
+                    src={imageUrl || getProductPlaceholder(name)}
                     alt={name}
                     className="w-full h-full object-cover"
                 />

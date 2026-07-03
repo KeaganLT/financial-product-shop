@@ -6,7 +6,7 @@ import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
 import { getEligibility } from '../services/subscriptionService';
 import { getProfile } from '../services/customerService';
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 // Dummy data for benefits and requirements per product
 // These will eventually come from Firebase or the API
@@ -215,7 +215,7 @@ export default function ProductDetailPage() {
                 <div className="px-6 pt-4 md:max-w-2xl">
                     <div className="relative w-full rounded-[8px] overflow-hidden" style={{ height: '289px' }}>
                         <img
-                            src={product.imageUrl || productPlaceholder}
+                            src={product.imageUrl || getProductPlaceholder(product.name)}
                             alt={product.name}
                             className="w-full h-full object-cover"
                         />
@@ -526,7 +526,7 @@ export default function ProductDetailPage() {
                                             style={{ height: '120px', borderRadius: '8px', backgroundColor: '#D9D9D9' }}
                                         >
                                             <img
-                                                src={related.imageUrl || productPlaceholder}
+                                                src={related.imageUrl || getProductPlaceholder(related.name)}
                                                 alt={related.name}
                                                 className="w-full h-full object-cover"
                                             />
