@@ -12,6 +12,7 @@ import AccountPage from './pages/AccountPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import CheckoutResultPage from './pages/CheckoutResultPage';
+import SubscribeCheckoutPage from './pages/SubscribeCheckoutPage';
 import KycDocumentsPage from './pages/KycDocumentsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Footer from './components/Footer';
@@ -46,6 +47,7 @@ export default function App() {
                             <Route path="/cart"          element={<CartPage />} />
                             <Route path="/checkout"      element={<CheckoutPage />} />
                             <Route path="/checkout/result" element={<CheckoutResultPage />} />
+                            <Route path="/checkout/subscribe/:productId" element={<SubscribeCheckoutPage />} />
                             <Route path="/kyc"           element={<KycDocumentsPage />} />
                             <Route path="/subscriptions" element={<SubscriptionsPage />} />
                             <Route path="*"              element={<Navigate to="/products" replace />} />

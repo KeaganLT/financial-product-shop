@@ -664,37 +664,51 @@ export default function ProductDetailPage() {
             </span>
                     </div>
 
-                    {/* Add to cart button */}
-                    <button
-                        onClick={() => {
-                            if (!isLoggedIn) {
-                                navigate('/login');
-                            } else if (isInCart(product.id)) {
-                                navigate('/cart');
-                            } else {
-                                addItem(product);
-                                navigate('/cart');
-                            }
-                        }}
-                        style={{
-                            width: '177.5px',
-                            height: '42px',
-                            borderRadius: '100px',
-                            background: isLoggedIn
-                                ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)'
-                                : '#E5E5EA',
-                            fontFamily: 'Roboto, sans-serif',
-                            fontSize: '17px',
-                            fontWeight: 600,
-                            lineHeight: '22px',
-                            letterSpacing: '0.0035em',
-                            color: isLoggedIn ? '#FFFFFF' : '#AEAEB2',
-                            border: 'none',
-                            cursor: isLoggedIn ? 'pointer' : 'default',
-                        }}
-                    >
-                        {isLoggedIn && isInCart(product.id) ? 'View cart' : 'Add to cart'}
-                    </button>
+                    {/* CTA button — physical products go to cart, non-physical go to subscribe flow */}
+                    {(() => {
+                        const isPhysical = (product.name ?? '').toLowerCase().includes('device') ||
+                            (product.name ?? '').toLowerCase().includes('contract');
+                        if (isPhysical) {
+                            return (
+                                <button
+                                    onClick={() => {
+                                        if (!isLoggedIn) { navigate('/login'); return; }
+                                        if (isInCart(product.id)) { navigate('/cart'); return; }
+                                        addItem(product);
+                                        navigate('/cart');
+                                    }}
+                                    style={{
+                                        width: '177.5px', height: '42px', borderRadius: '100px',
+                                        background: isLoggedIn ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                        fontFamily: 'Roboto, sans-serif', fontSize: '17px', fontWeight: 600,
+                                        color: isLoggedIn ? '#FFFFFF' : '#AEAEB2', border: 'none',
+                                        cursor: isLoggedIn ? 'pointer' : 'default',
+                                    }}
+                                >
+                                    {isLoggedIn && isInCart(product.id) ? 'View cart' : 'Add to cart'}
+                                </button>
+                            );
+                        }
+                        const isInsurance = (product.name ?? '').toLowerCase().includes('insurance');
+                        const label = isInsurance ? 'Get covered' : 'Start investing';
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (!isLoggedIn) { navigate('/login'); return; }
+                                    navigate(`/checkout/subscribe/${product.id}`);
+                                }}
+                                style={{
+                                    width: '177.5px', height: '42px', borderRadius: '100px',
+                                    background: isLoggedIn ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                    fontFamily: 'Roboto, sans-serif', fontSize: '17px', fontWeight: 600,
+                                    color: isLoggedIn ? '#FFFFFF' : '#AEAEB2', border: 'none',
+                                    cursor: isLoggedIn ? 'pointer' : 'default',
+                                }}
+                            >
+                                {isLoggedIn ? label : 'Sign in'}
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
         </div>

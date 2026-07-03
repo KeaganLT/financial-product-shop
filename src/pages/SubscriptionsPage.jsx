@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
+import { getBankDetails } from '../services/bankingService';
 
 function StatusBadge({ fulfilmentType }) {
     const isImmediate = (fulfilmentType || '').toLowerCase().includes('immediate');
@@ -136,6 +137,36 @@ function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
     );
 }
 
+function BankDetailsSection({ userId, navigate }) {
+    const bankDetails = getBankDetails(userId);
+    if (!bankDetails) return null;
+
+    return (
+        <div
+            className="rounded-[12px] px-4 py-3 flex items-center justify-between"
+            style={{ background: '#F0F4FF', border: '1px solid #C7D9FF' }}
+        >
+            <div className="flex flex-col gap-0.5">
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                    Debit account
+                </p>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>
+                    {bankDetails.bankName} · {bankDetails.accountType} ••••{bankDetails.last4}
+                </p>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>
+                    Debited on the {bankDetails.debitDay}{bankDetails.debitDay === 1 ? 'st' : 'th'} of each month
+                </p>
+            </div>
+            <button
+                onClick={() => navigate('/account/bank')}
+                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1860BF', flexShrink: 0, marginLeft: 12 }}
+            >
+                Change
+            </button>
+        </div>
+    );
+}
+
 export default function SubscriptionsPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn } = useAuth();
@@ -190,6 +221,8 @@ export default function SubscriptionsPage() {
                 >
                     My subscriptions
                 </h1>
+
+                {isLoggedIn && <BankDetailsSection userId={auth?.customerId} navigate={navigate} />}
 
                 {!isLoggedIn && (
                     <div className="flex flex-col items-center gap-4 pt-16 text-center">
