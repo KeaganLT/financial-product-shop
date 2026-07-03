@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
-import { getEligibility, probeEligibilityDetails } from '../services/subscriptionService';
+import { getEligibility } from '../services/subscriptionService';
 import { getProfile } from '../services/customerService';
 import productPlaceholder from '../assets/product-placeholder.svg';
 
@@ -97,7 +97,6 @@ export default function ProductDetailPage() {
     const [error, setError]             = useState(null);
     const [expanded, setExpanded]       = useState(false);
     const [eligibility, setEligibility] = useState(null); // null = not loaded yet
-    const [failedChecks, setFailedChecks] = useState([]);
     const [customerTypeIssue, setCustomerTypeIssue] = useState(null); // { required, current }
 
     useEffect(() => {
@@ -134,12 +133,7 @@ export default function ProductDetailPage() {
                             setCustomerTypeIssue({ required, current: profile.customerType.name });
                         } else {
                             setCustomerTypeIssue(null);
-                            const checks = await probeEligibilityDetails(Number(id), auth.token);
-                            setFailedChecks(checks);
                         }
-                    } else {
-                        const checks = await probeEligibilityDetails(Number(id), auth.token);
-                        setFailedChecks(checks);
                     }
                 }
             })
@@ -430,42 +424,7 @@ export default function ProductDetailPage() {
                                             </div>
                                         )}
 
-                                        {/* Per-check breakdown from takeUpProducts 422 — only shown when customer type is fine */}
-                                        {!eligibility.isEligible && !customerTypeIssue && failedChecks.length > 0 && (
-                                            <div className="flex flex-col gap-2">
-                                                {failedChecks.map((check, i) => {
-                                                    const name = check.name ?? check.checkName ?? check.type ?? '';
-                                                    const passed = check.passed ?? check.result ?? false;
-                                                    const lower = name.toLowerCase();
-                                                    const isKyc = lower.includes('kyc') || lower.includes('identity');
-                                                    const isAccount = lower.includes('account') || lower.includes('product');
-                                                    return (
-                                                        <div key={i} className="flex items-start gap-2 py-1">
-                                                            {passed ? (
-                                                                <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#168C34" /><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                                            ) : (
-                                                                <svg className="flex-shrink-0 mt-0.5" width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#FF9500" /><path d="M8 5v3M8 10.5v.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                                                            )}
-                                                            <div className="flex flex-col gap-0.5">
-                                                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '14px', fontWeight: 500, color: '#1C1C1C' }}>
-                                                                    {name}
-                                                                </span>
-                                                                {!passed && (isKyc || isAccount) && (
-                                                                    <button
-                                                                        onClick={() => navigate(isKyc ? '/kyc' : '/account')}
-                                                                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline', textAlign: 'left' }}
-                                                                    >
-                                                                        {isKyc ? 'Complete identity verification →' : 'Manage accounts →'}
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-
-                                        {!eligibility.isEligible && !customerTypeIssue && failedChecks.length === 0 && (
+                                        {!eligibility.isEligible && !customerTypeIssue && (
                                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: '#8E8E93' }}>
                                                 Complete your profile and identity verification to qualify.
                                             </p>

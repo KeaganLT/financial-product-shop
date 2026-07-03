@@ -30,15 +30,6 @@ export async function takeUpProducts(productIds, token) {
     return { success: true, fulfilmentResultList: data.fulfilmentResultList ?? [] };
 }
 
-export async function probeEligibilityDetails(productId, token) {
-    try {
-        const result = await takeUpProducts([productId], token);
-        return result.fulfilmentResultList ?? [];
-    } catch {
-        return [];
-    }
-}
-
 export async function getSubscriptions(token) {
     const response = await fetch(`${BASE_URL}/subscriptions`, {
         headers: { Authorization: `Bearer ${token}` },
