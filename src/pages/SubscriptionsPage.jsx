@@ -37,7 +37,7 @@ function EmptyIllustration() {
     );
 }
 
-function SubscriptionCard({ subscription, onCancel, cancelling }) {
+function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     // product is returned as an array — take the first item
@@ -47,31 +47,37 @@ function SubscriptionCard({ subscription, onCancel, cancelling }) {
     const imageUrl     = subscription.imageUrl ?? prod?.imageUrl ?? null;
     const fulfilType   = subscription.fulfilmentType ?? prod?.fulfilmentType ?? '';
     const subId        = subscription.subscriptionId ?? subscription.id;
+    const productId    = subscription.productId ?? prod?.id ?? null;
 
     return (
         <div
             className="w-full rounded-[12px] overflow-hidden border"
             style={{ borderColor: '#E5E5EA' }}
         >
-            {/* Product image strip */}
-            <div className="w-full overflow-hidden bg-[#D9D9D9]" style={{ height: 120 }}>
+            {/* Product image strip — tappable */}
+            <button
+                className="w-full overflow-hidden bg-[#D9D9D9] block"
+                style={{ height: 120 }}
+                onClick={() => productId && onView(productId)}
+            >
                 <img
                     src={imageUrl || productPlaceholder}
                     alt={name}
                     className="w-full h-full object-cover"
                 />
-            </div>
+            </button>
 
             {/* Card body */}
             <div className="px-4 py-3 flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1">
-                        <p
-                            className="font-semibold text-black"
+                        <button
+                            className="font-semibold text-black text-left"
                             style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em' }}
+                            onClick={() => productId && onView(productId)}
                         >
                             {name}
-                        </p>
+                        </button>
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93', lineHeight: '18px' }}>
                             R{Number(price).toFixed(2)} / month
                         </p>
@@ -169,6 +175,10 @@ export default function SubscriptionsPage() {
         }
     }
 
+    function handleView(productId) {
+        navigate(`/products/${productId}`);
+    }
+
     return (
         <div className="min-h-screen bg-white">
             <Header />
@@ -258,6 +268,7 @@ export default function SubscriptionsPage() {
                                     subscription={sub}
                                     onCancel={handleCancel}
                                     cancelling={cancellingId === subId}
+                                    onView={handleView}
                                 />
                             );
                         })}
