@@ -10,7 +10,7 @@ import UnsignedContractsBanner from '../components/subscriptions/UnsignedContrac
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
 import { getBankDetails } from '../services/bankingService';
 import { getContractRecord } from '../services/contractStorageService';
-import { CATEGORY_GROUPS, groupSubscriptions } from '../utils/subscriptionCategories.js';
+import { CATEGORY_GROUPS, groupSubscriptions } from '../utils/subscriptionCategories.jsx';
 
 export default function SubscriptionsPage() {
     const navigate = useNavigate();
