@@ -191,6 +191,7 @@ export default function SubscriptionsPage() {
                                             onView={handleView}
                                             onContract={handleContract}
                                             contractSigned={!!contractStatus[String(productId)]?.signed}
+                                            contractUrl={contractStatus[String(productId)]?.downloadUrl ?? ''}
                                         />
                                     );
                                 })}

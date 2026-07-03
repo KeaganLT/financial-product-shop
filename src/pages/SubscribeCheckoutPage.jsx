@@ -37,8 +37,10 @@ export default function SubscribeCheckoutPage() {
 
     useEffect(() => {
         if (auth?.customerId) {
-            const saved = getBankDetails(auth.customerId);
-            if (saved) setBankDetails(saved);
+            queueMicrotask(() => {
+                const saved = getBankDetails(auth.customerId);
+                if (saved) setBankDetails(saved);
+            });
         }
     }, [auth?.customerId]);
 
@@ -46,13 +48,22 @@ export default function SubscribeCheckoutPage() {
         setSubmitting(true);
         setSubmitError('');
         try {
-            saveBankDetails(auth.customerId, bankDetails);
             const result = await takeUpProducts([Number(productId)], auth.token);
             if (result.success) {
+                saveBankDetails(auth.customerId, bankDetails);
                 showToast(`${product.name} activated successfully!`, 'success');
                 navigate('/checkout/result?type=subscription', { state: { product, bankDetails } });
             } else {
-                setSubmitError('Activation failed. Please check your eligibility and try again.');
+                const failedChecks = (result.fulfilmentResultList ?? [])
+                    .flatMap((r) => r.checks ?? r.checkResults ?? [])
+                    .filter((c) => c.passed === false)
+                    .map((c) => c.name ?? c.checkName ?? c.type)
+                    .filter(Boolean);
+                setSubmitError(
+                    failedChecks.length > 0
+                        ? `Activation failed. The following checks did not pass: ${failedChecks.join(', ')}.`
+                        : 'Activation failed. Please check your eligibility and try again.'
+                );
             }
         } catch (err) {
             setSubmitError(err.message || 'Something went wrong. Please try again.');

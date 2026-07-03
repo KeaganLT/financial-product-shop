@@ -20,14 +20,6 @@ const MastercardLogo = () => (
     </svg>
 );
 
-const AmexLogo = () => (
-    <svg width="50" height="16" viewBox="0 0 50 16" fill="none">
-        <rect width="50" height="16" rx="2" fill="#2E77BC" />
-        <text x="4" y="12" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="9" fill="white">AMERICAN</text>
-        <text x="4" y="12" dy="0" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="9" fill="white" />
-    </svg>
-);
-
 // ── Shared header ─────────────────────────────────────────────────────────────
 
 function PageHeader({ title, onBack }) {
@@ -78,7 +70,8 @@ function CreditCardTile({ onClick }) {
 
 // ── Shared footer (total + pay button) ────────────────────────────────────────
 
-function CheckoutFooter({ monthlyTotal, onPay, loading }) {
+function CheckoutFooter({ monthlyTotal, onPay, loading, disabled = false, disabledHint = '' }) {
+    const isBlocked = disabled || loading;
     return (
         <>
             {/* Mobile: fixed bottom bar */}
@@ -97,9 +90,12 @@ function CheckoutFooter({ monthlyTotal, onPay, loading }) {
                             </div>
                         </div>
                     </div>
-                    <button onClick={onPay} disabled={loading} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                    <button onClick={onPay} disabled={isBlocked} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                         {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
                     </button>
+                    {disabled && disabledHint && (
+                        <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>{disabledHint}</p>
+                    )}
                 </div>
             </div>
             {/* Desktop: inline pay button */}
@@ -110,9 +106,14 @@ function CheckoutFooter({ monthlyTotal, onPay, loading }) {
                         <span className="text-[#8E8E93]" style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}>Monthly total</span>
                         <span className="font-bold text-black" style={{ fontSize: 22, fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
                     </div>
-                    <button onClick={onPay} disabled={loading} className="h-[42px] px-8 rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
-                        {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
-                    </button>
+                    <div className="flex flex-col items-end gap-1">
+                        <button onClick={onPay} disabled={isBlocked} className="h-[42px] px-8 rounded-[100px] font-semibold disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                            {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
+                        </button>
+                        {disabled && disabledHint && (
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>{disabledHint}</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </>
@@ -252,7 +253,13 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                     <p className="text-red-500 text-sm text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
                 )}
             </main>
-            <CheckoutFooter monthlyTotal={monthlyTotal} onPay={onPay} loading={loading} />
+            <CheckoutFooter
+                monthlyTotal={monthlyTotal}
+                onPay={onPay}
+                loading={loading}
+                disabled={!savedCard}
+                disabledHint="Add a payment method to continue"
+            />
         </>
     );
 }
@@ -311,7 +318,13 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
                     <p className="mt-6 text-red-500 text-sm text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
                 )}
             </main>
-            <CheckoutFooter monthlyTotal={monthlyTotal} onPay={onPay} loading={loading} />
+            <CheckoutFooter
+                monthlyTotal={monthlyTotal}
+                onPay={onPay}
+                loading={loading}
+                disabled={!savedCard}
+                disabledHint="Add a payment method to continue"
+            />
         </>
     );
 }
@@ -336,28 +349,64 @@ function TypeSelectView({ onSelectCard }) {
     );
 }
 
+function isValidExpiry(expiry) {
+    const match = expiry.match(/^(\d{2})\/(\d{2})$/);
+    if (!match) return false;
+    const month = Number(match[1]);
+    if (month < 1 || month > 12) return false;
+    const year = 2000 + Number(match[2]);
+    const now = new Date();
+    return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
+}
+
 function CardFormView({ onNext }) {
     const [name, setName] = useState('');
     const [number, setNumber] = useState('');
     const [expiry, setExpiry] = useState('');
     const [cvc, setCvc] = useState('');
+    const [formError, setFormError] = useState('');
 
-    const isComplete = name && number && expiry && cvc;
+    const digits = number.replace(/\s/g, '');
+    const isNumberValid = /^\d{13,19}$/.test(digits);
+    const isExpiryValid = isValidExpiry(expiry);
+    const isCvcValid    = /^\d{3,4}$/.test(cvc);
+    const isComplete    = name.trim() && number && expiry && cvc;
+
+    function handleNumberChange(value) {
+        const cleaned = value.replace(/[^\d\s]/g, '').slice(0, 23);
+        setNumber(cleaned);
+        setFormError('');
+    }
+
+    function handleExpiryChange(value) {
+        let cleaned = value.replace(/[^\d/]/g, '').slice(0, 5);
+        if (cleaned.length === 2 && !cleaned.includes('/') && expiry.length < cleaned.length) {
+            cleaned = `${cleaned}/`;
+        }
+        setExpiry(cleaned);
+        setFormError('');
+    }
 
     function handleNext() {
-        if (isComplete) {
-            onNext({ last4: number.slice(-3) });
-        }
+        if (!isComplete) return;
+        if (!isNumberValid) { setFormError('Please enter a valid card number (13–19 digits).'); return; }
+        if (!isExpiryValid) { setFormError('Please enter a valid expiry date (MM/YY) in the future.'); return; }
+        if (!isCvcValid)    { setFormError('Please enter a valid CVC (3–4 digits).'); return; }
+        onNext({ last4: digits.slice(-4) });
     }
 
     return (
         <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-10 flex flex-col gap-2">
-            <CardField label="Name of card holder" value={name} onChange={setName} placeholder="John" />
-            <CardField label="Card number" value={number} onChange={setNumber} placeholder="62406766893" type="tel" />
+            <CardField label="Name of card holder" value={name} onChange={(v) => { setName(v); setFormError(''); }} placeholder="John" />
+            <CardField label="Card number" value={number} onChange={handleNumberChange} placeholder="4242 4242 4242 4242" type="tel" />
             <div className="flex gap-2">
-                <CardField label="MM/YY" value={expiry} onChange={setExpiry} placeholder="11/26" type="tel" half />
-                <CardField label="CVC" value={cvc} onChange={setCvc} placeholder="545" type="tel" half />
+                <CardField label="MM/YY" value={expiry} onChange={handleExpiryChange} placeholder="11/26" type="tel" half />
+                <CardField label="CVC" value={cvc} onChange={(v) => { setCvc(v.replace(/\D/g, '').slice(0, 4)); setFormError(''); }} placeholder="545" type="tel" half />
             </div>
+
+            {formError && (
+                <p role="alert" className="text-red-500 text-sm mt-2" style={{ fontFamily: 'Roboto, sans-serif' }}>{formError}</p>
+            )}
 
             <button
                 onClick={handleNext}
@@ -394,11 +443,26 @@ export default function CheckoutPage() {
 
     async function handlePayNow() {
         if (!auth?.token) { navigate('/login'); return; }
+        if (!savedCard) { setError('Please add a payment method before paying.'); return; }
         setLoading(true);
         setError(null);
         try {
             const productIds = items.map((p) => p.id);
             const result = await takeUpProducts(productIds, auth.token);
+            if (!result.success) {
+                const failed = (result.fulfilmentResultList ?? [])
+                    .filter((r) => r.isEligible === false || r.success === false)
+                    .map((r) => {
+                        const item = items.find((p) => String(p.id) === String(r.productId));
+                        return item?.name ?? `Product ${r.productId}`;
+                    });
+                setError(
+                    failed.length > 0
+                        ? `Could not complete your order. You are not currently eligible for: ${failed.join(', ')}. Your cart has been kept.`
+                        : 'Could not complete your order. Please check your eligibility and try again. Your cart has been kept.'
+                );
+                return;
+            }
             clearCart();
             navigate('/checkout/result', { state: { result } });
         } catch (err) {

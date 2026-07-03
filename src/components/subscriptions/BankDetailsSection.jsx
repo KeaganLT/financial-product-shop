@@ -1,8 +1,18 @@
 import { getBankDetails } from '../../services/bankingService.js';
 
+function getNextDebitDate(debitDay) {
+    if (!debitDay) return null;
+    const now    = new Date();
+    const target = new Date(now.getFullYear(), now.getMonth(), debitDay);
+    if (target <= now) target.setMonth(target.getMonth() + 1);
+    return target.toLocaleDateString('en-ZA', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
 export default function BankDetailsSection({ userId, onChangeClick }) {
     const bankDetails = getBankDetails(userId);
     if (!bankDetails) return null;
+
+    const nextDebitDate = getNextDebitDate(bankDetails.debitDay);
 
     return (
         <div
@@ -19,6 +29,11 @@ export default function BankDetailsSection({ userId, onChangeClick }) {
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>
                     Debited on the {bankDetails.debitDay}{bankDetails.debitDay === 1 ? 'st' : 'th'} of each month
                 </p>
+                {nextDebitDate && (
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 600, color: '#1860BF' }}>
+                        Next debit: {nextDebitDate}
+                    </p>
+                )}
             </div>
             <button
                 onClick={onChangeClick}

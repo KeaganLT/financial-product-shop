@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getProductPlaceholder } from '../../assets/placeholders/index.js';
 import StatusBadge from './StatusBadge.jsx';
 
-export default function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned }) {
+export default function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned, contractUrl }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     const prod       = Array.isArray(subscription.product) ? subscription.product[0] : subscription.product;
@@ -56,6 +56,23 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                         </svg>
                         {contractSigned ? 'Signed ✓' : 'Sign contract'}
                     </button>
+                    {contractUrl && (
+                        <>
+                            <span style={{ color: '#C7C7CC' }}>·</span>
+                            <a
+                                href={contractUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1"
+                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF' }}
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="#1860BF" />
+                                </svg>
+                                View contract
+                            </a>
+                        </>
+                    )}
                     <span style={{ color: '#C7C7CC' }}>·</span>
                     {!confirmOpen && (
                         <button

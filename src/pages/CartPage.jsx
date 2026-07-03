@@ -19,14 +19,16 @@ const SWIPE_THRESHOLD = 40;  // px dragged before snap-open
 const REMOVE_WIDTH    = 99;  // px — matches Figma
 
 function CartItemCard({ product, onRemove }) {
-    const [offset, setOffset] = useState(0);   // how far the row is translated left
-    const [open, setOpen]     = useState(false);
+    const [offset, setOffset]     = useState(0);   // how far the row is translated left
+    const [open, setOpen]         = useState(false);
+    const [dragging, setDragging] = useState(false);
     const startX = useRef(null);
     const startOffset = useRef(0);
 
     function onTouchStart(e) {
         startX.current = e.touches[0].clientX;
         startOffset.current = offset;
+        setDragging(true);
     }
 
     function onTouchMove(e) {
@@ -36,6 +38,7 @@ function CartItemCard({ product, onRemove }) {
     }
 
     function onTouchEnd() {
+        setDragging(false);
         if (offset > SWIPE_THRESHOLD) {
             setOffset(REMOVE_WIDTH);
             setOpen(true);
@@ -74,7 +77,7 @@ function CartItemCard({ product, onRemove }) {
                 {/* Swipeable row */}
                 <div
                     className="relative bg-white flex items-start gap-[27px]"
-                    style={{ transform: `translateX(-${offset}px)`, transition: startX.current === null ? 'transform 0.2s' : 'none' }}
+                    style={{ transform: `translateX(-${offset}px)`, transition: dragging ? 'none' : 'transform 0.2s' }}
                     onTouchStart={onTouchStart}
                     onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
@@ -140,14 +143,21 @@ export default function CartPage() {
     const isEmpty = items.length === 0;
 
     const hasProductsNeedingVerification = items.some(needsVerification);
-    const [kycDone, setKycDone]           = useState(true);
+    const [kycDone, setKycDone]           = useState(null); // null = still checking
+    const [kycCheckFailed, setKycCheckFailed] = useState(false);
     const [needsAccount, setNeedsAccount] = useState(false); // eligibility failed due to account type
 
     useEffect(() => {
         if (!hasProductsNeedingVerification || !auth?.customerId) return;
-        getKycStatus(auth.customerId).then(({ proofOfResidence, selfie }) => {
-            setKycDone(proofOfResidence && selfie);
-        });
+        getKycStatus(auth.customerId)
+            .then(({ proofOfResidence, selfie }) => {
+                setKycDone(proofOfResidence && selfie);
+                setKycCheckFailed(false);
+            })
+            .catch(() => {
+                setKycDone(false);
+                setKycCheckFailed(true);
+            });
     }, [hasProductsNeedingVerification, auth?.customerId]);
 
     useEffect(() => {
@@ -168,13 +178,14 @@ export default function CartPage() {
             .catch(() => {});
     }, [items, auth?.token]);
 
-    const requiresVerification = hasProductsNeedingVerification && !kycDone;
+    const kycChecking          = hasProductsNeedingVerification && kycDone === null;
+    const requiresVerification = hasProductsNeedingVerification && kycDone === false;
+    const payBlocked           = kycChecking || requiresVerification;
     const monthlyTotal = items.reduce((sum, p) => sum + Number(p.price || 0), 0);
     const onceOffTotal = items.reduce((sum, p) => sum + Number(p.onceOffPrice || 0), 0);
     const grandTotal = monthlyTotal;
 
-    // Shared order summary panel content (used in both mobile footer and desktop card)
-    const OrderSummaryContent = () => (
+    const orderSummaryContent = (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start">
                 <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
@@ -201,18 +212,18 @@ export default function CartPage() {
                 </div>
             </div>
             <button
-                onClick={() => !requiresVerification && navigate('/checkout')}
-                disabled={requiresVerification}
+                onClick={() => !payBlocked && navigate('/checkout')}
+                disabled={payBlocked}
                 className="w-full h-[42px] rounded-[100px] font-semibold disabled:opacity-60"
                 style={{
-                    background: requiresVerification ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
-                    color: requiresVerification ? '#AEAEB2' : '#fff',
+                    background: payBlocked ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                    color: payBlocked ? '#AEAEB2' : '#fff',
                     fontSize: 17,
                     letterSpacing: '0.0035em',
                     fontFamily: 'Roboto, sans-serif',
                 }}
             >
-                Pay now (R{grandTotal.toFixed(2)})
+                {kycChecking ? 'Checking verification…' : `Pay now (R${grandTotal.toFixed(2)})`}
             </button>
         </div>
     );
@@ -272,10 +283,12 @@ export default function CartPage() {
                             {requiresVerification && (
                                 <div className="flex flex-col gap-2 rounded-[8px] px-6 py-3" style={{ background: '#E4EFFF', border: '1px solid #A6D0FF' }}>
                                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: '#1C1C1C' }}>
-                                        One or more products in your cart requires verification.
+                                        {kycCheckFailed ? 'We couldn\'t confirm your verification status.' : 'One or more products in your cart requires verification.'}
                                     </p>
                                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: '#1C1C1C' }}>
-                                        In order to complete your purchase, please complete the identity verification process.
+                                        {kycCheckFailed
+                                            ? 'Please check your connection and try again, or complete the identity verification process.'
+                                            : 'In order to complete your purchase, please complete the identity verification process.'}
                                     </p>
                                     <button
                                         onClick={() => navigate('/kyc', { state: { returnTo: '/cart' } })}
@@ -309,7 +322,7 @@ export default function CartPage() {
                 {/* Right column: order summary card — desktop only */}
                 {!isEmpty && (
                     <div className="hidden md:block sticky top-24 rounded-[12px] p-6" style={{ border: '1px solid #E5E5EA', background: '#FAFAFA' }}>
-                        <OrderSummaryContent />
+                        {orderSummaryContent}
                     </div>
                 )}
             </main>
@@ -332,18 +345,18 @@ export default function CartPage() {
                             </div>
                         </div>
                         <button
-                            onClick={() => !requiresVerification && navigate('/checkout')}
-                            disabled={requiresVerification}
+                            onClick={() => !payBlocked && navigate('/checkout')}
+                            disabled={payBlocked}
                             className="w-full h-[42px] rounded-[100px] font-semibold disabled:opacity-60"
                             style={{
-                                background: requiresVerification ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
-                                color: requiresVerification ? '#AEAEB2' : '#fff',
+                                background: payBlocked ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                                color: payBlocked ? '#AEAEB2' : '#fff',
                                 fontSize: 17,
                                 letterSpacing: '0.0035em',
                                 fontFamily: 'Roboto, sans-serif',
                             }}
                         >
-                            Pay now (R{grandTotal.toFixed(2)})
+                            {kycChecking ? 'Checking verification…' : `Pay now (R${grandTotal.toFixed(2)})`}
                         </button>
                     </div>
                 </div>

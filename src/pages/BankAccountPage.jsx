@@ -27,10 +27,14 @@ export default function BankAccountPage() {
     const [errors, setErrors]           = useState({});
     const [saving, setSaving]           = useState(false);
 
+    const keepingExistingAccount = !!existing && accountNo.length === 0;
+
     function validate() {
         const e = {};
         if (!bankName) e.bankName = 'Please select a bank';
-        if (!accountNo || accountNo.length < 6) e.accountNo = 'Enter a valid account number (min 6 digits)';
+        if (!keepingExistingAccount && (!accountNo || accountNo.length < 6)) {
+            e.accountNo = 'Enter a valid account number (min 6 digits)';
+        }
         return e;
     }
 
@@ -38,14 +42,19 @@ export default function BankAccountPage() {
         const e = validate();
         if (Object.keys(e).length > 0) { setErrors(e); return; }
         setSaving(true);
-        saveBankDetails(auth.customerId, {
-            bankName,
-            last4: accountNo.slice(-4),
-            accountType,
-            debitDay,
-        });
-        showToast('Bank account updated successfully.', 'success');
-        setTimeout(() => navigate(-1), 600);
+        try {
+            saveBankDetails(auth.customerId, {
+                bankName,
+                last4: keepingExistingAccount ? existing.last4 : accountNo.slice(-4),
+                accountType,
+                debitDay,
+            });
+            showToast('Bank account updated successfully.', 'success');
+            setTimeout(() => navigate(-1), 600);
+        } catch {
+            setSaving(false);
+            showToast('Could not save bank details. Please try again.', 'error');
+        }
     }
 
     return (
@@ -118,14 +127,16 @@ export default function BankAccountPage() {
 
                         {/* Account number */}
                         <div className="flex flex-col gap-1">
-                            <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>New account number</label>
+                            <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                                {existing ? 'New account number (optional)' : 'Account number'}
+                            </label>
                             <input
                                 type="tel"
                                 inputMode="numeric"
                                 maxLength={16}
                                 value={accountNo}
                                 onChange={(e) => { setAccountNo(e.target.value.replace(/\D/g, '')); setErrors((p) => ({ ...p, accountNo: '' })); }}
-                                placeholder="Enter new account number"
+                                placeholder={existing ? `Keep current ••••${existing.last4} or enter a new number` : 'Enter account number'}
                                 className="w-full h-[46px] rounded-[10px] px-3 border"
                                 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: errors.accountNo ? '#C51C13' : '#C7C7CC', outline: 'none' }}
                             />

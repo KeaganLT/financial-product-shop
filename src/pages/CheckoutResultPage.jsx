@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function CheckoutResultPage() {
@@ -8,6 +9,14 @@ export default function CheckoutResultPage() {
 
     const product     = state?.product ?? null;
     const bankDetails = state?.bankDetails ?? null;
+
+    useEffect(() => {
+        if (!state) {
+            navigate(isSubscription ? '/subscriptions' : '/products', { replace: true });
+        }
+    }, [state, isSubscription, navigate]);
+
+    if (!state) return null;
 
     const nextDebitDate = (() => {
         if (!bankDetails?.debitDay) return null;
@@ -100,7 +109,7 @@ export default function CheckoutResultPage() {
             {/* Footer buttons */}
             <div className="fixed bottom-0 left-0 right-0 bg-white" style={{ borderTop: '1px solid #E5E5EA' }}>
                 <div className="max-w-[480px] mx-auto px-6 pt-4 pb-6 flex flex-col gap-3">
-                    {isSubscription && (
+                    {isSubscription && product && (
                         <button
                             onClick={() => navigate('/contract', { state: { product, bankDetails } })}
                             className="w-full h-[46px] rounded-[100px] font-semibold flex items-center justify-center gap-2"
