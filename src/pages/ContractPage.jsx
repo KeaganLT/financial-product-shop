@@ -5,6 +5,7 @@ import { getProfile } from '../services/customerService';
 import { getBankDetails } from '../services/bankingService';
 import { generateContractPdf, downloadContract, getContractBlob } from '../services/contractService';
 import { uploadSignedContract } from '../services/firebase';
+import { saveContractRecord, getContractRecord } from '../services/contractStorageService';
 
 function Section({ heading, children }) {
     return (
@@ -47,6 +48,8 @@ export default function ContractPage() {
     const [uploading, setUploading]       = useState(false);
     const [uploadedUrl, setUploadedUrl]   = useState('');
     const [uploadError, setUploadError]   = useState('');
+    const [existingRecord, setExistingRecord] = useState(null);
+    const [recordLoading, setRecordLoading]   = useState(true);
 
     // Upload own file
     const [ownFile, setOwnFile]           = useState(null);
@@ -59,6 +62,21 @@ export default function ContractPage() {
             .catch(() => setProfile(null))
             .finally(() => setProfileLoading(false));
     }, [isLoggedIn]);
+
+    // Load existing Firestore record so signed status persists across sessions
+    useEffect(() => {
+        if (!auth?.customerId || !product?.id) { setRecordLoading(false); return; }
+        getContractRecord(auth.customerId, product.id)
+            .then((record) => {
+                if (record) {
+                    setExistingRecord(record);
+                    if (record.downloadUrl) setUploadedUrl(record.downloadUrl);
+                    if (record.signature)   setSignature(record.signature);
+                }
+            })
+            .catch(() => {})
+            .finally(() => setRecordLoading(false));
+    }, [auth?.customerId, product?.id]);
 
     // Resolve bank details: prefer passed state, fall back to localStorage
     const resolvedBank = bankDetails ?? (auth?.customerId ? getBankDetails(auth.customerId) : null);
@@ -83,14 +101,14 @@ export default function ContractPage() {
         if (!signature.trim())    { setSigError('Please type your full name as a signature.'); return; }
         setSigError('');
         const now = Date.now();
+        const sig = signature.trim();
         setSignedAt(now);
-        const doc = generateContractPdf({ product, bankDetails: resolvedBank, profile, signature: signature.trim(), signedAt: now });
-        downloadContract(doc, `${product.name.replace(/\s+/g, '-')}-signed-contract.pdf`);
-        // Also upload automatically
-        handleUploadSigned(doc);
+        const pdfDoc = generateContractPdf({ product, bankDetails: resolvedBank, profile, signature: sig, signedAt: now });
+        downloadContract(pdfDoc, `${product.name.replace(/\s+/g, '-')}-signed-contract.pdf`);
+        handleUploadSigned(pdfDoc, sig, now);
     }
 
-    async function handleUploadSigned(doc) {
+    async function handleUploadSigned(doc, sig, ts) {
         if (!auth?.customerId || !product?.id) return;
         setUploading(true);
         setUploadError('');
@@ -98,6 +116,17 @@ export default function ContractPage() {
             const blob = getContractBlob(doc);
             const url  = await uploadSignedContract(auth.customerId, product.id, blob);
             setUploadedUrl(url);
+            await saveContractRecord(auth.customerId, product.id, {
+                signature:    sig,
+                signedAt:     ts,
+                downloadUrl:  url,
+                productName:  product.name,
+                productPrice: product.price,
+                bankName:     resolvedBank?.bankName,
+                last4:        resolvedBank?.last4,
+                accountType:  resolvedBank?.accountType,
+                debitDay:     resolvedBank?.debitDay,
+            });
         } catch {
             setUploadError('Contract saved locally — upload to cloud failed. You can upload your signed copy below.');
         } finally {
@@ -113,6 +142,17 @@ export default function ContractPage() {
             const url = await uploadSignedContract(auth.customerId, product.id, ownFile);
             setUploadedUrl(url);
             setOwnFile(null);
+            await saveContractRecord(auth.customerId, product.id, {
+                signature:    null,
+                signedAt:     null,
+                downloadUrl:  url,
+                productName:  product.name,
+                productPrice: product.price,
+                bankName:     resolvedBank?.bankName,
+                last4:        resolvedBank?.last4,
+                accountType:  resolvedBank?.accountType,
+                debitDay:     resolvedBank?.debitDay,
+            });
         } catch {
             setUploadError('Upload failed. Please try again.');
         } finally {

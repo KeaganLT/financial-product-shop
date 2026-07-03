@@ -3,6 +3,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAnalytics, isSupported as isAnalyticsSupported, logEvent } from 'firebase/analytics';
 import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,9 +16,10 @@ const firebaseConfig = {
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);
-export const storage = getStorage(firebaseApp);
-export const auth = getAuth(firebaseApp);
-export const functions = getFunctions(firebaseApp);
+export const storage    = getStorage(firebaseApp);
+export const auth       = getAuth(firebaseApp);
+export const functions  = getFunctions(firebaseApp);
+export const db         = getFirestore(firebaseApp);
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
 const PASSWORD_FOR_SIGN_IN_KEY = 'passwordForSignIn';

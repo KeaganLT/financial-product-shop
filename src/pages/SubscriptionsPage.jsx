@@ -6,6 +6,7 @@ import BottomNav from '../components/BottomNav';
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 import { getBankDetails } from '../services/bankingService';
+import { getContractRecord } from '../services/contractStorageService';
 
 function StatusBadge({ fulfilmentType }) {
     const isImmediate = (fulfilmentType || '').toLowerCase().includes('immediate');
@@ -38,7 +39,7 @@ function EmptyIllustration() {
     );
 }
 
-function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract }) {
+function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     // product is returned as an array — take the first item
@@ -91,13 +92,13 @@ function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContra
                     <button
                         onClick={() => onContract({ id: productId, name, price })}
                         className="flex items-center gap-1"
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF' }}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: contractSigned ? '#168C34' : '#1860BF' }}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M14 2v6h6M16 13H8M16 17H8" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={contractSigned ? '#168C34' : '#1860BF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2v6h6M16 13H8M16 17H8" stroke={contractSigned ? '#168C34' : '#1860BF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                        Contract
+                        {contractSigned ? 'Signed ✓' : 'Sign contract'}
                     </button>
                     <span style={{ color: '#C7C7CC' }}>·</span>
                     {!confirmOpen ? (
@@ -185,10 +186,12 @@ export default function SubscriptionsPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn } = useAuth();
 
-    const [subscriptions, setSubscriptions] = useState([]);
-    const [loading, setLoading]             = useState(true);
-    const [error, setError]                 = useState('');
-    const [cancellingId, setCancellingId]   = useState(null);
+    const [subscriptions, setSubscriptions]   = useState([]);
+    const [loading, setLoading]               = useState(true);
+    const [error, setError]                   = useState('');
+    const [cancellingId, setCancellingId]     = useState(null);
+    // contractStatus: { [productId]: { signed: bool, downloadUrl: string } }
+    const [contractStatus, setContractStatus] = useState({});
 
     useEffect(() => {
         if (!isLoggedIn) return;
@@ -200,7 +203,22 @@ export default function SubscriptionsPage() {
         setError('');
         try {
             const data = await getSubscriptions(auth.token);
-            setSubscriptions(Array.isArray(data) ? data : []);
+            const list = Array.isArray(data) ? data : [];
+            setSubscriptions(list);
+
+            // Load contract status from Firestore for each subscription
+            if (auth?.customerId && list.length > 0) {
+                const entries = await Promise.all(
+                    list.map(async (sub) => {
+                        const prod      = Array.isArray(sub.product) ? sub.product[0] : sub.product;
+                        const productId = sub.productId ?? prod?.id ?? null;
+                        if (!productId) return null;
+                        const record = await getContractRecord(auth.customerId, productId).catch(() => null);
+                        return [String(productId), { signed: !!record?.signature, downloadUrl: record?.downloadUrl ?? '' }];
+                    })
+                );
+                setContractStatus(Object.fromEntries(entries.filter(Boolean)));
+            }
         } catch (err) {
             setError(err.message || 'Failed to load subscriptions');
         } finally {
@@ -322,6 +340,7 @@ export default function SubscriptionsPage() {
                                     cancelling={cancellingId === subId}
                                     onView={handleView}
                                     onContract={handleContract}
+                                    contractSigned={!!contractStatus[String(sub.productId ?? (Array.isArray(sub.product) ? sub.product[0]?.id : sub.product?.id))]?.signed}
                                 />
                             );
                         })}
