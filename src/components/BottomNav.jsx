@@ -37,7 +37,7 @@ export default function BottomNav() {
                     const productId = sub.productId ?? prod?.id ?? null;
                     if (!productId) return;
                     const record = await getContractRecord(auth.customerId, productId).catch(() => null);
-                    if (!record?.signature) count++;
+                    if (!record?.signature && !record?.downloadUrl) count++;
                 }));
                 if (!cancelled) setUnsignedCount(count);
             })

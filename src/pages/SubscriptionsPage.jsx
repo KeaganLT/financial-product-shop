@@ -44,7 +44,7 @@ export default function SubscriptionsPage() {
                         const productId = sub.productId ?? prod?.id ?? null;
                         if (!productId) return null;
                         const record = await getContractRecord(auth.customerId, productId).catch(() => null);
-                        return [String(productId), { signed: !!record?.signature, downloadUrl: record?.downloadUrl ?? '' }];
+                        return [String(productId), { signed: !!(record?.signature || record?.downloadUrl), downloadUrl: record?.downloadUrl ?? '' }];
                     })
                 );
                 setContractStatus(Object.fromEntries(entries.filter(Boolean)));
