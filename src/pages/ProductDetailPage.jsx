@@ -7,6 +7,8 @@ import { getProducts, getProductById } from '../services/productService';
 import { getEligibility } from '../services/subscriptionService';
 import { getProfile } from '../services/customerService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
+import { getKycStatus } from '../services/kycStatus.js';
+import { getKycBackendStatus } from '../services/customerService';
 
 // Dummy data for benefits and requirements per product
 // These will eventually come from Firebase or the API
@@ -97,7 +99,7 @@ export default function ProductDetailPage() {
     const [error, setError]             = useState(null);
     const [expanded, setExpanded]       = useState(false);
     const [eligibility, setEligibility] = useState(null); // null = not loaded yet
-    const [customerTypeIssue, setCustomerTypeIssue] = useState(null); // { required, current }
+    const [eligibilityChecks, setEligibilityChecks] = useState(null); // checklist when not eligible
 
     useEffect(() => {
         Promise.all([
@@ -113,29 +115,83 @@ export default function ProductDetailPage() {
     }, [id]);
 
     useEffect(() => {
-        if (!isLoggedIn || !id) return;
+        if (!isLoggedIn || !id || !product) return;
+
         Promise.all([
             getEligibility([Number(id)], auth.token),
             getProfile(auth.token),
         ])
             .then(async ([results, profile]) => {
-                const result = Array.isArray(results) ? results.find((r) => String(r.productId) === String(id)) : null;
+                const result = Array.isArray(results)
+                    ? results.find((r) => String(r.productId) === String(id))
+                    : null;
                 setEligibility(result ?? null);
 
-                if (result && !result.isEligible && product) {
-                    const required = getRequiredCustomerTypes(product.name);
-                    const currentTypeName = (profile?.customerType?.name ?? '').toUpperCase();
-                    if (required) {
-                        const normalised = required.map((t) => t.toUpperCase());
-                        if (!currentTypeName) {
-                            setCustomerTypeIssue({ required, current: null });
-                        } else if (!normalised.includes(currentTypeName)) {
-                            setCustomerTypeIssue({ required, current: profile.customerType.name });
-                        } else {
-                            setCustomerTypeIssue(null);
-                        }
-                    }
-                }
+                if (!result || result.isEligible) return;
+
+                // Fetch KYC data using numeric profile ID
+                const numericId = profile?.id;
+                const [kycStorage, kycBackend] = await Promise.all([
+                    numericId ? getKycStatus(numericId) : Promise.resolve({ proofOfResidence: false, selfie: false }),
+                    numericId ? getKycBackendStatus(numericId, auth.token) : Promise.resolve(null),
+                ]);
+
+                // Customer type check
+                const required = getRequiredCustomerTypes(product.name);
+                const currentTypeName = (profile?.customerType?.name ?? '').toUpperCase();
+                const customerTypePass = required
+                    ? (!!currentTypeName && required.map((t) => t.toUpperCase()).includes(currentTypeName))
+                    : true;
+
+                // Tax compliance check (amber or green passes)
+                const taxStatus = (kycBackend?.taxCompliance ?? '').toLowerCase();
+                const taxPass = taxStatus === 'amber' || taxStatus === 'green';
+
+                // KYC document checks (Firebase Storage)
+                const porPass = kycStorage.proofOfResidence;
+                const selfiePass = kycStorage.selfie;
+
+                // Account check — must have at least one account
+                const accounts = profile?.customerAccounts ?? profile?.accounts ?? [];
+                const accountPass = accounts.length > 0;
+
+                setEligibilityChecks({
+                    customerType: {
+                        pass: customerTypePass,
+                        label: 'Customer type',
+                        detail: customerTypePass
+                            ? `${profile?.customerType?.name ?? 'Set'}`
+                            : required
+                                ? `Required: ${required.join(', ')}${currentTypeName ? ` (yours: ${profile?.customerType?.name})` : ' (not set)'}`
+                                : 'Not set',
+                    },
+                    taxCompliance: {
+                        pass: taxPass,
+                        label: 'Tax compliance',
+                        detail: taxPass
+                            ? `Status: ${kycBackend.taxCompliance}`
+                            : kycBackend
+                                ? 'Tax compliance must be amber or green'
+                                : 'Not verified yet',
+                    },
+                    proofOfResidence: {
+                        pass: porPass,
+                        label: 'Proof of residence',
+                        detail: porPass ? 'Uploaded' : 'Not yet uploaded',
+                    },
+                    selfie: {
+                        pass: selfiePass,
+                        label: 'Identity selfie',
+                        detail: selfiePass ? 'Uploaded' : 'Not yet uploaded',
+                    },
+                    account: {
+                        pass: accountPass,
+                        label: 'Linked account',
+                        detail: accountPass
+                            ? `${accounts.length} account${accounts.length > 1 ? 's' : ''} linked`
+                            : 'No account linked',
+                    },
+                });
             })
             .catch(() => setEligibility(null));
     }, [isLoggedIn, id, auth?.token, product]);
@@ -404,40 +460,40 @@ export default function ProductDetailPage() {
                                             {eligibility.isEligible ? 'You qualify for this product' : 'You do not currently qualify'}
                                         </div>
 
-                                        {/* Customer type mismatch — shown as primary reason */}
-                                        {!eligibility.isEligible && customerTypeIssue && (
-                                            <div className="flex flex-col gap-2 px-3 py-3 rounded-[8px]" style={{ background: '#FFF8E4', border: '1px solid #FFD980' }}>
-                                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1C1C1C' }}>
-                                                    {customerTypeIssue.current
-                                                        ? `Your customer type (${customerTypeIssue.current}) does not qualify for this product.`
-                                                        : 'You need to set a customer type to qualify for this product.'}
-                                                </p>
-                                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: '#8E8E93' }}>
-                                                    Required: {customerTypeIssue.required.join(', ')}
-                                                </p>
+                                        {/* Eligibility checklist */}
+                                        {!eligibility.isEligible && eligibilityChecks && (
+                                            <div className="flex flex-col gap-2">
+                                                {Object.values(eligibilityChecks).map((check) => (
+                                                    <div
+                                                        key={check.label}
+                                                        className="flex items-start gap-3 px-3 py-2 rounded-[8px]"
+                                                        style={{ background: check.pass ? '#F0FFF4' : '#FFF5F5', border: `1px solid ${check.pass ? '#A3E9B8' : '#FFB3B3'}` }}
+                                                    >
+                                                        {check.pass ? (
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginTop: 2, flexShrink: 0 }}><circle cx="8" cy="8" r="8" fill="#168C34"/><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                                        ) : (
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginTop: 2, flexShrink: 0 }}><circle cx="8" cy="8" r="8" fill="#C51C13"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                                        )}
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1C1C1C' }}>{check.label}</span>
+                                                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: '#8E8E93' }}>{check.detail}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
                                                 <button
                                                     onClick={() => navigate('/account')}
-                                                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline', textAlign: 'left' }}
+                                                    className="self-start mt-1"
+                                                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline' }}
                                                 >
-                                                    {customerTypeIssue.current ? 'Manage account →' : 'Set customer type →'}
+                                                    Go to Account to resolve →
                                                 </button>
                                             </div>
                                         )}
 
-                                        {!eligibility.isEligible && !customerTypeIssue && (
+                                        {!eligibility.isEligible && !eligibilityChecks && (
                                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: '#8E8E93' }}>
-                                                Complete your profile and identity verification to qualify.
+                                                Loading eligibility details…
                                             </p>
-                                        )}
-
-                                        {!eligibility.isEligible && !customerTypeIssue && (
-                                            <button
-                                                onClick={() => navigate('/account')}
-                                                className="self-start px-4 py-2 rounded-full text-white text-[13px] font-semibold"
-                                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif' }}
-                                            >
-                                                Go to Account
-                                            </button>
                                         )}
                                     </div>
                                 </>
