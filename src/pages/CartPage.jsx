@@ -3,6 +3,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { getKycStatus } from '../services/kycStatus';
+import { useToast } from '../context/ToastContext';
 import { getEligibility } from '../services/subscriptionService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
@@ -110,10 +111,9 @@ function CartItemCard({ product, onRemove }) {
                             from R{Number(product.price).toFixed(0)} p/m
                         </p>
 
-                        {/* Desktop-only remove button */}
                         <button
                             onClick={() => onRemove(product.id)}
-                            className="hidden md:flex items-center gap-1 mt-2 text-[#C51C13]"
+                            className="flex items-center gap-1 mt-2 text-[#C51C13]"
                             style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}
                             aria-label={`Remove ${product.name}`}
                         >
@@ -140,6 +140,13 @@ export default function CartPage() {
     const navigate = useNavigate();
     const { items, removeItem } = useCart();
     const { auth } = useAuth();
+    const { showToast } = useToast();
+
+    function handleRemove(id) {
+        const item = items.find((p) => p.id === id);
+        removeItem(id);
+        showToast(`${item?.name ?? 'Item'} removed from cart.`, 'success');
+    }
     const isEmpty = items.length === 0;
 
     const hasProductsNeedingVerification = items.some(needsVerification);
@@ -277,7 +284,7 @@ export default function CartPage() {
                     ) : (
                         <div className="flex flex-col gap-4">
                             {items.map((item) => (
-                                <CartItemCard key={item.id} product={item} onRemove={removeItem} />
+                                <CartItemCard key={item.id} product={item} onRemove={handleRemove} />
                             ))}
 
                             {requiresVerification && (

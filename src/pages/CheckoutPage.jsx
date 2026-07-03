@@ -70,7 +70,7 @@ function CreditCardTile({ onClick }) {
 
 // ── Shared footer (total + pay button) ────────────────────────────────────────
 
-function CheckoutFooter({ monthlyTotal, onPay, loading, disabled = false, disabledHint = '' }) {
+function CheckoutFooter({ monthlyTotal, onceOffTotal = 0, onPay, loading, disabled = false, disabledHint = '' }) {
     const isBlocked = disabled || loading;
     return (
         <>
@@ -82,7 +82,7 @@ function CheckoutFooter({ monthlyTotal, onPay, loading, disabled = false, disabl
                         <div className="flex flex-col gap-[5px] items-end">
                             <div className="flex items-center gap-5">
                                 <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
-                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R 0.00</span>
+                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {onceOffTotal.toFixed(2)}</span>
                             </div>
                             <div className="flex items-center gap-6">
                                 <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
@@ -187,7 +187,7 @@ function StatusBadge({ fulfilmentType }) {
 
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
-function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay, loading, error }) {
+function OrderReviewView({ items, monthlyTotal, onceOffTotal, savedCard, onChangeMethod, onPay, loading, error }) {
     return (
         <>
             <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8 flex flex-col gap-6">
@@ -255,6 +255,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
             </main>
             <CheckoutFooter
                 monthlyTotal={monthlyTotal}
+                onceOffTotal={onceOffTotal}
                 onPay={onPay}
                 loading={loading}
                 disabled={!savedCard}
@@ -266,7 +267,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
 
 // ── Views ─────────────────────────────────────────────────────────────────────
 
-function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard }) {
+function MainView({ monthlyTotal, onceOffTotal, onAddMethod, onPay, loading, error, savedCard }) {
     return (
         <>
             <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8">
@@ -320,6 +321,7 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
             </main>
             <CheckoutFooter
                 monthlyTotal={monthlyTotal}
+                onceOffTotal={onceOffTotal}
                 onPay={onPay}
                 loading={loading}
                 disabled={!savedCard}
@@ -440,6 +442,7 @@ export default function CheckoutPage() {
     const [error, setError] = useState(null);
 
     const monthlyTotal = items.reduce((sum, p) => sum + Number(p.price || 0), 0);
+    const onceOffTotal = items.reduce((sum, p) => sum + Number(p.onceOffPrice || 0), 0);
 
     async function handlePayNow() {
         if (!auth?.token) { navigate('/login'); return; }
@@ -502,6 +505,7 @@ export default function CheckoutPage() {
             {view === 'main' && (
                 <MainView
                     monthlyTotal={monthlyTotal}
+                    onceOffTotal={onceOffTotal}
                     onAddMethod={() => setView('type-select')}
                     onPay={() => setView('order-review')}
                     loading={loading}
@@ -519,6 +523,7 @@ export default function CheckoutPage() {
                 <OrderReviewView
                     items={items}
                     monthlyTotal={monthlyTotal}
+                    onceOffTotal={onceOffTotal}
                     savedCard={savedCard}
                     onChangeMethod={() => setView('main')}
                     onPay={handlePayNow}

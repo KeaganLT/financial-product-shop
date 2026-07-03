@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import SubscriptionCard from '../components/subscriptions/SubscriptionCard.jsx';
@@ -15,6 +16,7 @@ import { CATEGORY_GROUPS, groupSubscriptions } from '../utils/subscriptionCatego
 export default function SubscriptionsPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn } = useAuth();
+    const { showToast } = useToast();
 
     const [subscriptions, setSubscriptions]   = useState([]);
     const [loading, setLoading]               = useState(true);
@@ -59,8 +61,9 @@ export default function SubscriptionsPage() {
         try {
             await deleteSubscription(id, auth.token);
             setSubscriptions((prev) => prev.filter((s) => (s.subscriptionId ?? s.id) !== id));
+            showToast('Subscription cancelled.', 'success');
         } catch (err) {
-            setError(err.message || 'Failed to cancel subscription');
+            showToast(err.message || 'Failed to cancel subscription. Please try again.', 'error');
         } finally {
             setCancellingId(null);
         }
@@ -82,7 +85,7 @@ export default function SubscriptionsPage() {
         <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
             <Header />
 
-            <main className="max-w-[411px] mx-auto pt-[73px] pb-[88px] md:pb-16 px-6 flex flex-col gap-4">
+            <main className="max-w-[411px] md:max-w-3xl mx-auto pt-[73px] pb-[88px] md:pb-16 px-6 flex flex-col gap-4">
                 <h1 className="text-[20px] font-semibold mt-6" style={{ color: 'var(--neutral-800)', fontFamily: 'Roboto, sans-serif' }}>
                     My subscriptions
                 </h1>
@@ -179,6 +182,7 @@ export default function SubscriptionsPage() {
                                     </span>
                                     <span className="flex-1 h-px" style={{ background: group.accent, opacity: 0.2 }} />
                                 </div>
+                                <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4 md:items-start">
                                 {groups[group.key].map((sub) => {
                                     const subId     = sub.subscriptionId ?? sub.id;
                                     const productId = sub.productId ?? (Array.isArray(sub.product) ? sub.product[0]?.id : sub.product?.id);
@@ -195,6 +199,7 @@ export default function SubscriptionsPage() {
                                         />
                                     );
                                 })}
+                                </div>
                             </div>
                         ))}
                     </>

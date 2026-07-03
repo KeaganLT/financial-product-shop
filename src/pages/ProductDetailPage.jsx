@@ -83,7 +83,7 @@ export default function ProductDetailPage() {
                 className="fixed top-0 left-0 right-0 bg-white z-50 flex items-center px-1"
                 style={{ height: '64px', borderBottom: '1px solid #E5E5EA' }}
             >
-                <div className="max-w-[411px] mx-auto w-full flex items-center gap-1">
+                <div className="max-w-[411px] md:max-w-5xl mx-auto w-full flex items-center gap-1">
                     <button onClick={() => navigate('/products')} className="w-12 h-12 flex items-center justify-center flex-shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
@@ -95,8 +95,8 @@ export default function ProductDetailPage() {
                 </div>
             </div>
 
-            <div className="pt-16 pb-24 max-w-[411px] mx-auto">
-                <div className="px-6 pt-4 md:max-w-2xl">
+            <div className="pt-16 pb-24 md:pb-12 max-w-[411px] md:max-w-5xl mx-auto md:grid md:grid-cols-[1fr_1.1fr] md:gap-10 md:px-6 md:pt-24 md:items-start">
+                <div className="px-6 pt-4 md:px-0 md:pt-0 md:sticky md:top-24">
                     <div className="relative w-full rounded-[8px] overflow-hidden" style={{ height: '289px' }}>
                         <img
                             src={product.imageUrl || getProductPlaceholder(product.name)}
@@ -116,7 +116,7 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                <div className="px-6 pt-6 flex flex-col gap-6 md:max-w-2xl">
+                <div className="px-6 pt-6 md:px-0 md:pt-0 flex flex-col gap-6">
                     <div className="flex flex-col gap-4">
                         <h2 style={{ ...textStyle('28px', 700, '#1C1C1C'), lineHeight: '34px', letterSpacing: '0.41px' }}>
                             {product.name}
@@ -147,6 +147,27 @@ export default function ProductDetailPage() {
                                 </button>
                             )}
                         </div>
+                    </div>
+
+                    <div className="hidden md:flex items-center justify-between rounded-[12px] border px-6 py-4" style={{ borderColor: '#E5E5EA' }}>
+                        <div className="flex flex-col justify-center">
+                            <span style={{ ...textStyle('22px', 700, '#000000'), lineHeight: '28px' }}>
+                                R {Number(product.price).toFixed(2)}
+                            </span>
+                            <span style={{ ...textStyle('14px', 400), lineHeight: '20px' }}>per month</span>
+                        </div>
+                        <button
+                            onClick={handleCta}
+                            style={{
+                                height: '42px', padding: '0 32px', borderRadius: '100px',
+                                background: isLoggedIn ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                fontFamily: 'Roboto, sans-serif', fontSize: '17px', fontWeight: 600,
+                                color: isLoggedIn ? '#FFFFFF' : '#AEAEB2', border: 'none',
+                                cursor: isLoggedIn ? 'pointer' : 'default',
+                            }}
+                        >
+                            {ctaLabel}
+                        </button>
                     </div>
 
                     {expanded && (
@@ -227,7 +248,7 @@ export default function ProductDetailPage() {
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 right-0 bg-white z-50" style={{ borderTop: '0.5px solid #C7C7CC' }}>
+            <div className="fixed bottom-0 left-0 right-0 bg-white z-50 md:hidden" style={{ borderTop: '0.5px solid #C7C7CC' }}>
                 <div className="max-w-[411px] mx-auto flex items-center justify-between px-7" style={{ height: '69px' }}>
                     <div className="flex flex-col justify-center">
                         <span style={{ ...textStyle('20px', 700, '#000000'), lineHeight: '28px', letterSpacing: '0.35px' }}>

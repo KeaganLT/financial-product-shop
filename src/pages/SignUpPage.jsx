@@ -328,7 +328,7 @@ export default function SignUpPage() {
                             </p>
                         )}
 
-                        {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
+                        {error && <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>}
 
                         <button
                             type="submit"
@@ -368,7 +368,7 @@ export default function SignUpPage() {
                         <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Open the email and click the link to continue.
                         </p>
-                        {error && <p className="text-[13px] text-red-400">{error}</p>}
+                        {error && <p role="alert" className="text-[13px] text-red-400">{error}</p>}
                         <button type="button" onClick={handleEmailSubmit} className="text-[15px] underline" style={{ color: 'var(--brand-200)' }}>
                             Resend email
                         </button>
@@ -421,7 +421,7 @@ export default function SignUpPage() {
                             <KycUploadRow label="Proof of residence" status={proofOfResidenceFile ? 'Uploaded' : 'Proof of identity'} isUploaded={!!proofOfResidenceFile} capture="environment" onSelect={(file) => setProofOfResidenceFile(file)} />
                             <KycUploadRow label="Selfie upload" status={selfieFile ? 'Uploaded' : 'Proof of identity'} isUploaded={!!selfieFile} capture="user" onSelect={(file) => setSelfieFile(file)} />
                         </div>
-                        {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
+                        {error && <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>}
                         <button
                             type="submit"
                             disabled={!isKycStepValid || isSubmitting}

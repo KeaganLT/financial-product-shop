@@ -6,6 +6,7 @@ import { getBankDetails } from '../services/bankingService';
 import { generateContractPdf, downloadContract, getContractBlob } from '../services/contractService';
 import { uploadSignedContract } from '../services/firebase';
 import { saveContractRecord, getContractRecord } from '../services/contractStorageService';
+import { useToast } from '../context/ToastContext';
 import Section from '../components/contract/Section.jsx';
 import ContractPreview from '../components/contract/ContractPreview.jsx';
 
@@ -17,6 +18,7 @@ export default function ContractPage() {
     const navigate = useNavigate();
     const { state } = useLocation();
     const { auth, isLoggedIn } = useAuth();
+    const { showToast } = useToast();
 
     const product    = state?.product ?? null;
     const bankDetails = state?.bankDetails ?? null;
@@ -99,6 +101,7 @@ export default function ContractPage() {
                 bankName: resolvedBank?.bankName, last4: resolvedBank?.last4,
                 accountType: resolvedBank?.accountType, debitDay: resolvedBank?.debitDay,
             });
+            showToast('Contract signed and stored securely.', 'success');
         } catch {
             setUploadError('Contract saved locally — upload to cloud failed. You can upload your signed copy below.');
         } finally {
@@ -120,6 +123,7 @@ export default function ContractPage() {
                 bankName: resolvedBank?.bankName, last4: resolvedBank?.last4,
                 accountType: resolvedBank?.accountType, debitDay: resolvedBank?.debitDay,
             });
+            showToast('Signed contract uploaded.', 'success');
         } catch {
             setUploadError('Upload failed. Please try again.');
         } finally {
@@ -197,8 +201,15 @@ export default function ContractPage() {
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
                             Sign online — your signature will be embedded in the PDF and saved to your account.
                         </p>
-                        <button onClick={() => { setAgreed((v) => !v); setSigError(''); }} className="flex items-start gap-3">
+                        <label className="flex items-start gap-3 cursor-pointer p-2 -m-2">
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={() => { setAgreed((v) => !v); setSigError(''); }}
+                                className="sr-only"
+                            />
                             <div
+                                aria-hidden="true"
                                 className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
                                 style={{ borderColor: agreed ? '#1860BF' : '#C7C7CC', background: agreed ? '#1860BF' : 'white' }}
                             >
@@ -211,7 +222,7 @@ export default function ContractPage() {
                             <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#3C3C43', lineHeight: '19px', textAlign: 'left' }}>
                                 I confirm I have read this agreement, that all details are correct, and I authorise the debit order as stated.
                             </span>
-                        </button>
+                        </label>
                         <div className="flex flex-col gap-1">
                             <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--neutral-800)' }}>
                                 Type your full name as signature
@@ -228,7 +239,7 @@ export default function ContractPage() {
                                 By typing your name you are providing a legally binding digital signature.
                             </p>
                         </div>
-                        {sigError && <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{sigError}</p>}
+                        {sigError && <p role="alert" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{sigError}</p>}
                         <button
                             onClick={handleSignAndDownload}
                             disabled={uploading}
@@ -268,7 +279,7 @@ export default function ContractPage() {
                                 {uploading ? 'Uploading…' : 'Upload signed copy'}
                             </button>
                         )}
-                        {uploadError && <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{uploadError}</p>}
+                        {uploadError && <p role="alert" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{uploadError}</p>}
                     </Section>
                 )}
 

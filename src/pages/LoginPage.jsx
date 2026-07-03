@@ -207,7 +207,7 @@ export default function LoginPage() {
                             </div>
 
                             {error && (
-                                <p className="text-[13px] text-red-400 -mt-2">{error}</p>
+                                <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>
                             )}
 
                             <div className="flex flex-col gap-6">
