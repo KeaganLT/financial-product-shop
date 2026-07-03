@@ -9,6 +9,10 @@ import { saveContractRecord, getContractRecord } from '../services/contractStora
 import Section from '../components/contract/Section.jsx';
 import ContractPreview from '../components/contract/ContractPreview.jsx';
 
+function currentTimestamp() {
+    return Date.now();
+}
+
 export default function ContractPage() {
     const navigate = useNavigate();
     const { state } = useLocation();
@@ -38,7 +42,10 @@ export default function ContractPage() {
     }, [isLoggedIn]);
 
     useEffect(() => {
-        if (!auth?.customerId || !product?.id) { setProfileLoading(false); return; }
+        if (!auth?.customerId || !product?.id) {
+            queueMicrotask(() => setProfileLoading(false));
+            return;
+        }
         getContractRecord(auth.customerId, product.id)
             .then((record) => {
                 if (record) {
@@ -70,7 +77,7 @@ export default function ContractPage() {
         if (!agreed)           { setSigError('Please accept the declaration first.'); return; }
         if (!signature.trim()) { setSigError('Please type your full name as a signature.'); return; }
         setSigError('');
-        const now = Date.now();
+        const now = currentTimestamp();
         const sig = signature.trim();
         setSignedAt(now);
         const pdfDoc = generateContractPdf({ product, bankDetails: resolvedBank, profile, signature: sig, signedAt: now });

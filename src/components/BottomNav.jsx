@@ -22,7 +22,10 @@ export default function BottomNav() {
     const [unsignedCount, setUnsignedCount] = useState(0);
 
     useEffect(() => {
-        if (!isLoggedIn || !auth?.customerId) { setUnsignedCount(0); return; }
+        if (!isLoggedIn || !auth?.customerId) {
+            queueMicrotask(() => setUnsignedCount(0));
+            return;
+        }
         let cancelled = false;
         getSubscriptions(auth.token)
             .then(async (subs) => {

@@ -28,17 +28,6 @@ export default function AccountPage() {
     const [typeError, setTypeError]           = useState('');
     const [accountLoading, setAccountLoading] = useState(null);
 
-    useEffect(() => {
-        if (!isLoggedIn) {
-            setStatus(null);
-            setProfile(null);
-            setTypes(null);
-            return;
-        }
-        getKycStatus(auth.customerId).then(setStatus);
-        loadProfileAndTypes();
-    }, [isLoggedIn, auth?.customerId]);
-
     async function loadProfileAndTypes() {
         setProfileLoading(true);
         setProfileError('');
@@ -56,6 +45,19 @@ export default function AccountPage() {
         }
     }
 
+    useEffect(() => {
+        if (!isLoggedIn) {
+            queueMicrotask(() => {
+                setStatus(null);
+                setProfile(null);
+                setTypes(null);
+            });
+            return;
+        }
+        getKycStatus(auth.customerId).then(setStatus);
+        queueMicrotask(loadProfileAndTypes);
+    }, [isLoggedIn, auth?.customerId]);
+
     async function handleUpload(docType, file) {
         setUploadError('');
         try {
@@ -71,9 +73,7 @@ export default function AccountPage() {
                     { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'amber' },
                     auth.token,
                 );
-                try {
-                    if (p?.idNumber) await seedDhaData(p.idNumber, auth.token);
-                } catch (_) {}
+                if (p?.idNumber) await seedDhaData(p.idNumber, auth.token).catch(() => {});
             }
         } catch (err) {
             setUploadError(err.message || 'Failed to upload document');
@@ -108,7 +108,8 @@ export default function AccountPage() {
             }
             const updated = await getProfile(auth.token);
             setProfile(updated);
-        } catch (_) {
+        } catch {
+            setTypeError('Failed to update accounts. Please try again.');
         } finally {
             setAccountLoading(null);
         }

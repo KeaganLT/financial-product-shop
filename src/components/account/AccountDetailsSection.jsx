@@ -11,24 +11,6 @@ function SectionLabel({ children }) {
     );
 }
 
-function CredentialRow({ label, value, onEdit, editLabel }) {
-    return (
-        <div className="w-full px-4 py-3 rounded-lg flex items-center justify-between border" style={{ borderColor: '#E5E5EA' }}>
-            <div>
-                <p className="text-[12px]" style={{ color: '#8E8E93', fontFamily: 'Roboto, sans-serif' }}>{label}</p>
-                <p className="text-[15px] font-semibold" style={{ color: 'var(--neutral-800)', fontFamily: 'Roboto, sans-serif' }}>{value}</p>
-            </div>
-            <button
-                onClick={onEdit}
-                className="px-3 py-1 rounded-full text-[13px] font-semibold border"
-                style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif' }}
-            >
-                {editLabel}
-            </button>
-        </div>
-    );
-}
-
 export default function AccountDetailsSection({ onSuccess }) {
     const [editing, setEditing] = useState(null);
     const isGoogleUser = getSignInProvider() === 'google.com';

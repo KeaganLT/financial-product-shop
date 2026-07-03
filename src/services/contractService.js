@@ -165,10 +165,6 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         }
     }
 
-    function text(str, x, size, opts = {}) {
-        doc.setFontSize(size);
-        doc.text(str, x, y, opts);
-    }
 
     // ── Header bar ──────────────────────────────────────────────────────────────
     doc.setFillColor(24, 96, 191);
