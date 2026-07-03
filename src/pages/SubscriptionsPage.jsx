@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
 function StatusBadge({ fulfilmentType }) {
     const isImmediate = (fulfilmentType || '').toLowerCase().includes('immediate');
@@ -37,51 +37,53 @@ function EmptyIllustration() {
     );
 }
 
-function SubscriptionCard({ subscription, onCancel, cancelling }) {
+function SubscriptionCard({ subscription, onCancel, cancelling, onView }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
-    // The API may nest product info differently — handle both flat and nested shapes
-    const name         = subscription.productName ?? subscription.product?.name ?? 'Product';
-    const price        = subscription.price ?? subscription.product?.price ?? subscription.monthlyPremium ?? 0;
-    const imageUrl     = subscription.imageUrl ?? subscription.product?.imageUrl ?? null;
-    const fulfilType   = subscription.fulfilmentType ?? subscription.product?.fulfilmentType ?? '';
-    const subId        = subscription.id;
+    // product is returned as an array — take the first item
+    const prod         = Array.isArray(subscription.product) ? subscription.product[0] : subscription.product;
+    const name         = subscription.productName ?? prod?.name ?? 'Product';
+    const price        = subscription.price ?? prod?.price ?? subscription.monthlyPremium ?? 0;
+    const imageUrl     = subscription.imageUrl ?? prod?.imageUrl ?? null;
+    const fulfilType   = subscription.fulfilmentType ?? prod?.fulfilmentType ?? '';
+    const subId        = subscription.subscriptionId ?? subscription.id;
+    const productId    = subscription.productId ?? prod?.id ?? null;
 
     return (
         <div
             className="w-full rounded-[12px] overflow-hidden border"
             style={{ borderColor: '#E5E5EA' }}
         >
-            {/* Product image strip */}
-            <div className="w-full overflow-hidden bg-[#D9D9D9]" style={{ height: 120 }}>
+             {/* Product image strip — tappable */}
+            <button
+                className="w-full overflow-hidden bg-[#D9D9D9] block"
+                style={{ height: 120 }}
+                onClick={() => productId && onView(productId)}
+            >
                 <img
-                    src={imageUrl || productPlaceholder}
+                    src={imageUrl || getProductPlaceholder(name)}
                     alt={name}
                     className="w-full h-full object-cover"
                 />
-            </div>
+            </button>
 
             {/* Card body */}
             <div className="px-4 py-3 flex flex-col gap-2">
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1">
-                        <p
-                            className="font-semibold text-black"
+                        <button
+                            className="font-semibold text-black text-left"
                             style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em' }}
+                            onClick={() => productId && onView(productId)}
                         >
                             {name}
-                        </p>
+                        </button>
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93', lineHeight: '18px' }}>
                             R{Number(price).toFixed(2)} / month
                         </p>
                     </div>
                     <StatusBadge fulfilmentType={fulfilType} />
                 </div>
-
-                {/* Subscription ID */}
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#C7C7CC', letterSpacing: '0.41px' }}>
-                    Ref: #{subId}
-                </p>
 
                 {/* Cancel flow */}
                 {!confirmOpen ? (
@@ -165,12 +167,16 @@ export default function SubscriptionsPage() {
         setCancellingId(id);
         try {
             await deleteSubscription(id, auth.token);
-            setSubscriptions((prev) => prev.filter((s) => s.id !== id));
+            setSubscriptions((prev) => prev.filter((s) => (s.subscriptionId ?? s.id) !== id));
         } catch (err) {
             setError(err.message || 'Failed to cancel subscription');
         } finally {
             setCancellingId(null);
         }
+    }
+
+    function handleView(productId) {
+        navigate(`/products/${productId}`);
     }
 
     return (
@@ -254,14 +260,18 @@ export default function SubscriptionsPage() {
                         {error && (
                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{error}</p>
                         )}
-                        {subscriptions.map((sub) => (
-                            <SubscriptionCard
-                                key={sub.id}
-                                subscription={sub}
-                                onCancel={handleCancel}
-                                cancelling={cancellingId === sub.id}
-                            />
-                        ))}
+                        {subscriptions.map((sub) => {
+                            const subId = sub.subscriptionId ?? sub.id;
+                            return (
+                                <SubscriptionCard
+                                    key={subId}
+                                    subscription={sub}
+                                    onCancel={handleCancel}
+                                    cancelling={cancellingId === subId}
+                                    onView={handleView}
+                                />
+                            );
+                        })}
                     </>
                 )}
             </main>

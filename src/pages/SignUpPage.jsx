@@ -258,10 +258,12 @@ export default function SignUpPage() {
                 if (err.status !== 400) {
                     throw err;
                 }
+                // Account already exists — we have no way to know its real
+                // password, so we can't continue this signup flow for it.
                 await sendExistingAccountEmail(email);
                 setError('An account with this email already exists. Please log in instead.');
                 trackEvent('registration_error', { stage: 'email', error: 'account_exists' });
-                return;   // ← stop here, don't advance to awaiting-verification
+                return;
             }
             setStage('awaiting-verification');
         } catch (err) {

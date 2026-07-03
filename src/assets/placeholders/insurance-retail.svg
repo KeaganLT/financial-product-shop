@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D47A1"/>
+      <stop offset="60%" stop-color="#1565C0"/>
+      <stop offset="100%" stop-color="#0288D1"/>
+    </linearGradient>
+    <linearGradient id="shieldFill" x1="200" y1="48" x2="200" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="glow" cx="50%" cy="50%" r="50%" fx="50%" fy="50%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#42A5F5" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#42A5F5" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="200" cy="144" r="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#64B5F6" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#64B5F6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur1">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="289" fill="url(#bg)"/>
+
+  <!-- Background glow blobs -->
+  <circle cx="200" cy="130" r="110" fill="url(#centerGlow)" filter="url(#blur1)"/>
+  <circle cx="50" cy="260" r="90" fill="#1E88E5" fill-opacity="0.12" filter="url(#blur1)"/>
+  <circle cx="360" cy="30" r="80" fill="#0288D1" fill-opacity="0.15" filter="url(#blur1)"/>
+
+  <!-- Concentric decorative rings -->
+  <circle cx="200" cy="130" r="115" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <circle cx="200" cy="130" r="90" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+
+  <!-- Shield shadow/glow -->
+  <path d="M200 52 L263 79 L263 152 C263 196 234 228 200 242 C166 228 137 196 137 152 L137 79 Z"
+        fill="#1565C0" fill-opacity="0.6" filter="url(#blur1)" transform="translate(0,8)"/>
+
+  <!-- Shield body -->
+  <path d="M200 52 L263 79 L263 152 C263 196 234 228 200 242 C166 228 137 196 137 152 L137 79 Z"
+        fill="url(#shieldFill)" stroke="white" stroke-width="2" stroke-opacity="0.7"/>
+
+  <!-- Shield inner highlight -->
+  <path d="M200 62 L252 84 L252 150 C252 188 226 216 200 228 C174 216 148 188 148 150 L148 84 Z"
+        fill="none" stroke="white" stroke-width="0.5" stroke-opacity="0.3"/>
+
+  <!-- Person head -->
+  <circle cx="200" cy="118" r="20" fill="white" fill-opacity="0.92"/>
+
+  <!-- Person shoulders -->
+  <path d="M163 182 C163 161 179 148 200 148 C221 148 237 161 237 182 Z"
+        fill="white" fill-opacity="0.92"/>
+
+  <!-- Checkmark overlay on person -->
+  <path d="M191 118 L197 125 L211 110" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Floating dots decoration -->
+  <circle cx="110" cy="80" r="3" fill="white" fill-opacity="0.3"/>
+  <circle cx="98" cy="110" r="2" fill="white" fill-opacity="0.2"/>
+  <circle cx="290" cy="75" r="3" fill="white" fill-opacity="0.3"/>
+  <circle cx="304" cy="105" r="2" fill="white" fill-opacity="0.2"/>
+  <circle cx="120" cy="200" r="2.5" fill="white" fill-opacity="0.2"/>
+  <circle cx="280" cy="195" r="2.5" fill="white" fill-opacity="0.2"/>
+
+  <!-- Bottom label band -->
+  <rect x="0" y="255" width="400" height="34" fill="black" fill-opacity="0.25"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="12" fill="white" fill-opacity="0.9" font-weight="600" letter-spacing="3">RETAIL INSURANCE</text>
+</svg>

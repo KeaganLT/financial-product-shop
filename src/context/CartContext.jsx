@@ -27,6 +27,8 @@ export function CartProvider({ children }) {
     const [items, setItems] = useState([]);
     const [customerId, setCustomerId] = useState(null);
 
+    // Called by App when user logs in/out — seeds cart from localStorage
+    // for the now-logged-in user, or clears it on logout.
     const initCart = useCallback((id) => {
         setCustomerId(id);
         setItems(id ? loadCart(id) : []);

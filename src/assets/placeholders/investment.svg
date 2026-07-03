@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#064E2B"/>
+      <stop offset="60%" stop-color="#0A6640"/>
+      <stop offset="100%" stop-color="#117A3F"/>
+    </linearGradient>
+    <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.02"/>
+    </linearGradient>
+    <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#81C784" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#4CAF50" stop-opacity="0.4"/>
+    </linearGradient>
+    <radialGradient id="topGlow" cx="295" cy="85" r="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#69F0AE" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#69F0AE" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="lineGlow"><feGaussianBlur stdDeviation="4"/></filter>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="18"/></filter>
+  </defs>
+
+  <rect width="400" height="289" fill="url(#bg)"/>
+
+  <!-- Background glow at chart peak -->
+  <circle cx="295" cy="85" r="70" fill="url(#topGlow)" filter="url(#softBlur)"/>
+
+  <!-- Subtle horizontal grid lines -->
+  <line x1="60" y1="200" x2="360" y2="200" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <line x1="60" y1="170" x2="360" y2="170" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <line x1="60" y1="140" x2="360" y2="140" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <line x1="60" y1="110" x2="360" y2="110" stroke="white" stroke-width="0.5" stroke-opacity="0.1"/>
+  <line x1="60" y1="80" x2="360" y2="80" stroke="white" stroke-width="0.5" stroke-opacity="0.08"/>
+
+  <!-- Y axis labels -->
+  <text x="52" y="204" text-anchor="end" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">0</text>
+  <text x="52" y="144" text-anchor="end" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">50k</text>
+  <text x="52" y="84" text-anchor="end" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">100k</text>
+
+  <!-- Area chart fill under line -->
+  <path d="M75 198 L130 182 L175 165 L215 145 L255 118 L295 88 L295 200 Z"
+        fill="url(#areaFill)"/>
+
+  <!-- Glow duplicate of line (blurred) -->
+  <path d="M75 198 L130 182 L175 165 L215 145 L255 118 L295 88"
+        stroke="#69F0AE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
+        fill="none" filter="url(#lineGlow)" opacity="0.6"/>
+
+  <!-- Main chart line -->
+  <path d="M75 198 L130 182 L175 165 L215 145 L255 118 L295 88"
+        stroke="#69F0AE" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Data point dots -->
+  <circle cx="75" cy="198" r="4" fill="#69F0AE"/>
+  <circle cx="130" cy="182" r="4" fill="#69F0AE"/>
+  <circle cx="175" cy="165" r="4" fill="#69F0AE"/>
+  <circle cx="215" cy="145" r="4" fill="#69F0AE"/>
+  <circle cx="255" cy="118" r="4" fill="#69F0AE"/>
+  <circle cx="295" cy="88" r="6" fill="#69F0AE"/>
+  <circle cx="295" cy="88" r="10" fill="#69F0AE" fill-opacity="0.25"/>
+
+  <!-- Arrow at peak -->
+  <path d="M295 88 L308 72" stroke="#69F0AE" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M302 68 L308 72 L304 80" stroke="#69F0AE" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Baseline -->
+  <line x1="60" y1="200" x2="330" y2="200" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+  <line x1="60" y1="200" x2="60" y2="70" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+
+  <!-- Callout box at peak -->
+  <rect x="308" y="62" width="62" height="32" rx="6" fill="#1B5E20" fill-opacity="0.9" stroke="#69F0AE" stroke-width="0.8" stroke-opacity="0.6"/>
+  <text x="339" y="75" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="#69F0AE" fill-opacity="0.7" letter-spacing="1">RETURN</text>
+  <text x="339" y="88" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="11" fill="white" font-weight="700">+24.8%</text>
+
+  <!-- Rand coin -->
+  <circle cx="112" cy="68" r="28" fill="#0A6640" fill-opacity="0.7" stroke="#4CAF50" stroke-width="1.5" stroke-opacity="0.4"/>
+  <text x="112" y="74" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="20" fill="white" fill-opacity="0.8" font-weight="700">R</text>
+
+  <!-- X axis labels -->
+  <text x="75" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">Jan</text>
+  <text x="130" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">Feb</text>
+  <text x="175" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">Mar</text>
+  <text x="215" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">Apr</text>
+  <text x="255" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">May</text>
+  <text x="295" y="214" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="9" fill="white" fill-opacity="0.35">Jun</text>
+
+  <!-- Label -->
+  <rect x="0" y="255" width="400" height="34" fill="black" fill-opacity="0.3"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="12" fill="white" fill-opacity="0.9" font-weight="600" letter-spacing="3">INVESTMENT PRODUCT</text>
+</svg>

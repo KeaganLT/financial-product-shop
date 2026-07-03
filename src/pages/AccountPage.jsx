@@ -7,7 +7,7 @@ import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
 import { uploadKycDocument, trackEvent } from '../services/firebase.js';
 import { getKycStatus } from '../services/kycStatus.js';
-import { getProfile, getTypes, updateCustomerType, addAccount, removeAccount } from '../services/customerService.js';
+import { getProfile, getTypes, updateCustomerType, addAccount, removeAccount, postKycStatus, seedDhaData } from '../services/customerService.js';
 
 export default function AccountPage() {
     const navigate = useNavigate();
@@ -64,19 +64,40 @@ export default function AccountPage() {
         try {
             await uploadKycDocument(auth.customerId, docType, file);
             trackEvent('kyc_document_updated', { docType });
-            setStatus(await getKycStatus(auth.customerId));
+            const newStatus = await getKycStatus(auth.customerId);
+            setStatus(newStatus);
+
+            // Once both docs are uploaded, sync KYC + DHA to backend
+            if (newStatus.proofOfResidence && newStatus.selfie) {
+                const p = profile ?? await getProfile(auth.token);
+                const numericCustomerId = p?.id ?? auth.customerId;
+                await postKycStatus(
+                    numericCustomerId,
+                    { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'amber' },
+                    auth.token,
+                );
+                try {
+                    if (p?.idNumber) await seedDhaData(p.idNumber, auth.token);
+                } catch (_) {
+                    // non-fatal
+                }
+            }
         } catch (err) {
             setUploadError(err.message || 'Failed to upload document');
         }
     }
 
     async function handleSelectCustomerType(typeId) {
-        if (profile?.customerTypeId) return; // locked — already set
+        if (profile?.customerType) return; // locked — already set
         setSettingType(true);
         setTypeError('');
         try {
             const updated = await updateCustomerType(typeId, auth.token);
-            setProfile((prev) => ({ ...prev, customerTypeId: typeId, ...(updated ?? {}) }));
+            setProfile((prev) => ({
+                ...prev,
+                customerType: updated?.customerType ?? types?.customerTypes?.find((t) => t.id === typeId) ?? { id: typeId },
+                ...(updated ?? {}),
+            }));
         } catch (err) {
             setTypeError(err.message || 'Failed to update customer type');
         } finally {
@@ -104,11 +125,11 @@ export default function AccountPage() {
 
     // Derive current account type IDs from profile
     const currentAccountTypeIds = new Set(
-        (profile?.accounts ?? []).map((a) => a.accountTypeId ?? a.id ?? a.typeId)
+        (profile?.customerAccounts ?? profile?.accounts ?? []).map((a) => a.accountTypeId ?? a.id ?? a.typeId)
     );
 
-    const currentCustomerType = types?.customerTypes?.find(
-        (t) => t.id === profile?.customerTypeId
+    const currentCustomerType = profile?.customerType ?? types?.customerTypes?.find(
+        (t) => t.id === (profile?.customerTypeId ?? profile?.customerType?.id)
     );
 
     return (
@@ -205,7 +226,7 @@ export default function AccountPage() {
                             )}
 
                             {!profileLoading && types && (
-                                profile?.customerTypeId ? (
+                                profile?.customerType ? (
                                     /* Already set — locked */
                                     <div
                                         className="w-full px-4 py-3 rounded-lg flex items-center justify-between"

@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#101828"/>
+      <stop offset="100%" stop-color="#1A3A5C"/>
+    </linearGradient>
+    <linearGradient id="phone" x1="155" y1="30" x2="245" y2="270" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2A2A3E"/>
+      <stop offset="100%" stop-color="#1A1A2E"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="162" y1="50" x2="238" y2="230" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0D47A1"/>
+      <stop offset="100%" stop-color="#01579B"/>
+    </linearGradient>
+    <linearGradient id="screenGlow" x1="200" y1="60" x2="200" y2="220" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#29B6F6" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0288D1" stop-opacity="0.1"/>
+    </linearGradient>
+    <radialGradient id="bgGlow" cx="200" cy="144" r="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0288D1" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#0288D1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id="softBlur"><feGaussianBlur stdDeviation="20"/></filter>
+  </defs>
+
+  <rect width="400" height="289" fill="url(#bg)"/>
+
+  <!-- Background radial glow -->
+  <circle cx="200" cy="144" r="120" fill="url(#bgGlow)" filter="url(#softBlur)"/>
+
+  <!-- Subtle grid lines -->
+  <line x1="0" y1="72" x2="400" y2="72" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+  <line x1="0" y1="144" x2="400" y2="144" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+  <line x1="0" y1="216" x2="400" y2="216" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+  <line x1="100" y1="0" x2="100" y2="289" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+  <line x1="200" y1="0" x2="200" y2="289" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+  <line x1="300" y1="0" x2="300" y2="289" stroke="white" stroke-width="0.3" stroke-opacity="0.05"/>
+
+  <!-- Phone glow behind -->
+  <rect x="155" y="28" width="90" height="165" rx="14" fill="#29B6F6" fill-opacity="0.15" filter="url(#glow)"/>
+
+  <!-- Phone body -->
+  <rect x="155" y="28" width="90" height="165" rx="14" fill="url(#phone)"/>
+  <rect x="156.5" y="29.5" width="87" height="162" rx="13" stroke="white" stroke-width="1" stroke-opacity="0.15"/>
+
+  <!-- Notch -->
+  <rect x="185" y="31" width="30" height="8" rx="4" fill="#0A0A14"/>
+  <circle cx="200" cy="35" r="3" fill="#1A1A2E"/>
+
+  <!-- Screen -->
+  <rect x="162" y="46" width="76" height="134" rx="6" fill="url(#screen)"/>
+  <rect x="162" y="46" width="76" height="134" rx="6" fill="url(#screenGlow)"/>
+
+  <!-- Screen: status bar -->
+  <rect x="168" y="52" width="20" height="2.5" rx="1" fill="white" fill-opacity="0.4"/>
+  <rect x="214" y="52" width="18" height="2.5" rx="1" fill="white" fill-opacity="0.3"/>
+
+  <!-- Screen: app card -->
+  <rect x="168" y="62" width="64" height="44" rx="5" fill="white" fill-opacity="0.08"/>
+
+  <!-- Contract icon on card -->
+  <rect x="175" y="68" width="20" height="26" rx="2" fill="white" fill-opacity="0.7"/>
+  <line x1="178" y1="74" x2="192" y2="74" stroke="#0D47A1" stroke-width="1.5" stroke-opacity="0.8"/>
+  <line x1="178" y1="79" x2="192" y2="79" stroke="#0D47A1" stroke-width="1.5" stroke-opacity="0.8"/>
+  <line x1="178" y1="84" x2="188" y2="84" stroke="#0D47A1" stroke-width="1.5" stroke-opacity="0.8"/>
+
+  <!-- Checkmark circle -->
+  <circle cx="213" cy="80" r="11" fill="#4CAF50" fill-opacity="0.9"/>
+  <path d="M207 80 L211 84 L219 74" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Screen: stat rows -->
+  <rect x="168" y="114" width="64" height="2.5" rx="1" fill="white" fill-opacity="0.2"/>
+  <rect x="168" y="122" width="44" height="2.5" rx="1" fill="white" fill-opacity="0.15"/>
+  <rect x="168" y="130" width="54" height="2.5" rx="1" fill="white" fill-opacity="0.2"/>
+
+  <!-- Screen: bottom action button -->
+  <rect x="170" y="142" width="60" height="20" rx="10" fill="#29B6F6" fill-opacity="0.8"/>
+  <rect x="174" y="148" width="30" height="2.5" rx="1" fill="white" fill-opacity="0.9"/>
+  <rect x="174" y="153.5" width="20" height="2" rx="1" fill="white" fill-opacity="0.6"/>
+
+  <!-- Home bar -->
+  <rect x="183" y="185" width="34" height="3" rx="1.5" fill="white" fill-opacity="0.3"/>
+
+  <!-- Side buttons -->
+  <rect x="153" y="75" width="3" height="18" rx="1.5" fill="white" fill-opacity="0.2"/>
+  <rect x="153" y="98" width="3" height="24" rx="1.5" fill="white" fill-opacity="0.2"/>
+  <rect x="244" y="85" width="3" height="30" rx="1.5" fill="white" fill-opacity="0.2"/>
+
+  <!-- Floating tech elements -->
+  <circle cx="110" cy="90" r="18" fill="none" stroke="#29B6F6" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="110" cy="90" r="10" fill="none" stroke="#29B6F6" stroke-width="0.5" stroke-opacity="0.3"/>
+  <circle cx="110" cy="90" r="3" fill="#29B6F6" fill-opacity="0.4"/>
+
+  <circle cx="290" cy="165" r="22" fill="none" stroke="#29B6F6" stroke-width="1" stroke-opacity="0.2"/>
+  <circle cx="290" cy="165" r="12" fill="none" stroke="#29B6F6" stroke-width="0.5" stroke-opacity="0.3"/>
+  <circle cx="290" cy="165" r="3.5" fill="#29B6F6" fill-opacity="0.4"/>
+
+  <!-- Signal arcs -->
+  <path d="M320 80 Q340 95 320 110" fill="none" stroke="#29B6F6" stroke-width="1.5" stroke-opacity="0.3"/>
+  <path d="M330 72 Q360 95 330 118" fill="none" stroke="#29B6F6" stroke-width="1.5" stroke-opacity="0.2"/>
+  <path d="M340 64 Q380 95 340 126" fill="none" stroke="#29B6F6" stroke-width="1.5" stroke-opacity="0.1"/>
+
+  <!-- Label -->
+  <rect x="0" y="255" width="400" height="34" fill="black" fill-opacity="0.35"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="12" fill="white" fill-opacity="0.9" font-weight="600" letter-spacing="3">DEVICE CONTRACT</text>
+</svg>

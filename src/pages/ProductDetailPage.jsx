@@ -5,7 +5,9 @@ import { useCart } from '../context/CartContext';
 import { ProductDetailSkeleton } from '../components/Skeletons';
 import { getProducts, getProductById } from '../services/productService';
 import { getEligibility } from '../services/subscriptionService';
-import productPlaceholder from '../assets/product-placeholder.svg';
+import { getProfile } from '../services/customerService';
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
+import { getKycBackendStatus } from '../services/customerService';
 
 // Dummy data for benefits and requirements per product
 // These will eventually come from Firebase or the API
@@ -53,6 +55,26 @@ const PRODUCT_DETAILS = {
     },
 };
 
+const PRODUCT_CUSTOMER_TYPES = {
+    'Retail Short Term Insurance':    ['INDIVIDUAL'],
+    'Retail Long-Term Insurance':     ['INDIVIDUAL'],
+    'Commercial Short Term Insurance':['SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Commercial Long-Term Insurance': ['SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Device Contract':                ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Short-Term Investment Product':  ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Long-Term investment Product':   ['INDIVIDUAL', 'SOLE PROP', 'NON-PROFIT', 'CIPC'],
+    'Islamic Investment Product':     ['INDIVIDUAL', 'NON-PROFIT'],
+    'VIP Investment Product':         ['INDIVIDUAL'],
+};
+
+function getRequiredCustomerTypes(productName = '') {
+    const entry = Object.entries(PRODUCT_CUSTOMER_TYPES).find(([key]) =>
+        productName.toLowerCase().includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(productName.toLowerCase())
+    );
+    return entry ? entry[1] : null;
+}
+
 function getProductDetails(productName = '') {
     const name = productName.toLowerCase();
     if (name.includes('insurance') || name.includes('device') || name.includes('contract')) {
@@ -67,7 +89,7 @@ function getProductDetails(productName = '') {
 export default function ProductDetailPage() {
     const { id }              = useParams();
     const navigate            = useNavigate();
-    const { isLoggedIn }      = useAuth();
+    const { isLoggedIn, auth } = useAuth();
     const { addItem, isInCart } = useCart();
 
     const [product, setProduct]         = useState(null);
@@ -76,6 +98,7 @@ export default function ProductDetailPage() {
     const [error, setError]             = useState(null);
     const [expanded, setExpanded]       = useState(false);
     const [eligibility, setEligibility] = useState(null); // null = not loaded yet
+    const [eligibilityChecks, setEligibilityChecks] = useState(null); // checklist when not eligible
 
     useEffect(() => {
         Promise.all([
@@ -91,14 +114,85 @@ export default function ProductDetailPage() {
     }, [id]);
 
     useEffect(() => {
-        if (!isLoggedIn || !id) return;
-        getEligibility([Number(id)], auth.token)
-            .then((results) => {
-                const result = Array.isArray(results) ? results.find((r) => String(r.productId) === String(id)) : null;
+        if (!isLoggedIn || !id || !product) return;
+
+        Promise.all([
+            getEligibility([Number(id)], auth.token),
+            getProfile(auth.token),
+        ])
+            .then(async ([results, profile]) => {
+                const result = Array.isArray(results)
+                    ? results.find((r) => String(r.productId) === String(id))
+                    : null;
                 setEligibility(result ?? null);
+
+                if (!result || result.isEligible) return;
+
+                // Fetch KYC data using numeric profile ID
+                const numericId = profile?.id;
+                const kycBackend = numericId
+                    ? await getKycBackendStatus(numericId, auth.token)
+                    : null;
+
+                // Customer type check
+                const required = getRequiredCustomerTypes(product.name);
+                const currentTypeName = (profile?.customerType?.name ?? '').toUpperCase();
+                const customerTypePass = required
+                    ? (!!currentTypeName && required.map((t) => t.toUpperCase()).includes(currentTypeName))
+                    : true;
+
+                // Tax compliance check (amber or green passes)
+                const taxStatus = (kycBackend?.taxCompliance ?? '').toLowerCase();
+                const taxPass = taxStatus === 'amber' || taxStatus === 'green';
+
+                // KYC document checks — use backend indicators set when docs were uploaded
+                const porPass = kycBackend?.primaryIndicator === true;
+                const selfiePass = kycBackend?.secondaryIndicator === true;
+
+                // Account check — must have at least one account
+                const accounts = profile?.customerAccounts ?? profile?.accounts ?? [];
+                const accountPass = accounts.length > 0;
+
+                setEligibilityChecks({
+                    customerType: {
+                        pass: customerTypePass,
+                        label: 'Customer type',
+                        detail: customerTypePass
+                            ? `${profile?.customerType?.name ?? 'Set'}`
+                            : required
+                                ? `Required: ${required.join(', ')}${currentTypeName ? ` (yours: ${profile?.customerType?.name})` : ' (not set)'}`
+                                : 'Not set',
+                    },
+                    taxCompliance: {
+                        pass: taxPass,
+                        label: 'Tax compliance',
+                        detail: taxPass
+                            ? `Status: ${kycBackend.taxCompliance}`
+                            : kycBackend
+                                ? 'Tax compliance must be amber or green'
+                                : 'Not verified yet',
+                    },
+                    proofOfResidence: {
+                        pass: porPass,
+                        label: 'Proof of residence',
+                        detail: porPass ? 'Uploaded' : 'Not yet uploaded',
+                    },
+                    selfie: {
+                        pass: selfiePass,
+                        label: 'Identity selfie',
+                        detail: selfiePass ? 'Uploaded' : 'Not yet uploaded',
+                    },
+                    account: {
+                        pass: accountPass,
+                        label: 'Linked account',
+                        detail: accountPass
+                            ? `${accounts.length} account${accounts.length > 1 ? 's' : ''} linked`
+                            : 'No account linked',
+                    },
+                });
             })
             .catch(() => setEligibility(null));
-    }, [isLoggedIn, id, auth?.token]);
+    }, [isLoggedIn, id, auth?.token, product]);
 
     if (loading) return <ProductDetailSkeleton />;
 
@@ -175,7 +269,7 @@ export default function ProductDetailPage() {
                 <div className="px-6 pt-4 md:max-w-2xl">
                     <div className="relative w-full rounded-[8px] overflow-hidden" style={{ height: '289px' }}>
                         <img
-                            src={product.imageUrl || productPlaceholder}
+                            src={product.imageUrl || getProductPlaceholder(product.name)}
                             alt={product.name}
                             className="w-full h-full object-cover"
                         />
@@ -348,12 +442,12 @@ export default function ProductDetailPage() {
                             {isLoggedIn && eligibility !== null && (
                                 <>
                                     <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
-                                    <div className="flex flex-col gap-2">
+                                    <div className="flex flex-col gap-3">
                                         <h3 style={{ fontFamily: 'Roboto, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '28px', letterSpacing: '0.35px', color: '#000000' }}>
                                             Your eligibility
                                         </h3>
                                         <div
-                                            className="flex items-center gap-2 mb-1"
+                                            className="flex items-center gap-2"
                                             style={{ fontFamily: 'Roboto, sans-serif', fontSize: '15px', fontWeight: 600, color: eligibility.isEligible ? '#168C34' : '#C51C13' }}
                                         >
                                             {eligibility.isEligible ? (
@@ -363,24 +457,41 @@ export default function ProductDetailPage() {
                                             )}
                                             {eligibility.isEligible ? 'You qualify for this product' : 'You do not currently qualify'}
                                         </div>
-                                        {/* Per-check breakdown if the API returns checks */}
-                                        {Array.isArray(eligibility.checks) && eligibility.checks.map((check, i) => (
-                                            <div key={i} className="flex items-center gap-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: '15px', color: '#8E8E93' }}>
-                                                {check.passed ? (
-                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#168C34" /><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                                ) : (
-                                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#FF9500" /><path d="M8 5v3M8 10.5v.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>
-                                                )}
-                                                <span style={{ color: check.passed ? '#1C1C1C' : '#8E8E93' }}>{check.name ?? check.checkName ?? check.type}</span>
+
+                                        {/* Eligibility checklist */}
+                                        {!eligibility.isEligible && eligibilityChecks && (
+                                            <div className="flex flex-col gap-2">
+                                                {Object.values(eligibilityChecks).map((check) => (
+                                                    <div
+                                                        key={check.label}
+                                                        className="flex items-start gap-3 px-3 py-2 rounded-[8px]"
+                                                        style={{ background: check.pass ? '#F0FFF4' : '#FFF5F5', border: `1px solid ${check.pass ? '#A3E9B8' : '#FFB3B3'}` }}
+                                                    >
+                                                        {check.pass ? (
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginTop: 2, flexShrink: 0 }}><circle cx="8" cy="8" r="8" fill="#168C34"/><path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                                        ) : (
+                                                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginTop: 2, flexShrink: 0 }}><circle cx="8" cy="8" r="8" fill="#C51C13"/><path d="M5 5l6 6M11 5l-6 6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                                                        )}
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1C1C1C' }}>{check.label}</span>
+                                                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: '#8E8E93' }}>{check.detail}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                <button
+                                                    onClick={() => navigate('/account')}
+                                                    className="self-start mt-1"
+                                                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline' }}
+                                                >
+                                                    Go to Account to resolve →
+                                                </button>
                                             </div>
-                                        ))}
-                                        {!eligibility.isEligible && (
-                                            <button
-                                                onClick={() => navigate('/account')}
-                                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline', textAlign: 'left' }}
-                                            >
-                                                Manage your account →
-                                            </button>
+                                        )}
+
+                                        {!eligibility.isEligible && !eligibilityChecks && (
+                                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: '#8E8E93' }}>
+                                                Loading eligibility details…
+                                            </p>
                                         )}
                                     </div>
                                 </>
@@ -469,7 +580,7 @@ export default function ProductDetailPage() {
                                             style={{ height: '120px', borderRadius: '8px', backgroundColor: '#D9D9D9' }}
                                         >
                                             <img
-                                                src={related.imageUrl || productPlaceholder}
+                                                src={related.imageUrl || getProductPlaceholder(related.name)}
                                                 alt={related.name}
                                                 className="w-full h-full object-cover"
                                             />

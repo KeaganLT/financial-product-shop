@@ -77,7 +77,20 @@ export async function removeAccount(accountTypeId, token) {
     if (!response.ok) throw new Error('Failed to remove account');
 }
 
+export async function getKycBackendStatus(customerId, token) {
+    const response = await fetch(`${USER_BASE_URL}/kyc/${customerId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) return null;
+    return response.json().catch(() => null);
+}
+
 export async function postKycStatus(customerId, { primaryIndicator, secondaryIndicator, taxCompliance }, token) {
+    // Guard against duplicates — skip if a record already exists
+    const existing = await getKycBackendStatus(customerId, token);
+    if (existing) return;
+
     const response = await fetch(`${USER_BASE_URL}/kyc/${customerId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -89,16 +102,24 @@ export async function postKycStatus(customerId, { primaryIndicator, secondaryInd
 
 export async function seedDhaData(idNumber, token) {
     const headers = { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+
+    // Check each endpoint before posting to avoid duplicates
+    const [livingRes, duplicateRes, maritalRes] = await Promise.all([
+        fetch(`${USER_BASE_URL}/status/living/${idNumber}`, { headers }),
+        fetch(`${USER_BASE_URL}/status/duplicateId/${idNumber}`, { headers }),
+        fetch(`${USER_BASE_URL}/status/marital/${idNumber}`, { headers }),
+    ]);
+
     await Promise.all([
-        fetch(`${USER_BASE_URL}/status/living/${idNumber}`, {
+        livingRes.ok ? null : fetch(`${USER_BASE_URL}/status/living/${idNumber}`, {
             method: 'POST', headers,
             body: JSON.stringify({ livingStatus: 'alive' }),
         }),
-        fetch(`${USER_BASE_URL}/status/duplicateId/${idNumber}`, {
+        duplicateRes.ok ? null : fetch(`${USER_BASE_URL}/status/duplicateId/${idNumber}`, {
             method: 'POST', headers,
             body: JSON.stringify({ hasDuplicateId: false }),
         }),
-        fetch(`${USER_BASE_URL}/status/marital/${idNumber}`, {
+        maritalRes.ok ? null : fetch(`${USER_BASE_URL}/status/marital/${idNumber}`, {
             method: 'POST', headers,
             body: JSON.stringify({ status: 'Single', effectiveFrom: '2000-01-01', effectiveTo: '2099-12-31' }),
         }),

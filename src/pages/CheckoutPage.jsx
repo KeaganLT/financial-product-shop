@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { takeUpProducts } from '../services/subscriptionService';
-import productPlaceholder from '../assets/product-placeholder.svg';
 
 // ── Card brand logos (inline SVG approximations) ────────────────────────────
 
@@ -33,7 +32,7 @@ const AmexLogo = () => (
 
 function PageHeader({ title, onBack }) {
     return (
-        <div className="flex items-center px-1 bg-white" style={{ height: 64, borderBottom: '1px solid #E5E5EA' }}>
+        <div className="flex items-center px-1 bg-white md:hidden" style={{ height: 64, borderBottom: '1px solid #E5E5EA' }}>
             <div className="max-w-[411px] mx-auto w-full flex items-center gap-1">
                 <button onClick={onBack} className="w-12 h-12 flex items-center justify-center" aria-label="Go back">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -81,33 +80,42 @@ function CreditCardTile({ onClick }) {
 
 function CheckoutFooter({ monthlyTotal, onPay, loading }) {
     return (
-        <div className="fixed bottom-0 left-0 right-0 bg-white" style={{ borderTop: '1px solid #E5E5EA' }}>
-            <div className="max-w-[411px] mx-auto px-7 pt-4 pb-6 flex flex-col gap-4">
-                <div className="flex justify-between items-start">
-                    <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
-                        Total
-                    </span>
-                    <div className="flex flex-col gap-[5px] items-end">
-                        <div className="flex items-center gap-5">
-                            <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
-                            <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R 0.00</span>
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
-                            <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+        <>
+            {/* Mobile: fixed bottom bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white md:hidden" style={{ borderTop: '1px solid #E5E5EA' }}>
+                <div className="max-w-[411px] mx-auto px-7 pt-4 pb-6 flex flex-col gap-4">
+                    <div className="flex justify-between items-start">
+                        <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>Total</span>
+                        <div className="flex flex-col gap-[5px] items-end">
+                            <div className="flex items-center gap-5">
+                                <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
+                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R 0.00</span>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
+                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
+                    <button onClick={onPay} disabled={loading} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                        {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
+                    </button>
                 </div>
-                <button
-                    onClick={onPay}
-                    disabled={loading}
-                    className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60"
-                    style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
-                >
-                    {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
-                </button>
             </div>
-        </div>
+            {/* Desktop: inline pay button */}
+            <div className="hidden md:block max-w-3xl mx-auto w-full px-6 pb-12 pt-4">
+                <div className="h-px bg-[#E5E5EA] mb-4" />
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[#8E8E93]" style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}>Monthly total</span>
+                        <span className="font-bold text-black" style={{ fontSize: 22, fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+                    </div>
+                    <button onClick={onPay} disabled={loading} className="h-[42px] px-8 rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                        {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
+                    </button>
+                </div>
+            </div>
+        </>
     );
 }
 
@@ -176,16 +184,18 @@ function StatusBadge({ fulfilmentType }) {
     );
 }
 
+import { getProductPlaceholder } from '../assets/placeholders/index.js';
+
 function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay, loading, error }) {
     return (
         <>
-            <main className="flex-1 max-w-[411px] mx-auto w-full px-6 pt-7 pb-40 flex flex-col gap-6">
+            <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8 flex flex-col gap-6">
                 {/* Items */}
                 <div className="flex flex-col gap-4">
                     {items.map((product) => (
                         <div key={product.id} className="flex items-start gap-4">
                             <div className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[#D9D9D9]" style={{ width: 72, height: 62 }}>
-                                <img src={product.imageUrl || productPlaceholder} alt={product.name} className="w-full h-full object-cover" />
+                                <img src={product.imageUrl || getProductPlaceholder(product.name)} alt={product.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 flex flex-col gap-1">
                                 <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: '#000' }}>{product.name}</p>
@@ -252,7 +262,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
 function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard }) {
     return (
         <>
-            <main className="flex-1 max-w-[411px] mx-auto w-full px-6 pt-7 pb-40">
+            <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8">
                 <div className="flex flex-col gap-4">
                     {/* Payment method heading */}
                     <div className="flex items-center gap-3">
@@ -308,7 +318,7 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
 
 function TypeSelectView({ onSelectCard }) {
     return (
-        <main className="flex-1 max-w-[411px] mx-auto w-full px-6 pt-7 pb-10">
+        <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-10">
             <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                     <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
@@ -341,7 +351,7 @@ function CardFormView({ onNext }) {
     }
 
     return (
-        <main className="flex-1 max-w-[411px] mx-auto w-full px-6 pt-7 pb-10 flex flex-col gap-2">
+        <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-10 flex flex-col gap-2">
             <CardField label="Name of card holder" value={name} onChange={setName} placeholder="John" />
             <CardField label="Card number" value={number} onChange={setNumber} placeholder="62406766893" type="tel" />
             <div className="flex gap-2">
@@ -420,6 +430,10 @@ export default function CheckoutPage() {
     return (
         <div className="min-h-screen bg-white flex flex-col">
             <PageHeader title={titles[view]} onBack={handleBack} />
+            {/* Desktop heading */}
+            <div className="hidden md:block max-w-3xl mx-auto w-full px-6 pt-10 pb-2">
+                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, fontWeight: 700, color: '#1C1C1C' }}>{titles[view]}</h1>
+            </div>
 
             {view === 'main' && (
                 <MainView

@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 289" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="289" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0A1628"/>
+      <stop offset="55%" stop-color="#0D2347"/>
+      <stop offset="100%" stop-color="#1040A0"/>
+    </linearGradient>
+    <linearGradient id="skyline" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.06"/>
+    </linearGradient>
+    <radialGradient id="moonGlow" cx="280" cy="60" r="55" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFD54F" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#FFD54F" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur2"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+
+  <rect width="400" height="289" fill="url(#bg)"/>
+
+  <!-- Moon glow -->
+  <circle cx="280" cy="60" r="55" fill="url(#moonGlow)" filter="url(#blur2)"/>
+
+  <!-- Stars -->
+  <circle cx="40" cy="35" r="1.5" fill="white" fill-opacity="0.7"/>
+  <circle cx="80" cy="20" r="1" fill="white" fill-opacity="0.5"/>
+  <circle cx="130" cy="40" r="1.5" fill="white" fill-opacity="0.6"/>
+  <circle cx="180" cy="18" r="1" fill="white" fill-opacity="0.4"/>
+  <circle cx="230" cy="35" r="1.5" fill="white" fill-opacity="0.6"/>
+  <circle cx="320" cy="25" r="1" fill="white" fill-opacity="0.5"/>
+  <circle cx="360" cy="45" r="1.5" fill="white" fill-opacity="0.7"/>
+  <circle cx="60" cy="70" r="1" fill="white" fill-opacity="0.4"/>
+  <circle cx="350" cy="80" r="1" fill="white" fill-opacity="0.4"/>
+
+  <!-- City skyline silhouette -->
+  <!-- Building cluster - left -->
+  <rect x="20" y="148" width="18" height="92" fill="url(#skyline)"/>
+  <rect x="22" y="140" width="14" height="12" fill="url(#skyline)"/>
+  <rect x="25" y="132" width="8" height="12" fill="url(#skyline)"/>
+  <!-- antenna -->
+  <line x1="29" y1="110" x2="29" y2="132" stroke="white" stroke-width="1" stroke-opacity="0.2"/>
+
+  <rect x="42" y="160" width="22" height="80" fill="url(#skyline)"/>
+  <rect x="44" y="150" width="18" height="14" fill="url(#skyline)"/>
+
+  <rect x="68" y="130" width="28" height="110" fill="url(#skyline)"/>
+  <rect x="70" y="118" width="24" height="16" fill="url(#skyline)"/>
+  <rect x="74" y="106" width="16" height="16" fill="url(#skyline)"/>
+  <line x1="82" y1="85" x2="82" y2="106" stroke="white" stroke-width="1.5" stroke-opacity="0.25"/>
+
+  <!-- Windows on left buildings -->
+  <rect x="72" y="135" width="5" height="6" rx="0.5" fill="white" fill-opacity="0.15"/>
+  <rect x="82" y="135" width="5" height="6" rx="0.5" fill="white" fill-opacity="0.25"/>
+  <rect x="72" y="148" width="5" height="6" rx="0.5" fill="white" fill-opacity="0.2"/>
+  <rect x="82" y="148" width="5" height="6" rx="0.5" fill="white" fill-opacity="0.1"/>
+  <rect x="72" y="161" width="5" height="6" rx="0.5" fill="#FFD54F" fill-opacity="0.35"/>
+  <rect x="82" y="161" width="5" height="6" rx="0.5" fill="white" fill-opacity="0.15"/>
+
+  <!-- Center tall building -->
+  <rect x="160" y="95" width="80" height="145" fill="url(#skyline)"/>
+  <rect x="167" y="82" width="66" height="17" fill="url(#skyline)"/>
+  <rect x="177" y="70" width="46" height="16" fill="url(#skyline)"/>
+  <rect x="189" y="58" width="22" height="16" fill="url(#skyline)"/>
+  <line x1="200" y1="35" x2="200" y2="58" stroke="white" stroke-width="1.5" stroke-opacity="0.3"/>
+  <circle cx="200" cy="33" r="2.5" fill="#FF5252" fill-opacity="0.8"/>
+
+  <!-- Windows on center building -->
+  <rect x="168" y="100" width="10" height="12" rx="1" fill="white" fill-opacity="0.12"/>
+  <rect x="184" y="100" width="10" height="12" rx="1" fill="#FFD54F" fill-opacity="0.3"/>
+  <rect x="200" y="100" width="10" height="12" rx="1" fill="white" fill-opacity="0.12"/>
+  <rect x="216" y="100" width="10" height="12" rx="1" fill="white" fill-opacity="0.18"/>
+  <rect x="168" y="118" width="10" height="12" rx="1" fill="white" fill-opacity="0.18"/>
+  <rect x="184" y="118" width="10" height="12" rx="1" fill="white" fill-opacity="0.12"/>
+  <rect x="200" y="118" width="10" height="12" rx="1" fill="#FFD54F" fill-opacity="0.3"/>
+  <rect x="216" y="118" width="10" height="12" rx="1" fill="white" fill-opacity="0.12"/>
+  <rect x="168" y="136" width="10" height="12" rx="1" fill="white" fill-opacity="0.1"/>
+  <rect x="184" y="136" width="10" height="12" rx="1" fill="white" fill-opacity="0.18"/>
+  <rect x="200" y="136" width="10" height="12" rx="1" fill="white" fill-opacity="0.1"/>
+  <rect x="216" y="136" width="10" height="12" rx="1" fill="#FFD54F" fill-opacity="0.25"/>
+
+  <!-- Buildings right -->
+  <rect x="300" y="128" width="30" height="112" fill="url(#skyline)"/>
+  <rect x="302" y="116" width="26" height="16" fill="url(#skyline)"/>
+  <rect x="305" y="102" width="20" height="18" fill="url(#skyline)"/>
+
+  <rect x="334" y="155" width="24" height="85" fill="url(#skyline)"/>
+  <rect x="336" y="146" width="20" height="13" fill="url(#skyline)"/>
+
+  <rect x="362" y="145" width="22" height="95" fill="url(#skyline)"/>
+  <rect x="363" y="133" width="20" height="16" fill="url(#skyline)"/>
+
+  <!-- Windows right -->
+  <rect x="303" y="133" width="6" height="7" rx="0.5" fill="white" fill-opacity="0.15"/>
+  <rect x="314" y="133" width="6" height="7" rx="0.5" fill="#FFD54F" fill-opacity="0.3"/>
+  <rect x="303" y="146" width="6" height="7" rx="0.5" fill="white" fill-opacity="0.2"/>
+  <rect x="314" y="146" width="6" height="7" rx="0.5" fill="white" fill-opacity="0.1"/>
+
+  <!-- Ground / horizon glow -->
+  <rect x="0" y="235" width="400" height="54" fill="#0A1628" fill-opacity="0.7"/>
+  <rect x="0" y="230" width="400" height="8" fill="#1565C0" fill-opacity="0.15" filter="url(#blur2)"/>
+
+  <!-- Shield overlay (semi-transparent) -->
+  <path d="M200 172 L224 181 L224 200 C224 215 213 224 200 229 C187 224 176 215 176 200 L176 181 Z"
+        fill="white" fill-opacity="0.08" stroke="white" stroke-width="1" stroke-opacity="0.4"/>
+
+  <!-- Label band -->
+  <rect x="0" y="255" width="400" height="34" fill="black" fill-opacity="0.4"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Roboto, Arial, sans-serif" font-size="12" fill="white" fill-opacity="0.9" font-weight="600" letter-spacing="3">COMMERCIAL INSURANCE</text>
+</svg>

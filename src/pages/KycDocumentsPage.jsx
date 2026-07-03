@@ -46,16 +46,19 @@ export default function KycDocumentsPage() {
             markKycSubmitted(auth.customerId);
             trackEvent('kyc_documents_submitted');
 
-            // Sync KYC status to backend: selfie = secondary, proof-of-residence = primary
+            // Fetch profile to get numeric customer ID and idNumber
+            const profile = await getProfile(auth.token);
+            const numericCustomerId = profile?.id ?? auth.customerId;
+
+            // Sync KYC status to backend using numeric customer ID
             await postKycStatus(
-                auth.customerId,
-                { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'red' },
+                numericCustomerId,
+                { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'amber' },
                 auth.token,
             );
 
             // Seed DHA data so living/marital/duplicateId checks pass
             try {
-                const profile = await getProfile(auth.token);
                 if (profile?.idNumber) {
                     await seedDhaData(profile.idNumber, auth.token);
                 }

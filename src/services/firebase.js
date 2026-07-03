@@ -21,6 +21,12 @@ export const functions = getFunctions(firebaseApp);
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
 const PASSWORD_FOR_SIGN_IN_KEY = 'passwordForSignIn';
+
+// Sends a real "click to verify" email via Firebase's own infrastructure.
+// The link sends the user back to /signup, where we detect and complete it.
+// The link click reloads the page (fresh React state), so we also stash the
+// legacy-account password the user just chose — otherwise it's lost and the
+// later /v1/token login during KYC submit fails with Bad credentials.
 export async function sendVerificationEmail(email, password) {
     const actionCodeSettings = {
         url: `${window.location.origin}/signup`,

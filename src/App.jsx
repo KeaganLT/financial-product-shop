@@ -14,6 +14,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import CheckoutResultPage from './pages/CheckoutResultPage';
 import KycDocumentsPage from './pages/KycDocumentsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import Footer from './components/Footer';
 
 // Syncs cart state with the currently logged-in user.
 // Sits inside both providers so it can read both contexts without coupling them.
@@ -49,6 +50,7 @@ export default function App() {
                             <Route path="/subscriptions" element={<SubscriptionsPage />} />
                             <Route path="*"              element={<Navigate to="/products" replace />} />
                         </Routes>
+                        <Footer />
                     </BrowserRouter>
                 </CartProvider>
             </AuthProvider>
