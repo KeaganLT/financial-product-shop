@@ -5,7 +5,7 @@ export default function StepIndicator({ current, total }) {
                 <div key={i} className="flex items-center gap-2 flex-1">
                     <div
                         className="h-1.5 w-full rounded-full transition-all"
-                        style={{ background: i < current ? '#1860BF' : '#E5E5EA' }}
+                        style={{ background: i < current ? '#1860BF' : 'var(--neutral-300)' }}
                     />
                 </div>
             ))}

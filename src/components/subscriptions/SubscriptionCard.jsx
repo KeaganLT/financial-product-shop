@@ -14,9 +14,9 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
     const productId  = subscription.productId ?? prod?.id ?? null;
 
     return (
-        <div className="w-full rounded-[12px] overflow-hidden border" style={{ borderColor: '#E5E5EA' }}>
+        <div className="w-full rounded-[12px] overflow-hidden border" style={{ borderColor: 'var(--neutral-300)' }}>
             <button
-                className="w-full overflow-hidden bg-[#D9D9D9] block"
+                className="w-full overflow-hidden bg-[var(--neutral-300)] block"
                 style={{ height: 120 }}
                 onClick={() => productId && onView(productId)}
             >
@@ -31,13 +31,13 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                 <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col gap-1">
                         <button
-                            className="font-semibold text-black text-left"
+                            className="font-semibold text-[var(--text-primary)] text-left"
                             style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em' }}
                             onClick={() => productId && onView(productId)}
                         >
                             {name}
                         </button>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93', lineHeight: '18px' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)', lineHeight: '18px' }}>
                             R{Number(price).toFixed(2)} / month
                         </p>
                     </div>
@@ -89,7 +89,7 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                         className="flex flex-col gap-2 mt-1 px-3 py-2 rounded-[8px]"
                         style={{ background: '#FFF5F5', border: '1px solid #FFB3B3' }}
                     >
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1C1C1C' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-primary)' }}>
                             Are you sure you want to cancel this subscription?
                         </p>
                         <div className="flex gap-2">
@@ -104,7 +104,7 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                             <button
                                 onClick={() => setConfirmOpen(false)}
                                 className="flex-1 py-1.5 rounded-full font-semibold border"
-                                style={{ borderColor: '#C7C7CC', fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1C1C1C' }}
+                                style={{ borderColor: 'var(--neutral-400)', fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-primary)' }}
                             >
                                 Keep it
                             </button>

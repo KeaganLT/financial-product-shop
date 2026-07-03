@@ -39,9 +39,9 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                 </div>
             </div>
 
-            <div className="border rounded-b-[10px] px-4 pb-4 flex flex-col gap-4" style={{ borderColor: '#E5E5EA', borderTop: 'none' }}>
+            <div className="border rounded-b-[10px] px-4 pb-4 flex flex-col gap-4" style={{ borderColor: 'var(--neutral-300)', borderTop: 'none' }}>
                 <div className="pt-3">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Parties</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Parties</p>
                     <InfoRow label="Service Provider" value="FinShop (Pty) Ltd" />
                     <InfoRow
                         label="Policyholder"
@@ -54,7 +54,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                 </div>
 
                 <div>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Product details</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Product details</p>
                     <InfoRow label="Product" value={product.name} />
                     <InfoRow label="Monthly premium" value={`R${Number(product.price).toFixed(2)}`} />
                     {resolvedBank && (
@@ -67,7 +67,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                 </div>
 
                 <div>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What's covered</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What's covered</p>
                     <ul className="flex flex-col gap-1.5">
                         {coverPoints.map((p) => (
                             <li key={p} className="flex items-center gap-2">
@@ -75,17 +75,17 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                                     <circle cx="7" cy="7" r="7" fill="#E6F9ED" />
                                     <path d="M4 7l2.5 2.5 4-4" stroke="#168C34" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>{p}</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>{p}</span>
                             </li>
                         ))}
                     </ul>
                 </div>
 
                 <div>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Key terms</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Key terms</p>
                     <ul className="flex flex-col gap-1.5">
                         {KEY_TERMS.map((t) => (
-                            <li key={t} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43', paddingLeft: 12, position: 'relative' }}>
+                            <li key={t} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)', paddingLeft: 12, position: 'relative' }}>
                                 <span style={{ position: 'absolute', left: 0, color: '#1860BF' }}>·</span>
                                 {t}
                             </li>

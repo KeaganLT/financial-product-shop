@@ -137,17 +137,17 @@ export default function ContractPage() {
         <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
             <div
                 className="fixed top-0 left-0 right-0 z-50"
-                style={{ backgroundColor: 'var(--neutral-100)', borderBottom: '1px solid #E5E5EA' }}
+                style={{ backgroundColor: 'var(--neutral-100)', borderBottom: '1px solid var(--neutral-300)' }}
             >
                 <div className="max-w-[480px] md:max-w-2xl mx-auto px-4 flex items-center gap-3" style={{ height: 64 }}>
                     <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="var(--neutral-700)" />
                         </svg>
                     </button>
                     <div>
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, fontWeight: 600, color: 'var(--neutral-800)' }}>Your contract</p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>{product.name}</p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>{product.name}</p>
                     </div>
                 </div>
             </div>
@@ -161,7 +161,7 @@ export default function ContractPage() {
                         </svg>
                         <div>
                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A5C30' }}>Signed contract uploaded</p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>Your signed contract has been stored securely.</p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Your signed contract has been stored securely.</p>
                         </div>
                     </div>
                 ) : (
@@ -173,7 +173,7 @@ export default function ContractPage() {
                         </svg>
                         <div>
                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#7A4F00' }}>Signature required</p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>Please sign this contract to complete your product agreement.</p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Please sign this contract to complete your product agreement.</p>
                         </div>
                     </div>
                 )}
@@ -181,7 +181,7 @@ export default function ContractPage() {
                 <ContractPreview product={product} profile={profile} profileLoading={profileLoading} resolvedBank={resolvedBank} />
 
                 <Section heading="Download">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                         Download the contract as a PDF to read, print, or sign manually, then upload the signed copy below.
                     </p>
                     <button
@@ -198,7 +198,7 @@ export default function ContractPage() {
 
                 {!uploadedUrl && (
                     <Section heading="Sign digitally">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Sign online — your signature will be embedded in the PDF and saved to your account.
                         </p>
                         <label className="flex items-start gap-3 cursor-pointer p-2 -m-2">
@@ -211,7 +211,7 @@ export default function ContractPage() {
                             <div
                                 aria-hidden="true"
                                 className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
-                                style={{ borderColor: agreed ? '#1860BF' : '#C7C7CC', background: agreed ? '#1860BF' : 'white' }}
+                                style={{ borderColor: agreed ? '#1860BF' : 'var(--neutral-400)', background: agreed ? '#1860BF' : 'var(--neutral-100)' }}
                             >
                                 {agreed && (
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -219,7 +219,7 @@ export default function ContractPage() {
                                     </svg>
                                 )}
                             </div>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#3C3C43', lineHeight: '19px', textAlign: 'left' }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--neutral-700)', lineHeight: '19px', textAlign: 'left' }}>
                                 I confirm I have read this agreement, that all details are correct, and I authorise the debit order as stated.
                             </span>
                         </label>
@@ -233,9 +233,9 @@ export default function ContractPage() {
                                 onChange={(e) => { setSignature(e.target.value); setSigError(''); }}
                                 placeholder="e.g. Keagan Truter"
                                 className="w-full h-[46px] rounded-[10px] px-3 border"
-                                style={{ fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif', fontSize: 18, borderColor: sigError && !signature ? '#C51C13' : '#C7C7CC', color: '#1860BF' }}
+                                style={{ fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif', fontSize: 18, borderColor: sigError && !signature ? '#C51C13' : 'var(--neutral-400)', color: '#1860BF' }}
                             />
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>
                                 By typing your name you are providing a legally binding digital signature.
                             </p>
                         </div>
@@ -257,14 +257,14 @@ export default function ContractPage() {
 
                 {!uploadedUrl && (
                     <Section heading="Upload signed copy">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Already signed a physical or scanned copy? Upload it here.
                         </p>
-                        <label className="w-full h-[46px] rounded-[100px] border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer" style={{ borderColor: ownFile ? '#168C34' : '#C7C7CC' }}>
+                        <label className="w-full h-[46px] rounded-[100px] border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer" style={{ borderColor: ownFile ? '#168C34' : 'var(--neutral-400)' }}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill={ownFile ? '#168C34' : '#8E8E93'} />
+                                <path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill={ownFile ? '#168C34' : 'var(--text-secondary)'} />
                             </svg>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: ownFile ? '#168C34' : '#8E8E93', fontWeight: ownFile ? 600 : 400 }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: ownFile ? '#168C34' : 'var(--text-secondary)', fontWeight: ownFile ? 600 : 400 }}>
                                 {ownFile ? ownFile.name : 'Choose PDF or image…'}
                             </span>
                             <input type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => setOwnFile(e.target.files[0] ?? null)} />
@@ -285,7 +285,7 @@ export default function ContractPage() {
 
                 {uploadedUrl && (
                     <Section heading="Signed contract">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Your signed contract is stored securely. You can download a copy below.
                         </p>
                         <a

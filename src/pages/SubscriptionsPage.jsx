@@ -104,7 +104,7 @@ export default function SubscriptionsPage() {
                 {!isLoggedIn && (
                     <div className="flex flex-col items-center gap-4 pt-16 text-center">
                         <EmptyIllustration />
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, color: 'var(--text-secondary)' }}>
                             Sign in to view your subscriptions.
                         </p>
                         <button
@@ -120,11 +120,11 @@ export default function SubscriptionsPage() {
                 {isLoggedIn && loading && (
                     <div className="flex flex-col gap-4 mt-2">
                         {[1, 2].map((i) => (
-                            <div key={i} className="w-full rounded-[12px] overflow-hidden border border-[#E5E5EA] animate-pulse">
-                                <div className="w-full bg-[#F2F2F7]" style={{ height: 120 }} />
+                            <div key={i} className="w-full rounded-[12px] overflow-hidden border border-[var(--neutral-300)] animate-pulse">
+                                <div className="w-full bg-[var(--surface-field)]" style={{ height: 120 }} />
                                 <div className="px-4 py-3 flex flex-col gap-2">
-                                    <div className="h-4 w-2/3 bg-[#F2F2F7] rounded" />
-                                    <div className="h-3 w-1/3 bg-[#F2F2F7] rounded" />
+                                    <div className="h-4 w-2/3 bg-[var(--surface-field)] rounded" />
+                                    <div className="h-3 w-1/3 bg-[var(--surface-field)] rounded" />
                                 </div>
                             </div>
                         ))}
@@ -149,7 +149,7 @@ export default function SubscriptionsPage() {
                         <p className="font-bold" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, color: 'var(--neutral-800)' }}>
                             No subscriptions yet
                         </p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-secondary)' }}>
                             Browse our products and take out your first subscription.
                         </p>
                         <button

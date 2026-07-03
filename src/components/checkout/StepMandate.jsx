@@ -24,10 +24,10 @@ export default function StepMandate({ product, bankDetails, onNext }) {
     return (
         <div className="flex flex-col gap-5 px-6 pt-4 pb-8">
             <div>
-                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: '#1C1C1C' }}>
+                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
                     Debit order mandate
                 </h2>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93', marginTop: 4 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
                     Please read and accept the terms below.
                 </p>
             </div>
@@ -47,16 +47,16 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         </svg>
                     </div>
                     <div>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 700, color: '#1C1C1C' }}>FinShop Bank</p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>FSP Licence No. 12345 | Authorised Financial Services Provider</p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>FinShop Bank</p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>FSP Licence No. 12345 | Authorised Financial Services Provider</p>
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: '#1C1C1C', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                         Debit Order Mandate
                     </p>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43', lineHeight: '18px' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)', lineHeight: '18px' }}>
                         I, the account holder, hereby authorise <strong>FinShop (Pty) Ltd</strong> to debit my account at <strong>{bankDetails.bankName}</strong> (ending <strong>••••{bankDetails.last4}</strong>) with the amount of <strong>R{Number(product.price).toFixed(2)}</strong> on the <strong>{bankDetails.debitDay}{daySuffix} of each month</strong>, commencing on the next available debit date.
                     </p>
                 </div>
@@ -70,7 +70,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                             >
                                 {i + 1}
                             </span>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43', lineHeight: '17px' }}>{point}</span>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)', lineHeight: '17px' }}>{point}</span>
                         </li>
                     ))}
                 </ul>
@@ -78,8 +78,8 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                 <div style={{ height: 1, background: '#D0DDEE' }} />
 
                 <div className="flex flex-col gap-1">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>Date: {today}</p>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>Reference: {product.name}</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>Date: {today}</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>Reference: {product.name}</p>
                 </div>
             </div>
 
@@ -89,7 +89,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
             >
                 <div
                     className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
-                    style={{ borderColor: agreed ? '#1860BF' : '#C7C7CC', background: agreed ? '#1860BF' : 'white' }}
+                    style={{ borderColor: agreed ? '#1860BF' : 'var(--neutral-400)', background: agreed ? '#1860BF' : 'var(--neutral-100)' }}
                 >
                     {agreed && (
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -97,13 +97,13 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         </svg>
                     )}
                 </div>
-                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#3C3C43', lineHeight: '19px', textAlign: 'left' }}>
+                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--neutral-700)', lineHeight: '19px', textAlign: 'left' }}>
                     I have read and accept the debit order mandate above and authorise the debit to my account.
                 </span>
             </button>
 
             <div className="flex flex-col gap-1">
-                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                     Type your full name as signature
                 </label>
                 <input
@@ -115,11 +115,11 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                     style={{
                         fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif',
                         fontSize: 18,
-                        borderColor: error && !signature ? '#C51C13' : '#C7C7CC',
+                        borderColor: error && !signature ? '#C51C13' : 'var(--neutral-400)',
                         color: '#1860BF',
                     }}
                 />
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>
                     By typing your name, you are digitally signing this mandate.
                 </p>
             </div>

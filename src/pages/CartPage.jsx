@@ -77,7 +77,7 @@ function CartItemCard({ product, onRemove }) {
 
                 {/* Swipeable row */}
                 <div
-                    className="relative bg-white flex items-start gap-[27px]"
+                    className="relative bg-[var(--surface-page)] flex items-start gap-[27px]"
                     style={{ transform: `translateX(-${offset}px)`, transition: dragging ? 'none' : 'transform 0.2s' }}
                     onTouchStart={onTouchStart}
                     onTouchMove={onTouchMove}
@@ -86,7 +86,7 @@ function CartItemCard({ product, onRemove }) {
                 >
                     {/* Product image */}
                     <div
-                        className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[#D9D9D9]"
+                        className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[var(--neutral-300)]"
                         style={{ width: 125, height: 107 }}
                     >
                         <img
@@ -99,13 +99,13 @@ function CartItemCard({ product, onRemove }) {
                     {/* Details */}
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                         <p
-                            className="font-semibold text-black leading-[22px]"
+                            className="font-semibold text-[var(--text-primary)] leading-[22px]"
                             style={{ fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
                         >
                             {product.name}
                         </p>
                         <p
-                            className="text-[#8E8E93]"
+                            className="text-[var(--text-secondary)]"
                             style={{ fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}
                         >
                             from R{Number(product.price).toFixed(0)} p/m
@@ -127,7 +127,7 @@ function CartItemCard({ product, onRemove }) {
             </div>
 
             {/* Divider */}
-            <div className="h-px bg-[#D9D9D9]" />
+            <div className="h-px bg-[var(--neutral-300)]" />
         </div>
     );
 }
@@ -195,27 +195,27 @@ export default function CartPage() {
     const orderSummaryContent = (
         <div className="flex flex-col gap-4">
             <div className="flex justify-between items-start">
-                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                     Order summary
                 </span>
             </div>
             <div className="flex flex-col gap-2">
                 {items.map((item) => (
                     <div key={item.id} className="flex justify-between">
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }} className="truncate mr-4">{item.name}</span>
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C', whiteSpace: 'nowrap' }}>R {Number(item.price).toFixed(2)}</span>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }} className="truncate mr-4">{item.name}</span>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>R {Number(item.price).toFixed(2)}</span>
                     </div>
                 ))}
             </div>
-            <div className="h-px bg-[#E5E5EA]" />
+            <div className="h-px bg-[var(--neutral-300)]" />
             <div className="flex flex-col gap-1">
                 <div className="flex justify-between">
-                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>Once off</span>
-                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>R {onceOffTotal.toFixed(2)}</span>
+                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>Once off</span>
+                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>R {onceOffTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>Monthly total</span>
-                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 700, color: '#1C1C1C' }}>R {monthlyTotal.toFixed(2)}</span>
+                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>Monthly total</span>
+                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>R {monthlyTotal.toFixed(2)}</span>
                 </div>
             </div>
             <button
@@ -236,20 +236,20 @@ export default function CartPage() {
     );
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-[var(--surface-page)] flex flex-col">
 
             {/* Top app bar — mobile only (desktop uses Header) */}
             <div
-                className="flex items-center px-1 bg-white md:hidden"
-                style={{ height: 64, borderBottom: '1px solid #E5E5EA' }}
+                className="flex items-center px-1 bg-[var(--surface-page)] md:hidden"
+                style={{ height: 64, borderBottom: '1px solid var(--neutral-300)' }}
             >
                 <div className="max-w-[411px] mx-auto w-full flex items-center gap-1">
                     <button onClick={() => navigate(-1)} className="w-12 h-12 flex items-center justify-center" aria-label="Go back">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="var(--neutral-700)" />
                         </svg>
                     </button>
-                    <h1 className="flex-1" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: '#1D1B20' }}>
+                    <h1 className="flex-1" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: 'var(--text-primary)' }}>
                         Cart
                     </h1>
                 </div>
@@ -257,7 +257,7 @@ export default function CartPage() {
 
             {/* Desktop page heading */}
             <div className="hidden md:block max-w-5xl mx-auto w-full px-6 pt-10 pb-2">
-                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, fontWeight: 700, color: '#1C1C1C' }}>Your cart</h1>
+                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)' }}>Your cart</h1>
             </div>
 
             {/* Content */}
@@ -270,7 +270,7 @@ export default function CartPage() {
                     {isEmpty ? (
                         <div className="flex flex-col items-center justify-center gap-6 pt-24">
                             <EmptyCartIllustration />
-                            <p className="font-bold text-[#1C1C1C]" style={{ fontSize: 20, letterSpacing: '0.35px', fontFamily: 'Roboto, sans-serif' }}>
+                            <p className="font-bold text-[var(--text-primary)]" style={{ fontSize: 20, letterSpacing: '0.35px', fontFamily: 'Roboto, sans-serif' }}>
                                 Your cart is empty
                             </p>
                             <button
@@ -289,10 +289,10 @@ export default function CartPage() {
 
                             {requiresVerification && (
                                 <div className="flex flex-col gap-2 rounded-[8px] px-6 py-3" style={{ background: '#E4EFFF', border: '1px solid #A6D0FF' }}>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: '#1C1C1C' }}>
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: 'var(--text-primary)' }}>
                                         {kycCheckFailed ? 'We couldn\'t confirm your verification status.' : 'One or more products in your cart requires verification.'}
                                     </p>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: '#1C1C1C' }}>
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: 'var(--text-primary)' }}>
                                         {kycCheckFailed
                                             ? 'Please check your connection and try again, or complete the identity verification process.'
                                             : 'In order to complete your purchase, please complete the identity verification process.'}
@@ -308,10 +308,10 @@ export default function CartPage() {
 
                             {needsAccount && (
                                 <div className="flex flex-col gap-2 rounded-[8px] px-6 py-3" style={{ background: '#FFF8E4', border: '1px solid #FFD980' }}>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: '#1C1C1C' }}>
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: 'var(--text-primary)' }}>
                                         Account type required
                                     </p>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: '#1C1C1C' }}>
+                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: 'var(--text-primary)' }}>
                                         One or more products require a specific account type. Add the required account to proceed.
                                     </p>
                                     <button
@@ -328,7 +328,7 @@ export default function CartPage() {
 
                 {/* Right column: order summary card — desktop only */}
                 {!isEmpty && (
-                    <div className="hidden md:block sticky top-24 rounded-[12px] p-6" style={{ border: '1px solid #E5E5EA', background: '#FAFAFA' }}>
+                    <div className="hidden md:block sticky top-24 rounded-[12px] p-6" style={{ border: '1px solid var(--neutral-300)', background: 'var(--neutral-200)' }}>
                         {orderSummaryContent}
                     </div>
                 )}
@@ -336,18 +336,18 @@ export default function CartPage() {
 
             {/* Sticky footer — mobile only */}
             {!isEmpty && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white md:hidden" style={{ borderTop: '1px solid #E5E5EA' }}>
+                <div className="fixed bottom-0 left-0 right-0 bg-[var(--surface-page)] md:hidden" style={{ borderTop: '1px solid var(--neutral-300)' }}>
                     <div className="max-w-[411px] mx-auto px-7 pt-4 pb-6 flex flex-col gap-4">
                         <div className="flex justify-between items-start">
-                            <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>Total</span>
+                            <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>Total</span>
                             <div className="flex flex-col gap-[5px] items-end">
                                 <div className="flex items-center gap-5">
-                                    <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
-                                    <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {onceOffTotal.toFixed(2)}</span>
+                                    <span className="text-[var(--text-secondary)]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
+                                    <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {onceOffTotal.toFixed(2)}</span>
                                 </div>
                                 <div className="flex items-center gap-6">
-                                    <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
-                                    <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+                                    <span className="text-[var(--text-secondary)]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
+                                    <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>

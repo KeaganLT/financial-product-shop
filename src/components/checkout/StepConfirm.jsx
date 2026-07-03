@@ -17,19 +17,19 @@ export default function StepConfirm({ product, bankDetails, submitting, error, o
     return (
         <div className="flex flex-col gap-6 px-6 pt-4 pb-8">
             <div>
-                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: '#1C1C1C' }}>
+                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
                     Confirm & activate
                 </h2>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93', marginTop: 4 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
                     Review your details before activating.
                 </p>
             </div>
 
-            <div className="rounded-[12px] border flex flex-col divide-y" style={{ borderColor: '#E5E5EA' }}>
+            <div className="rounded-[12px] border flex flex-col divide-y" style={{ borderColor: 'var(--neutral-300)' }}>
                 {rows.map(({ label, value }) => (
                     <div key={label} className="flex items-center justify-between px-4 py-3">
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>{label}</span>
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', textAlign: 'right', maxWidth: '60%' }}>{value}</span>
                     </div>
                 ))}
             </div>

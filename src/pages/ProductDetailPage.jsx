@@ -38,7 +38,7 @@ export default function ProductDetailPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 gap-4">
+            <div className="min-h-screen bg-[var(--surface-page)] flex flex-col items-center justify-center px-6 gap-4">
                 <p className="text-red-500 text-sm text-center">{error}</p>
                 <button onClick={() => navigate('/products')} className="text-[#1860BF] text-[14px] font-semibold">
                     ← Back to Products
@@ -73,23 +73,23 @@ export default function ProductDetailPage() {
         }
     }
 
-    const textStyle = (size, weight = 400, color = '#8E8E93') => ({
+    const textStyle = (size, weight = 400, color = 'var(--text-secondary)') => ({
         fontFamily: 'Roboto, sans-serif', fontSize: size, fontWeight: weight, color,
     });
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[var(--surface-page)]">
             <div
-                className="fixed top-0 left-0 right-0 bg-white z-50 flex items-center px-1"
-                style={{ height: '64px', borderBottom: '1px solid #E5E5EA' }}
+                className="fixed top-0 left-0 right-0 bg-[var(--surface-page)] z-50 flex items-center px-1"
+                style={{ height: '64px', borderBottom: '1px solid var(--neutral-300)' }}
             >
                 <div className="max-w-[411px] md:max-w-5xl mx-auto w-full flex items-center gap-1">
                     <button onClick={() => navigate('/products')} className="w-12 h-12 flex items-center justify-center flex-shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="var(--neutral-700)" />
                         </svg>
                     </button>
-                    <h1 className="flex-1 truncate" style={{ ...textStyle('20px', 400, '#1D1B20'), lineHeight: '28px', letterSpacing: '0.35px' }}>
+                    <h1 className="flex-1 truncate" style={{ ...textStyle('20px', 400, 'var(--text-primary)'), lineHeight: '28px', letterSpacing: '0.35px' }}>
                         {product.name}
                     </h1>
                 </div>
@@ -118,7 +118,7 @@ export default function ProductDetailPage() {
 
                 <div className="px-6 pt-6 md:px-0 md:pt-0 flex flex-col gap-6">
                     <div className="flex flex-col gap-4">
-                        <h2 style={{ ...textStyle('28px', 700, '#1C1C1C'), lineHeight: '34px', letterSpacing: '0.41px' }}>
+                        <h2 style={{ ...textStyle('28px', 700, 'var(--text-primary)'), lineHeight: '34px', letterSpacing: '0.41px' }}>
                             {product.name}
                         </h2>
 
@@ -149,9 +149,9 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
-                    <div className="hidden md:flex items-center justify-between rounded-[12px] border px-6 py-4" style={{ borderColor: '#E5E5EA' }}>
+                    <div className="hidden md:flex items-center justify-between rounded-[12px] border px-6 py-4" style={{ borderColor: 'var(--neutral-300)' }}>
                         <div className="flex flex-col justify-center">
-                            <span style={{ ...textStyle('22px', 700, '#000000'), lineHeight: '28px' }}>
+                            <span style={{ ...textStyle('22px', 700, 'var(--text-primary)'), lineHeight: '28px' }}>
                                 R {Number(product.price).toFixed(2)}
                             </span>
                             <span style={{ ...textStyle('14px', 400), lineHeight: '20px' }}>per month</span>
@@ -172,28 +172,28 @@ export default function ProductDetailPage() {
 
                     {expanded && (
                         <>
-                            <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
+                            <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />
 
                             <div className="flex flex-col gap-2">
-                                <h3 style={{ ...textStyle('20px', 700, '#000000'), lineHeight: '28px', letterSpacing: '0.35px' }}>Benefits</h3>
+                                <h3 style={{ ...textStyle('20px', 700, 'var(--text-primary)'), lineHeight: '28px', letterSpacing: '0.35px' }}>Benefits</h3>
                                 <ul className="flex flex-col gap-1">
                                     {details.benefits.map((benefit, i) => (
                                         <li key={i} className="flex items-start gap-2" style={{ ...textStyle('17px'), lineHeight: '22px', letterSpacing: '0.0035em' }}>
-                                            <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-[#8E8E93] flex-shrink-0" />
+                                            <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-[var(--text-secondary)] flex-shrink-0" />
                                             {benefit}
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
-                            <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
+                            <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />
 
                             <div className="flex flex-col gap-2">
-                                <h3 style={{ ...textStyle('20px', 700, '#000000'), lineHeight: '28px', letterSpacing: '0.35px' }}>Requirement</h3>
+                                <h3 style={{ ...textStyle('20px', 700, 'var(--text-primary)'), lineHeight: '28px', letterSpacing: '0.35px' }}>Requirement</h3>
                                 <ul className="flex flex-col gap-1">
                                     {details.requirements.map((req, i) => (
                                         <li key={i} className="flex items-start gap-2" style={{ ...textStyle('17px'), lineHeight: '22px', letterSpacing: '0.0035em' }}>
-                                            <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-[#8E8E93] flex-shrink-0" />
+                                            <span className="mt-[6px] w-1.5 h-1.5 rounded-full bg-[var(--text-secondary)] flex-shrink-0" />
                                             {req}
                                         </li>
                                     ))}
@@ -202,7 +202,7 @@ export default function ProductDetailPage() {
 
                             {isLoggedIn && eligibility !== null && (
                                 <>
-                                    <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
+                                    <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />
                                     <EligibilitySection eligibility={eligibility} eligibilityChecks={eligibilityChecks} />
                                 </>
                             )}
@@ -215,7 +215,7 @@ export default function ProductDetailPage() {
                                 >
                                     Read less
                                 </button>
-                                <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />
+                                <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />
                             </div>
                         </>
                     )}
@@ -242,16 +242,16 @@ export default function ProductDetailPage() {
                         </div>
                     )}
 
-                    {!expanded && <div style={{ height: '1px', backgroundColor: '#D9D9D9' }} />}
+                    {!expanded && <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />}
 
                     <RelatedProducts products={relatedProducts} />
                 </div>
             </div>
 
-            <div className="fixed bottom-0 left-0 right-0 bg-white z-50 md:hidden" style={{ borderTop: '0.5px solid #C7C7CC' }}>
+            <div className="fixed bottom-0 left-0 right-0 bg-[var(--surface-page)] z-50 md:hidden" style={{ borderTop: '0.5px solid var(--neutral-400)' }}>
                 <div className="max-w-[411px] mx-auto flex items-center justify-between px-7" style={{ height: '69px' }}>
                     <div className="flex flex-col justify-center">
-                        <span style={{ ...textStyle('20px', 700, '#000000'), lineHeight: '28px', letterSpacing: '0.35px' }}>
+                        <span style={{ ...textStyle('20px', 700, 'var(--text-primary)'), lineHeight: '28px', letterSpacing: '0.35px' }}>
                             R {Number(product.price).toFixed(2)}
                         </span>
                         <span style={{ ...textStyle('15px', 400), lineHeight: '20px', letterSpacing: '0.41px' }}>

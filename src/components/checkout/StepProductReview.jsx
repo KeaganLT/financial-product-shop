@@ -17,16 +17,16 @@ export default function StepProductReview({ product, onNext }) {
     return (
         <div className="flex flex-col gap-6 px-6 pt-4 pb-8">
             <div>
-                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: '#1C1C1C' }}>
+                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
                     Review your product
                 </h2>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93', marginTop: 4 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
                     Here's what you're signing up for.
                 </p>
             </div>
 
-            <div className="rounded-[12px] border overflow-hidden" style={{ borderColor: '#E5E5EA' }}>
-                <div className="w-full overflow-hidden bg-[#D9D9D9]" style={{ height: 160 }}>
+            <div className="rounded-[12px] border overflow-hidden" style={{ borderColor: 'var(--neutral-300)' }}>
+                <div className="w-full overflow-hidden bg-[var(--neutral-300)]" style={{ height: 160 }}>
                     <img
                         src={product.imageUrl || getProductPlaceholder(product.name)}
                         alt={product.name}
@@ -35,10 +35,10 @@ export default function StepProductReview({ product, onNext }) {
                 </div>
                 <div className="px-4 py-4 flex flex-col gap-3">
                     <div>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 18, fontWeight: 700, color: '#1C1C1C' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 18, fontWeight: 700, color: 'var(--text-primary)' }}>
                             {product.name}
                         </p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93', marginTop: 2 }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)', marginTop: 2 }}>
                             {product.description?.slice(0, 120)}{product.description?.length > 120 ? '…' : ''}
                         </p>
                     </div>
@@ -46,11 +46,11 @@ export default function StepProductReview({ product, onNext }) {
                         <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 24, fontWeight: 700, color: '#1860BF' }}>
                             R{Number(product.price).toFixed(2)}
                         </span>
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93' }}>/ month</span>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)' }}>/ month</span>
                     </div>
-                    <div style={{ height: 1, background: '#E5E5EA' }} />
+                    <div style={{ height: 1, background: 'var(--neutral-300)' }} />
                     <div>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C', marginBottom: 8 }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 8 }}>
                             What's covered
                         </p>
                         <ul className="flex flex-col gap-2">
@@ -60,7 +60,7 @@ export default function StepProductReview({ product, onNext }) {
                                         <circle cx="8" cy="8" r="8" fill="#E6F9ED" />
                                         <path d="M4.5 8l2.5 2.5 4.5-4.5" stroke="#168C34" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
-                                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#3C3C43' }}>{point}</span>
+                                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--neutral-700)' }}>{point}</span>
                                 </li>
                             ))}
                         </ul>

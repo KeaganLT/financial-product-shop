@@ -19,7 +19,7 @@ export default function EligibilitySection({ eligibility, eligibilityChecks }) {
 
     return (
         <div className="flex flex-col gap-3">
-            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '28px', letterSpacing: '0.35px', color: '#000000' }}>
+            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontSize: '20px', fontWeight: 700, lineHeight: '28px', letterSpacing: '0.35px', color: 'var(--text-primary)' }}>
                 Your eligibility
             </h3>
             <div
@@ -50,8 +50,8 @@ export default function EligibilitySection({ eligibility, eligibilityChecks }) {
                         >
                             <CheckCircle pass={check.pass} />
                             <div className="flex flex-col gap-0.5">
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1C1C1C' }}>{check.label}</span>
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: '#8E8E93' }}>{check.detail}</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{check.label}</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: '12px', color: 'var(--text-secondary)' }}>{check.detail}</span>
                             </div>
                         </div>
                     ))}
@@ -66,7 +66,7 @@ export default function EligibilitySection({ eligibility, eligibilityChecks }) {
             )}
 
             {!eligibility.isEligible && !eligibilityChecks && (
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: '#8E8E93' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', color: 'var(--text-secondary)' }}>
                     Loading eligibility details…
                 </p>
             )}

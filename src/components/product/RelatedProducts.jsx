@@ -15,7 +15,7 @@ export default function RelatedProducts({ products }) {
                     fontWeight: 700,
                     lineHeight: '28px',
                     letterSpacing: '0.35px',
-                    color: '#000000',
+                    color: 'var(--text-primary)',
                 }}
             >
                 Related product
@@ -29,8 +29,8 @@ export default function RelatedProducts({ products }) {
                         style={{
                             width: '284px',
                             height: '192px',
-                            backgroundColor: '#FFFFFF',
-                            border: '1px solid #C7C7CC',
+                            backgroundColor: 'var(--neutral-100)',
+                            border: '1px solid var(--neutral-400)',
                             borderRadius: '12px',
                             padding: '12px',
                             display: 'flex',
@@ -40,7 +40,7 @@ export default function RelatedProducts({ products }) {
                     >
                         <div
                             className="w-full overflow-hidden"
-                            style={{ height: '120px', borderRadius: '8px', backgroundColor: '#D9D9D9' }}
+                            style={{ height: '120px', borderRadius: '8px', backgroundColor: 'var(--neutral-300)' }}
                         >
                             <img
                                 src={related.imageUrl || getProductPlaceholder(related.name)}
@@ -57,7 +57,7 @@ export default function RelatedProducts({ products }) {
                                     fontWeight: 600,
                                     lineHeight: '22px',
                                     letterSpacing: '0.0035em',
-                                    color: '#000000',
+                                    color: 'var(--text-primary)',
                                 }}
                             >
                                 {related.name}
@@ -69,7 +69,7 @@ export default function RelatedProducts({ products }) {
                                     fontWeight: 400,
                                     lineHeight: '18px',
                                     letterSpacing: '0.41px',
-                                    color: '#8E8E93',
+                                    color: 'var(--text-secondary)',
                                 }}
                             >
                                 from R{Number(related.price).toFixed(0)} p/m

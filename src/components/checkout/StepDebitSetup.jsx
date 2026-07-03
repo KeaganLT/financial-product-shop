@@ -24,21 +24,21 @@ export default function StepDebitSetup({ existingBankDetails, onNext }) {
     return (
         <div className="flex flex-col gap-5 px-6 pt-4 pb-8">
             <div>
-                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: '#1C1C1C' }}>
+                <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
                     Set up your debit order
                 </h2>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: '#8E8E93', marginTop: 4 }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
                     Your monthly premium will be debited from this account.
                 </p>
             </div>
 
             <div className="flex flex-col gap-1">
-                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>Bank</label>
+                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Bank</label>
                 <select
                     value={bankName}
                     onChange={(e) => { setBankName(e.target.value); setErrors((p) => ({ ...p, bankName: '' })); }}
-                    className="w-full h-[46px] rounded-[10px] px-3 border bg-white"
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: errors.bankName ? '#C51C13' : '#C7C7CC' }}
+                    className="w-full h-[46px] rounded-[10px] px-3 border bg-[var(--surface-page)]"
+                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: errors.bankName ? '#C51C13' : 'var(--neutral-400)' }}
                 >
                     <option value="">Select your bank</option>
                     {BANKS.map((b) => <option key={b} value={b}>{b}</option>)}
@@ -47,7 +47,7 @@ export default function StepDebitSetup({ existingBankDetails, onNext }) {
             </div>
 
             <div className="flex flex-col gap-1">
-                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>Account number</label>
+                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Account number</label>
                 <input
                     type="tel"
                     inputMode="numeric"
@@ -56,13 +56,13 @@ export default function StepDebitSetup({ existingBankDetails, onNext }) {
                     onChange={(e) => { setAccountNo(e.target.value.replace(/\D/g, '')); setErrors((p) => ({ ...p, accountNo: '' })); }}
                     placeholder="e.g. 1234567890"
                     className="w-full h-[46px] rounded-[10px] px-3 border"
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: errors.accountNo ? '#C51C13' : '#C7C7CC' }}
+                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: errors.accountNo ? '#C51C13' : 'var(--neutral-400)' }}
                 />
                 {errors.accountNo && <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#C51C13' }}>{errors.accountNo}</p>}
             </div>
 
             <div className="flex flex-col gap-1">
-                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>Account type</label>
+                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Account type</label>
                 <div className="flex gap-2">
                     {ACCOUNT_TYPES.map((type) => (
                         <button
@@ -73,9 +73,9 @@ export default function StepDebitSetup({ existingBankDetails, onNext }) {
                                 fontFamily: 'Roboto, sans-serif',
                                 fontSize: 12,
                                 fontWeight: accountType === type ? 700 : 400,
-                                borderColor: accountType === type ? '#1860BF' : '#C7C7CC',
-                                background: accountType === type ? '#EFF4FF' : 'white',
-                                color: accountType === type ? '#1860BF' : '#3C3C43',
+                                borderColor: accountType === type ? '#1860BF' : 'var(--neutral-400)',
+                                background: accountType === type ? '#EFF4FF' : 'var(--neutral-100)',
+                                color: accountType === type ? '#1860BF' : 'var(--neutral-700)',
                             }}
                         >
                             {type}
@@ -85,17 +85,17 @@ export default function StepDebitSetup({ existingBankDetails, onNext }) {
             </div>
 
             <div className="flex flex-col gap-1">
-                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>Debit date</label>
+                <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Debit date</label>
                 <div className="flex gap-3">
                     {DEBIT_DAYS.map((day) => (
                         <button
                             key={day}
                             onClick={() => setDebitDay(day)}
                             className="w-[64px] h-[64px] rounded-[12px] flex flex-col items-center justify-center border"
-                            style={{ borderColor: debitDay === day ? '#1860BF' : '#C7C7CC', background: debitDay === day ? '#EFF4FF' : 'white' }}
+                            style={{ borderColor: debitDay === day ? '#1860BF' : 'var(--neutral-400)', background: debitDay === day ? '#EFF4FF' : 'var(--neutral-100)' }}
                         >
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: debitDay === day ? '#1860BF' : '#1C1C1C' }}>{day}</span>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 10, color: '#8E8E93' }}>of month</span>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: debitDay === day ? '#1860BF' : 'var(--text-primary)' }}>{day}</span>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 10, color: 'var(--text-secondary)' }}>of month</span>
                         </button>
                     ))}
                 </div>

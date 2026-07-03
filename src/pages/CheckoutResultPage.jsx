@@ -27,13 +27,13 @@ export default function CheckoutResultPage() {
     })();
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-[var(--surface-page)] flex flex-col">
             {/* Header */}
-            <div className="flex items-center px-1 bg-white" style={{ height: 64, borderBottom: '1px solid #E5E5EA' }}>
+            <div className="flex items-center px-1 bg-[var(--surface-page)]" style={{ height: 64, borderBottom: '1px solid var(--neutral-300)' }}>
                 <div className="max-w-[480px] mx-auto w-full flex items-center gap-1 px-4">
                     <h1
                         className="flex-1"
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: '#1D1B20' }}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: 'var(--text-primary)' }}
                     >
                         {isSubscription ? 'Subscription activated' : 'Order summary'}
                     </h1>
@@ -49,11 +49,11 @@ export default function CheckoutResultPage() {
                 </svg>
 
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: '#1C1C1C' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
                         {isSubscription ? 'You\'re all set!' : 'Thank you for your order.'}
                     </p>
                     {isSubscription && product && (
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-secondary)' }}>
                             {product.name} is now active.
                         </p>
                     )}
@@ -63,26 +63,26 @@ export default function CheckoutResultPage() {
                 {isSubscription && bankDetails && (
                     <div
                         className="w-full rounded-[12px] border flex flex-col divide-y"
-                        style={{ borderColor: '#E5E5EA' }}
+                        style={{ borderColor: 'var(--neutral-300)' }}
                     >
                         {product && (
                             <div className="flex items-center justify-between px-4 py-3">
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>Monthly premium</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>Monthly premium</span>
                                 <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: '#168C34' }}>
                                     R{Number(product.price).toFixed(2)} / month
                                 </span>
                             </div>
                         )}
                         <div className="flex items-center justify-between px-4 py-3">
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>Debit account</span>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>Debit account</span>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                                 {bankDetails.bankName} ••••{bankDetails.last4}
                             </span>
                         </div>
                         {nextDebitDate && (
                             <div className="flex items-center justify-between px-4 py-3">
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>First debit date</span>
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>First debit date</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                                     {nextDebitDate}
                                 </span>
                             </div>
@@ -107,7 +107,7 @@ export default function CheckoutResultPage() {
             </main>
 
             {/* Footer buttons */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white" style={{ borderTop: '1px solid #E5E5EA' }}>
+            <div className="fixed bottom-0 left-0 right-0 bg-[var(--surface-page)]" style={{ borderTop: '1px solid var(--neutral-300)' }}>
                 <div className="max-w-[480px] mx-auto px-6 pt-4 pb-6 flex flex-col gap-3">
                     {isSubscription && product && (
                         <button
@@ -131,7 +131,7 @@ export default function CheckoutResultPage() {
                                 fontFamily: 'Roboto, sans-serif',
                                 fontSize: 16,
                                 color: '#1860BF',
-                                background: 'white',
+                                background: 'var(--neutral-100)',
                             }}
                         >
                             View subscriptions

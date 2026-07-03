@@ -20,13 +20,13 @@ export default function BankDetailsSection({ userId, onChangeClick }) {
             style={{ background: '#F0F4FF', border: '1px solid #C7D9FF' }}
         >
             <div className="flex flex-col gap-0.5">
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
                     Debit account
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>
                     {bankDetails.bankName} · {bankDetails.accountType} ••••{bankDetails.last4}
                 </p>
-                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>
+                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>
                     Debited on the {bankDetails.debitDay}{bankDetails.debitDay === 1 ? 'st' : 'th'} of each month
                 </p>
                 {nextDebitDate && (
