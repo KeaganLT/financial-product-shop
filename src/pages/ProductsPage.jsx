@@ -7,13 +7,14 @@ import SectionRow from '../components/SectionRow';
 import DiscoverSection from '../components/DiscoverSection';
 import { HeroSliderSkeleton, SectionRowSkeleton, DiscoverSectionSkeleton } from '../components/Skeletons';
 import { getProducts } from '../services/productService';
-import { getEligibility } from '../services/subscriptionService';
+import { getEligibility, getSubscriptions } from '../services/subscriptionService';
 
 export default function ProductsPage() {
     const { isLoggedIn, auth } = useAuth();
 
     const [products, setProducts] = useState([]);
     const [eligibleIds, setEligibleIds] = useState(null);
+    const [ownedProductIds, setOwnedProductIds] = useState(new Set());
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState(null);
 
@@ -32,20 +33,34 @@ export default function ProductsPage() {
             return;
         }
 
-        getEligibility(products.map((p) => p.id), auth.token)
-            .then((results) => {
-                const ids = new Set(results.filter((r) => r.isEligible).map((r) => r.productId));
+        const productIds = products.map((p) => p.id);
+        Promise.all([
+            getEligibility(productIds, auth.token),
+            getSubscriptions(auth.token),
+        ])
+            .then(([eligResults, subs]) => {
+                const ids = new Set(eligResults.filter((r) => r.isEligible).map((r) => r.productId));
                 setEligibleIds(ids);
+
+                const owned = new Set(
+                    (Array.isArray(subs) ? subs : []).map((s) => {
+                        const prod = Array.isArray(s.product) ? s.product[0] : s.product;
+                        return s.productId ?? prod?.id ?? null;
+                    }).filter(Boolean)
+                );
+                setOwnedProductIds(owned);
             })
             .catch(() => setEligibleIds(null));
     }, [isLoggedIn, products, auth?.token]);
 
+    const visibleProducts = products.filter((p) => !ownedProductIds.has(p.id));
+
     const recommended = eligibleIds
-        ? products.filter((p) => eligibleIds.has(p.id))
+        ? visibleProducts.filter((p) => eligibleIds.has(p.id))
         : [];
     const newArrivals = eligibleIds
-        ? products.filter((p) => !eligibleIds.has(p.id))
-        : products;
+        ? visibleProducts.filter((p) => !eligibleIds.has(p.id))
+        : visibleProducts;
 
     return (
         <div className="min-h-screen bg-white">
@@ -102,7 +117,7 @@ export default function ProductsPage() {
                                     />
                                 )}
 
-                                {products.length === 0 && (
+                                {visibleProducts.length === 0 && (
                                     <div className="flex flex-col items-center py-16 px-6 text-center">
                                         <p className="text-[15px] font-semibold text-black">No products yet</p>
                                         <p className="text-[13px] text-gray-400 mt-1">Check back soon</p>
