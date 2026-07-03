@@ -57,13 +57,8 @@ export default function KycDocumentsPage() {
                 auth.token,
             );
 
-            // Seed DHA data so living/marital/duplicateId checks pass
-            try {
-                if (profile?.idNumber) {
-                    await seedDhaData(profile.idNumber, auth.token);
-                }
-            } catch (_) {
-                // non-fatal — DHA seeding failure should not block the user
+            if (profile?.idNumber) {
+                await seedDhaData(profile.idNumber, auth.token).catch(() => {});
             }
 
             navigate(returnTo, { replace: true });

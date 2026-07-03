@@ -20,26 +20,18 @@ const MastercardLogo = () => (
     </svg>
 );
 
-const AmexLogo = () => (
-    <svg width="50" height="16" viewBox="0 0 50 16" fill="none">
-        <rect width="50" height="16" rx="2" fill="#2E77BC" />
-        <text x="4" y="12" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="9" fill="white">AMERICAN</text>
-        <text x="4" y="12" dy="0" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="9" fill="white" />
-    </svg>
-);
-
 // ── Shared header ─────────────────────────────────────────────────────────────
 
 function PageHeader({ title, onBack }) {
     return (
-        <div className="flex items-center px-1 bg-white md:hidden" style={{ height: 64, borderBottom: '1px solid #E5E5EA' }}>
+        <div className="flex items-center px-1 bg-[var(--surface-page)] md:hidden" style={{ height: 64, borderBottom: '1px solid var(--neutral-300)' }}>
             <div className="max-w-[411px] mx-auto w-full flex items-center gap-1">
                 <button onClick={onBack} className="w-12 h-12 flex items-center justify-center" aria-label="Go back">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="var(--neutral-700)" />
                     </svg>
                 </button>
-                <h1 className="flex-1" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: '#1D1B20' }}>
+                <h1 className="flex-1" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 400, lineHeight: '28px', letterSpacing: '0.35px', color: 'var(--text-primary)' }}>
                     {title}
                 </h1>
             </div>
@@ -54,10 +46,10 @@ function CreditCardTile({ onClick }) {
         <button
             onClick={onClick}
             className="w-full flex items-center justify-between px-4 py-3 rounded-[8px]"
-            style={{ background: '#F2F2F7' }}
+            style={{ background: 'var(--surface-field)' }}
         >
             <div className="flex flex-col items-start gap-[9px]">
-                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: '#000' }}>
+                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: 'var(--text-primary)' }}>
                     Credit card
                 </span>
                 <div className="flex items-center gap-4">
@@ -78,41 +70,50 @@ function CreditCardTile({ onClick }) {
 
 // ── Shared footer (total + pay button) ────────────────────────────────────────
 
-function CheckoutFooter({ monthlyTotal, onPay, loading }) {
+function CheckoutFooter({ monthlyTotal, onceOffTotal = 0, onPay, loading, disabled = false, disabledHint = '' }) {
+    const isBlocked = disabled || loading;
     return (
         <>
             {/* Mobile: fixed bottom bar */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white md:hidden" style={{ borderTop: '1px solid #E5E5EA' }}>
+            <div className="fixed bottom-0 left-0 right-0 bg-[var(--surface-page)] md:hidden" style={{ borderTop: '1px solid var(--neutral-300)' }}>
                 <div className="max-w-[411px] mx-auto px-7 pt-4 pb-6 flex flex-col gap-4">
                     <div className="flex justify-between items-start">
-                        <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>Total</span>
+                        <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>Total</span>
                         <div className="flex flex-col gap-[5px] items-end">
                             <div className="flex items-center gap-5">
-                                <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
-                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R 0.00</span>
+                                <span className="text-[var(--text-secondary)]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Once off</span>
+                                <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {onceOffTotal.toFixed(2)}</span>
                             </div>
                             <div className="flex items-center gap-6">
-                                <span className="text-[#8E8E93]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
-                                <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+                                <span className="text-[var(--text-secondary)]" style={{ fontSize: 13, lineHeight: '18px', letterSpacing: '0.41px', fontFamily: 'Roboto, sans-serif' }}>Monthly</span>
+                                <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
-                    <button onClick={onPay} disabled={loading} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                    <button onClick={onPay} disabled={isBlocked} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                         {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
                     </button>
+                    {disabled && disabledHint && (
+                        <p className="text-center" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>{disabledHint}</p>
+                    )}
                 </div>
             </div>
             {/* Desktop: inline pay button */}
             <div className="hidden md:block max-w-3xl mx-auto w-full px-6 pb-12 pt-4">
-                <div className="h-px bg-[#E5E5EA] mb-4" />
+                <div className="h-px bg-[var(--neutral-300)] mb-4" />
                 <div className="flex items-center justify-between">
                     <div className="flex flex-col gap-1">
-                        <span className="text-[#8E8E93]" style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}>Monthly total</span>
-                        <span className="font-bold text-black" style={{ fontSize: 22, fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
+                        <span className="text-[var(--text-secondary)]" style={{ fontSize: 13, fontFamily: 'Roboto, sans-serif' }}>Monthly total</span>
+                        <span className="font-bold text-[var(--text-primary)]" style={{ fontSize: 22, fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
                     </div>
-                    <button onClick={onPay} disabled={loading} className="h-[42px] px-8 rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
-                        {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
-                    </button>
+                    <div className="flex flex-col items-end gap-1">
+                        <button onClick={onPay} disabled={isBlocked} className="h-[42px] px-8 rounded-[100px] font-semibold disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                            {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
+                        </button>
+                        {disabled && disabledHint && (
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>{disabledHint}</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </>
@@ -133,13 +134,13 @@ function CardField({ label, value, onChange, placeholder, type = 'text', half = 
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 placeholder={!hasValue && !focused ? '' : placeholder}
-                className="w-full h-full px-4 pt-4 pb-1 outline-none rounded-[4px] text-[#1C1C1C]"
+                className="w-full h-full px-4 pt-4 pb-1 outline-none rounded-[4px] text-[var(--text-primary)]"
                 style={{
-                    border: `${focused ? 3 : 1}px solid ${focused ? '#1AAFDE' : '#C7C7CC'}`,
+                    border: `${focused ? 3 : 1}px solid ${focused ? '#1AAFDE' : 'var(--neutral-400)'}`,
                     fontFamily: 'Roboto, sans-serif',
                     fontSize: 16,
                     letterSpacing: '0.5px',
-                    background: 'white',
+                    background: 'var(--neutral-100)',
                 }}
             />
             <span
@@ -149,8 +150,8 @@ function CardField({ label, value, onChange, placeholder, type = 'text', half = 
                     top: focused || hasValue ? -8 : 16,
                     fontSize: focused || hasValue ? 12 : 16,
                     lineHeight: focused || hasValue ? '16px' : '24px',
-                    color: focused ? '#1AAFDE' : '#8E8E93',
-                    background: focused || hasValue ? 'white' : 'transparent',
+                    color: focused ? '#1AAFDE' : 'var(--text-secondary)',
+                    background: focused || hasValue ? 'var(--neutral-100)' : 'transparent',
                     padding: focused || hasValue ? '0 4px' : '0',
                     fontFamily: 'Roboto, sans-serif',
                 }}
@@ -186,7 +187,7 @@ function StatusBadge({ fulfilmentType }) {
 
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 
-function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay, loading, error }) {
+function OrderReviewView({ items, monthlyTotal, onceOffTotal, savedCard, onChangeMethod, onPay, loading, error }) {
     return (
         <>
             <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8 flex flex-col gap-6">
@@ -194,12 +195,12 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                 <div className="flex flex-col gap-4">
                     {items.map((product) => (
                         <div key={product.id} className="flex items-start gap-4">
-                            <div className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[#D9D9D9]" style={{ width: 72, height: 62 }}>
+                            <div className="flex-shrink-0 rounded-[8px] overflow-hidden bg-[var(--neutral-300)]" style={{ width: 72, height: 62 }}>
                                 <img src={product.imageUrl || getProductPlaceholder(product.name)} alt={product.name} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 flex flex-col gap-1">
-                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: '#000' }}>{product.name}</p>
-                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: '#8E8E93' }}>
+                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', color: 'var(--text-primary)' }}>{product.name}</p>
+                                <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: 'var(--text-secondary)' }}>
                                     from R{Number(product.price).toFixed(0)} p/m
                                 </p>
                                 <StatusBadge fulfilmentType={product.fulfilmentType} />
@@ -209,7 +210,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-[#E5E5EA]" />
+                <div className="h-px bg-[var(--neutral-300)]" />
 
                 {/* Payment method */}
                 <div className="flex flex-col gap-3">
@@ -219,7 +220,7 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                             <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
                             <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
                         </svg>
-                        <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                             Payment method
                         </span>
                     </div>
@@ -229,8 +230,8 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                                 <div className="w-2 h-2 rounded-full bg-[#1860BF]" />
                             </div>
                             <div className="flex-1">
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#000' }}>Visa</span>
-                                <span className="text-[#8E8E93] ml-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13 }}>••••••••{savedCard.last4}</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-primary)' }}>Visa</span>
+                                <span className="text-[var(--text-secondary)] ml-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13 }}>••••••••{savedCard.last4}</span>
                             </div>
                             <VisaLogo />
                             <button
@@ -252,14 +253,21 @@ function OrderReviewView({ items, monthlyTotal, savedCard, onChangeMethod, onPay
                     <p className="text-red-500 text-sm text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
                 )}
             </main>
-            <CheckoutFooter monthlyTotal={monthlyTotal} onPay={onPay} loading={loading} />
+            <CheckoutFooter
+                monthlyTotal={monthlyTotal}
+                onceOffTotal={onceOffTotal}
+                onPay={onPay}
+                loading={loading}
+                disabled={!savedCard}
+                disabledHint="Add a payment method to continue"
+            />
         </>
     );
 }
 
 // ── Views ─────────────────────────────────────────────────────────────────────
 
-function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard }) {
+function MainView({ monthlyTotal, onceOffTotal, onAddMethod, onPay, loading, error, savedCard }) {
     return (
         <>
             <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-40 md:pb-8">
@@ -271,7 +279,7 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
                             <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
                             <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
                         </svg>
-                        <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                        <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                             Payment method
                         </span>
                     </div>
@@ -283,8 +291,8 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
                                 <div className="w-2 h-2 rounded-full bg-[#1860BF]" />
                             </div>
                             <div className="flex-1">
-                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#000' }}>Visa</span>
-                                <span className="text-[#8E8E93] ml-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13 }}>••••••••{savedCard.last4}</span>
+                                <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-primary)' }}>Visa</span>
+                                <span className="text-[var(--text-secondary)] ml-2" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13 }}>••••••••{savedCard.last4}</span>
                             </div>
                             <VisaLogo />
                         </div>
@@ -293,7 +301,7 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
                     {/* Add payment method */}
                     <div className="flex flex-col gap-3">
                         {savedCard && (
-                            <span className="font-semibold text-black" style={{ fontSize: 15, fontFamily: 'Roboto, sans-serif' }}>Add payment method</span>
+                            <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 15, fontFamily: 'Roboto, sans-serif' }}>Add payment method</span>
                         )}
                         {!savedCard && (
                             <button onClick={onAddMethod} className="flex items-center gap-[9px] text-left">
@@ -311,7 +319,14 @@ function MainView({ monthlyTotal, onAddMethod, onPay, loading, error, savedCard 
                     <p className="mt-6 text-red-500 text-sm text-center" style={{ fontFamily: 'Roboto, sans-serif' }}>{error}</p>
                 )}
             </main>
-            <CheckoutFooter monthlyTotal={monthlyTotal} onPay={onPay} loading={loading} />
+            <CheckoutFooter
+                monthlyTotal={monthlyTotal}
+                onceOffTotal={onceOffTotal}
+                onPay={onPay}
+                loading={loading}
+                disabled={!savedCard}
+                disabledHint="Add a payment method to continue"
+            />
         </>
     );
 }
@@ -326,7 +341,7 @@ function TypeSelectView({ onSelectCard }) {
                         <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
                         <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
                     </svg>
-                    <span className="font-semibold text-black" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                    <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                         Payment method
                     </span>
                 </div>
@@ -336,28 +351,64 @@ function TypeSelectView({ onSelectCard }) {
     );
 }
 
+function isValidExpiry(expiry) {
+    const match = expiry.match(/^(\d{2})\/(\d{2})$/);
+    if (!match) return false;
+    const month = Number(match[1]);
+    if (month < 1 || month > 12) return false;
+    const year = 2000 + Number(match[2]);
+    const now = new Date();
+    return year > now.getFullYear() || (year === now.getFullYear() && month >= now.getMonth() + 1);
+}
+
 function CardFormView({ onNext }) {
     const [name, setName] = useState('');
     const [number, setNumber] = useState('');
     const [expiry, setExpiry] = useState('');
     const [cvc, setCvc] = useState('');
+    const [formError, setFormError] = useState('');
 
-    const isComplete = name && number && expiry && cvc;
+    const digits = number.replace(/\s/g, '');
+    const isNumberValid = /^\d{13,19}$/.test(digits);
+    const isExpiryValid = isValidExpiry(expiry);
+    const isCvcValid    = /^\d{3,4}$/.test(cvc);
+    const isComplete    = name.trim() && number && expiry && cvc;
+
+    function handleNumberChange(value) {
+        const cleaned = value.replace(/[^\d\s]/g, '').slice(0, 23);
+        setNumber(cleaned);
+        setFormError('');
+    }
+
+    function handleExpiryChange(value) {
+        let cleaned = value.replace(/[^\d/]/g, '').slice(0, 5);
+        if (cleaned.length === 2 && !cleaned.includes('/') && expiry.length < cleaned.length) {
+            cleaned = `${cleaned}/`;
+        }
+        setExpiry(cleaned);
+        setFormError('');
+    }
 
     function handleNext() {
-        if (isComplete) {
-            onNext({ last4: number.slice(-3) });
-        }
+        if (!isComplete) return;
+        if (!isNumberValid) { setFormError('Please enter a valid card number (13–19 digits).'); return; }
+        if (!isExpiryValid) { setFormError('Please enter a valid expiry date (MM/YY) in the future.'); return; }
+        if (!isCvcValid)    { setFormError('Please enter a valid CVC (3–4 digits).'); return; }
+        onNext({ last4: digits.slice(-4) });
     }
 
     return (
         <main className="flex-1 max-w-[411px] md:max-w-3xl mx-auto w-full px-6 pt-7 pb-10 flex flex-col gap-2">
-            <CardField label="Name of card holder" value={name} onChange={setName} placeholder="John" />
-            <CardField label="Card number" value={number} onChange={setNumber} placeholder="62406766893" type="tel" />
+            <CardField label="Name of card holder" value={name} onChange={(v) => { setName(v); setFormError(''); }} placeholder="John" />
+            <CardField label="Card number" value={number} onChange={handleNumberChange} placeholder="4242 4242 4242 4242" type="tel" />
             <div className="flex gap-2">
-                <CardField label="MM/YY" value={expiry} onChange={setExpiry} placeholder="11/26" type="tel" half />
-                <CardField label="CVC" value={cvc} onChange={setCvc} placeholder="545" type="tel" half />
+                <CardField label="MM/YY" value={expiry} onChange={handleExpiryChange} placeholder="11/26" type="tel" half />
+                <CardField label="CVC" value={cvc} onChange={(v) => { setCvc(v.replace(/\D/g, '').slice(0, 4)); setFormError(''); }} placeholder="545" type="tel" half />
             </div>
+
+            {formError && (
+                <p role="alert" className="text-red-500 text-sm mt-2" style={{ fontFamily: 'Roboto, sans-serif' }}>{formError}</p>
+            )}
 
             <button
                 onClick={handleNext}
@@ -391,14 +442,30 @@ export default function CheckoutPage() {
     const [error, setError] = useState(null);
 
     const monthlyTotal = items.reduce((sum, p) => sum + Number(p.price || 0), 0);
+    const onceOffTotal = items.reduce((sum, p) => sum + Number(p.onceOffPrice || 0), 0);
 
     async function handlePayNow() {
         if (!auth?.token) { navigate('/login'); return; }
+        if (!savedCard) { setError('Please add a payment method before paying.'); return; }
         setLoading(true);
         setError(null);
         try {
             const productIds = items.map((p) => p.id);
             const result = await takeUpProducts(productIds, auth.token);
+            if (!result.success) {
+                const failed = (result.fulfilmentResultList ?? [])
+                    .filter((r) => r.isEligible === false || r.success === false)
+                    .map((r) => {
+                        const item = items.find((p) => String(p.id) === String(r.productId));
+                        return item?.name ?? `Product ${r.productId}`;
+                    });
+                setError(
+                    failed.length > 0
+                        ? `Could not complete your order. You are not currently eligible for: ${failed.join(', ')}. Your cart has been kept.`
+                        : 'Could not complete your order. Please check your eligibility and try again. Your cart has been kept.'
+                );
+                return;
+            }
             clearCart();
             navigate('/checkout/result', { state: { result } });
         } catch (err) {
@@ -428,16 +495,17 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-[var(--surface-page)] flex flex-col">
             <PageHeader title={titles[view]} onBack={handleBack} />
             {/* Desktop heading */}
             <div className="hidden md:block max-w-3xl mx-auto w-full px-6 pt-10 pb-2">
-                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, fontWeight: 700, color: '#1C1C1C' }}>{titles[view]}</h1>
+                <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, fontWeight: 700, color: 'var(--text-primary)' }}>{titles[view]}</h1>
             </div>
 
             {view === 'main' && (
                 <MainView
                     monthlyTotal={monthlyTotal}
+                    onceOffTotal={onceOffTotal}
                     onAddMethod={() => setView('type-select')}
                     onPay={() => setView('order-review')}
                     loading={loading}
@@ -455,6 +523,7 @@ export default function CheckoutPage() {
                 <OrderReviewView
                     items={items}
                     monthlyTotal={monthlyTotal}
+                    onceOffTotal={onceOffTotal}
                     savedCard={savedCard}
                     onChangeMethod={() => setView('main')}
                     onPay={handlePayNow}

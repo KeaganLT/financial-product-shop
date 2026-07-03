@@ -6,53 +6,33 @@ import { getBankDetails } from '../services/bankingService';
 import { generateContractPdf, downloadContract, getContractBlob } from '../services/contractService';
 import { uploadSignedContract } from '../services/firebase';
 import { saveContractRecord, getContractRecord } from '../services/contractStorageService';
+import { useToast } from '../context/ToastContext';
+import Section from '../components/contract/Section.jsx';
+import ContractPreview from '../components/contract/ContractPreview.jsx';
 
-function Section({ heading, children }) {
-    return (
-        <div className="flex flex-col gap-2">
-            <h3 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 700, color: '#1C1C1C', borderLeft: '3px solid #1860BF', paddingLeft: 8 }}>
-                {heading}
-            </h3>
-            {children}
-        </div>
-    );
-}
-
-function InfoRow({ label, value }) {
-    return (
-        <div className="flex items-start justify-between gap-4 py-2" style={{ borderBottom: '1px solid #F2F2F7' }}>
-            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93', flexShrink: 0 }}>{label}</span>
-            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 600, color: '#1C1C1C', textAlign: 'right' }}>{value}</span>
-        </div>
-    );
+function currentTimestamp() {
+    return Date.now();
 }
 
 export default function ContractPage() {
-    const navigate    = useNavigate();
-    const { state }   = useLocation();
+    const navigate = useNavigate();
+    const { state } = useLocation();
     const { auth, isLoggedIn } = useAuth();
+    const { showToast } = useToast();
 
     const product    = state?.product ?? null;
     const bankDetails = state?.bankDetails ?? null;
 
-    const [profile, setProfile]           = useState(null);
+    const [profile, setProfile]               = useState(null);
     const [profileLoading, setProfileLoading] = useState(true);
-
-    // Signature flow
-    const [signature, setSignature]       = useState('');
-    const [signedAt, setSignedAt]         = useState(null);
-    const [agreed, setAgreed]             = useState(false);
-    const [sigError, setSigError]         = useState('');
-
-    // Upload flow
-    const [uploading, setUploading]       = useState(false);
-    const [uploadedUrl, setUploadedUrl]   = useState('');
-    const [uploadError, setUploadError]   = useState('');
-    const [existingRecord, setExistingRecord] = useState(null);
-    const [recordLoading, setRecordLoading]   = useState(true);
-
-    // Upload own file
-    const [ownFile, setOwnFile]           = useState(null);
+    const [signature, setSignature]           = useState('');
+    const [signedAt, setSignedAt]             = useState(null);
+    const [agreed, setAgreed]                 = useState(false);
+    const [sigError, setSigError]             = useState('');
+    const [uploading, setUploading]           = useState(false);
+    const [uploadedUrl, setUploadedUrl]       = useState('');
+    const [uploadError, setUploadError]       = useState('');
+    const [ownFile, setOwnFile]               = useState(null);
 
     useEffect(() => {
         if (!isLoggedIn) { navigate('/login'); return; }
@@ -63,22 +43,21 @@ export default function ContractPage() {
             .finally(() => setProfileLoading(false));
     }, [isLoggedIn]);
 
-    // Load existing Firestore record so signed status persists across sessions
     useEffect(() => {
-        if (!auth?.customerId || !product?.id) { setRecordLoading(false); return; }
+        if (!auth?.customerId || !product?.id) {
+            queueMicrotask(() => setProfileLoading(false));
+            return;
+        }
         getContractRecord(auth.customerId, product.id)
             .then((record) => {
                 if (record) {
-                    setExistingRecord(record);
                     if (record.downloadUrl) setUploadedUrl(record.downloadUrl);
                     if (record.signature)   setSignature(record.signature);
                 }
             })
-            .catch(() => {})
-            .finally(() => setRecordLoading(false));
+            .catch(() => {});
     }, [auth?.customerId, product?.id]);
 
-    // Resolve bank details: prefer passed state, fall back to localStorage
     const resolvedBank = bankDetails ?? (auth?.customerId ? getBankDetails(auth.customerId) : null);
 
     function buildDoc(withSig) {
@@ -97,18 +76,18 @@ export default function ContractPage() {
     }
 
     function handleSignAndDownload() {
-        if (!agreed)              { setSigError('Please accept the declaration first.'); return; }
-        if (!signature.trim())    { setSigError('Please type your full name as a signature.'); return; }
+        if (!agreed)           { setSigError('Please accept the declaration first.'); return; }
+        if (!signature.trim()) { setSigError('Please type your full name as a signature.'); return; }
         setSigError('');
-        const now = Date.now();
+        const now = currentTimestamp();
         const sig = signature.trim();
         setSignedAt(now);
         const pdfDoc = generateContractPdf({ product, bankDetails: resolvedBank, profile, signature: sig, signedAt: now });
         downloadContract(pdfDoc, `${product.name.replace(/\s+/g, '-')}-signed-contract.pdf`);
-        handleUploadSigned(pdfDoc, sig, now);
+        uploadAndSave(pdfDoc, sig, now);
     }
 
-    async function handleUploadSigned(doc, sig, ts) {
+    async function uploadAndSave(doc, sig, ts) {
         if (!auth?.customerId || !product?.id) return;
         setUploading(true);
         setUploadError('');
@@ -117,16 +96,12 @@ export default function ContractPage() {
             const url  = await uploadSignedContract(auth.customerId, product.id, blob);
             setUploadedUrl(url);
             await saveContractRecord(auth.customerId, product.id, {
-                signature:    sig,
-                signedAt:     ts,
-                downloadUrl:  url,
-                productName:  product.name,
-                productPrice: product.price,
-                bankName:     resolvedBank?.bankName,
-                last4:        resolvedBank?.last4,
-                accountType:  resolvedBank?.accountType,
-                debitDay:     resolvedBank?.debitDay,
+                signature: sig, signedAt: ts, downloadUrl: url,
+                productName: product.name, productPrice: product.price,
+                bankName: resolvedBank?.bankName, last4: resolvedBank?.last4,
+                accountType: resolvedBank?.accountType, debitDay: resolvedBank?.debitDay,
             });
+            showToast('Contract signed and stored securely.', 'success');
         } catch {
             setUploadError('Contract saved locally — upload to cloud failed. You can upload your signed copy below.');
         } finally {
@@ -143,16 +118,12 @@ export default function ContractPage() {
             setUploadedUrl(url);
             setOwnFile(null);
             await saveContractRecord(auth.customerId, product.id, {
-                signature:    null,
-                signedAt:     null,
-                downloadUrl:  url,
-                productName:  product.name,
-                productPrice: product.price,
-                bankName:     resolvedBank?.bankName,
-                last4:        resolvedBank?.last4,
-                accountType:  resolvedBank?.accountType,
-                debitDay:     resolvedBank?.debitDay,
+                signature: null, signedAt: null, downloadUrl: url,
+                productName: product.name, productPrice: product.price,
+                bankName: resolvedBank?.bankName, last4: resolvedBank?.last4,
+                accountType: resolvedBank?.accountType, debitDay: resolvedBank?.debitDay,
             });
+            showToast('Signed contract uploaded.', 'success');
         } catch {
             setUploadError('Upload failed. Please try again.');
         } finally {
@@ -162,169 +133,55 @@ export default function ContractPage() {
 
     if (!product) return null;
 
-    // Quick contract body preview (human-readable, not PDF)
-    const coverPoints = (() => {
-        const n = product.name?.toLowerCase() ?? '';
-        if (n.includes('insurance')) return ['Accidental damage', 'Theft & loss', 'International cover', 'No excess on first claim'];
-        if (n.includes('islamic'))   return ['Sharia-compliant', 'Profit-sharing basis', 'No interest (riba)', 'Certified by Supervisory Board'];
-        if (n.includes('vip'))       return ['Dedicated relationship manager', 'Priority support line', 'High-yield portfolio', 'Quarterly statements'];
-        if (n.includes('device'))    return ['Device financing', 'Maintenance cover', 'Theft protection', 'Easy upgrades'];
-        return ['Competitive returns', 'Flexible terms', 'Tax-efficient', 'Monthly statements'];
-    })();
-
     return (
-        <div className="min-h-screen bg-white">
-            {/* Header */}
+        <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
             <div
-                className="fixed top-0 left-0 right-0 bg-white z-50"
-                style={{ borderBottom: '1px solid #E5E5EA' }}
+                className="fixed top-0 left-0 right-0 z-50"
+                style={{ backgroundColor: 'var(--neutral-100)', borderBottom: '1px solid var(--neutral-300)' }}
             >
                 <div className="max-w-[480px] md:max-w-2xl mx-auto px-4 flex items-center gap-3" style={{ height: 64 }}>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="w-10 h-10 flex items-center justify-center flex-shrink-0"
-                    >
+                    <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center flex-shrink-0">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="#49454F" />
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="var(--neutral-700)" />
                         </svg>
                     </button>
                     <div>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, fontWeight: 600, color: '#1C1C1C' }}>
-                            Your contract
-                        </p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#8E8E93' }}>
-                            {product.name}
-                        </p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 17, fontWeight: 600, color: 'var(--neutral-800)' }}>Your contract</p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>{product.name}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Content */}
             <div className="pt-[76px] pb-12 max-w-[480px] md:max-w-2xl mx-auto px-6 flex flex-col gap-6">
-
-                {/* Status banner */}
                 {uploadedUrl ? (
-                    <div
-                        className="flex items-start gap-3 px-4 py-3 rounded-[10px]"
-                        style={{ background: '#F0FFF4', border: '1px solid #A3E9B8' }}
-                    >
+                    <div className="flex items-start gap-3 px-4 py-3 rounded-[10px]" style={{ background: '#F0FFF4', border: '1px solid #A3E9B8' }}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
                             <circle cx="10" cy="10" r="10" fill="#168C34" />
                             <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A5C30' }}>
-                                Signed contract uploaded
-                            </p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>
-                                Your signed contract has been stored securely.
-                            </p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A5C30' }}>Signed contract uploaded</p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Your signed contract has been stored securely.</p>
                         </div>
                     </div>
                 ) : (
-                    <div
-                        className="flex items-start gap-3 px-4 py-3 rounded-[10px]"
-                        style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}
-                    >
+                    <div className="flex items-start gap-3 px-4 py-3 rounded-[10px]" style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}>
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
                             <circle cx="10" cy="10" r="10" fill="#F5A623" />
                             <rect x="9" y="5" width="2" height="6" rx="1" fill="white" />
                             <circle cx="10" cy="14" r="1" fill="white" />
                         </svg>
                         <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#7A4F00' }}>
-                                Signature required
-                            </p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>
-                                Please sign this contract to complete your product agreement.
-                            </p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#7A4F00' }}>Signature required</p>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Please sign this contract to complete your product agreement.</p>
                         </div>
                     </div>
                 )}
 
-                {/* Contract preview */}
-                <Section heading="Contract summary">
-                    {/* Header */}
-                    <div
-                        className="rounded-t-[10px] px-4 py-3 flex items-center justify-between"
-                        style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' }}
-                    >
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: 'white' }}>FinShop (Pty) Ltd</p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>FSP Licence No. 12345 · Authorised Financial Services Provider</p>
-                        </div>
-                        <div
-                            className="px-2 py-0.5 rounded"
-                            style={{ background: 'rgba(255,255,255,0.2)', fontSize: 10, fontFamily: 'Roboto, sans-serif', color: 'white', fontWeight: 600 }}
-                        >
-                            PRODUCT AGREEMENT
-                        </div>
-                    </div>
+                <ContractPreview product={product} profile={profile} profileLoading={profileLoading} resolvedBank={resolvedBank} />
 
-                    <div className="border rounded-b-[10px] px-4 pb-4 flex flex-col gap-4" style={{ borderColor: '#E5E5EA', borderTop: 'none' }}>
-                        {/* Parties */}
-                        <div className="pt-3">
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Parties</p>
-                            <InfoRow label="Service Provider" value="FinShop (Pty) Ltd" />
-                            <InfoRow label="Policyholder" value={
-                                profile
-                                    ? (`${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim() || profile.username || 'N/A')
-                                    : (profileLoading ? 'Loading…' : 'N/A')
-                            } />
-                        </div>
-
-                        {/* Product */}
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Product details</p>
-                            <InfoRow label="Product" value={product.name} />
-                            <InfoRow label="Monthly premium" value={`R${Number(product.price).toFixed(2)}`} />
-                            {resolvedBank && <>
-                                <InfoRow label="Debit bank" value={resolvedBank.bankName} />
-                                <InfoRow label="Account" value={`${resolvedBank.accountType} ••••${resolvedBank.last4}`} />
-                                <InfoRow label="Debit date" value={`${resolvedBank.debitDay}${resolvedBank.debitDay === 1 ? 'st' : 'th'} of each month`} />
-                            </>}
-                        </div>
-
-                        {/* What's covered */}
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>What's covered</p>
-                            <ul className="flex flex-col gap-1.5">
-                                {coverPoints.map((p) => (
-                                    <li key={p} className="flex items-center gap-2">
-                                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                                            <circle cx="7" cy="7" r="7" fill="#E6F9ED" />
-                                            <path d="M4 7l2.5 2.5 4-4" stroke="#168C34" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43' }}>{p}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Key terms */}
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: '#8E8E93', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Key terms</p>
-                            <ul className="flex flex-col gap-1.5">
-                                {[
-                                    'Governed by South African law',
-                                    '31-day cooling-off period',
-                                    'Regulated by the FSCA under the FAIS Act',
-                                    'Personal information protected under POPIA',
-                                    'Disputes: approach the Ombud for Financial Services',
-                                ].map((t) => (
-                                    <li key={t} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#3C3C43', paddingLeft: 12, position: 'relative' }}>
-                                        <span style={{ position: 'absolute', left: 0, color: '#1860BF' }}>·</span>
-                                        {t}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-                </Section>
-
-                {/* Download unsigned */}
                 <Section heading="Download">
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                         Download the contract as a PDF to read, print, or sign manually, then upload the signed copy below.
                     </p>
                     <button
@@ -339,21 +196,22 @@ export default function ContractPage() {
                     </button>
                 </Section>
 
-                {/* Digital signature */}
                 {!uploadedUrl && (
                     <Section heading="Sign digitally">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Sign online — your signature will be embedded in the PDF and saved to your account.
                         </p>
-
-                        {/* Declaration */}
-                        <button
-                            onClick={() => { setAgreed((v) => !v); setSigError(''); }}
-                            className="flex items-start gap-3"
-                        >
+                        <label className="flex items-start gap-3 cursor-pointer p-2 -m-2">
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={() => { setAgreed((v) => !v); setSigError(''); }}
+                                className="sr-only"
+                            />
                             <div
+                                aria-hidden="true"
                                 className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
-                                style={{ borderColor: agreed ? '#1860BF' : '#C7C7CC', background: agreed ? '#1860BF' : 'white' }}
+                                style={{ borderColor: agreed ? '#1860BF' : 'var(--neutral-400)', background: agreed ? '#1860BF' : 'var(--neutral-100)' }}
                             >
                                 {agreed && (
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -361,14 +219,12 @@ export default function ContractPage() {
                                     </svg>
                                 )}
                             </div>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#3C3C43', lineHeight: '19px', textAlign: 'left' }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--neutral-700)', lineHeight: '19px', textAlign: 'left' }}>
                                 I confirm I have read this agreement, that all details are correct, and I authorise the debit order as stated.
                             </span>
-                        </button>
-
-                        {/* Typed name */}
+                        </label>
                         <div className="flex flex-col gap-1">
-                            <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1C1C1C' }}>
+                            <label style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--neutral-800)' }}>
                                 Type your full name as signature
                             </label>
                             <input
@@ -377,100 +233,59 @@ export default function ContractPage() {
                                 onChange={(e) => { setSignature(e.target.value); setSigError(''); }}
                                 placeholder="e.g. Keagan Truter"
                                 className="w-full h-[46px] rounded-[10px] px-3 border"
-                                style={{
-                                    fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif',
-                                    fontSize: 18,
-                                    borderColor: sigError && !signature ? '#C51C13' : '#C7C7CC',
-                                    outline: 'none',
-                                    color: '#1860BF',
-                                }}
+                                style={{ fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif', fontSize: 18, borderColor: sigError && !signature ? '#C51C13' : 'var(--neutral-400)', color: '#1860BF' }}
                             />
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: '#8E8E93' }}>
+                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>
                                 By typing your name you are providing a legally binding digital signature.
                             </p>
                         </div>
-
-                        {sigError && (
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{sigError}</p>
-                        )}
-
+                        {sigError && <p role="alert" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{sigError}</p>}
                         <button
                             onClick={handleSignAndDownload}
                             disabled={uploading}
                             className="w-full h-[50px] rounded-[100px] font-semibold text-white flex items-center justify-center gap-2"
-                            style={{
-                                background: uploading ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
-                                fontFamily: 'Roboto, sans-serif',
-                                fontSize: 16,
-                                cursor: uploading ? 'not-allowed' : 'pointer',
-                            }}
+                            style={{ background: uploading ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16, cursor: uploading ? 'not-allowed' : 'pointer' }}
                         >
                             {uploading ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Uploading…
-                                </>
+                                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Uploading…</>
                             ) : (
-                                <>
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill="white" />
-                                    </svg>
-                                    Sign & download
-                                </>
+                                <><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill="white" /></svg>Sign & download</>
                             )}
                         </button>
                     </Section>
                 )}
 
-                {/* Upload own signed copy */}
                 {!uploadedUrl && (
                     <Section heading="Upload signed copy">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Already signed a physical or scanned copy? Upload it here.
                         </p>
-                        <label
-                            className="w-full h-[46px] rounded-[100px] border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer"
-                            style={{ borderColor: ownFile ? '#168C34' : '#C7C7CC' }}
-                        >
+                        <label className="w-full h-[46px] rounded-[100px] border-2 border-dashed flex items-center justify-center gap-2 cursor-pointer" style={{ borderColor: ownFile ? '#168C34' : 'var(--neutral-400)' }}>
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill={ownFile ? '#168C34' : '#8E8E93'} />
+                                <path d="M12 8l4 4h-3v8h-2v-8H8l4-4zM4 4h16v2H4V4z" fill={ownFile ? '#168C34' : 'var(--text-secondary)'} />
                             </svg>
-                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: ownFile ? '#168C34' : '#8E8E93', fontWeight: ownFile ? 600 : 400 }}>
+                            <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: ownFile ? '#168C34' : 'var(--text-secondary)', fontWeight: ownFile ? 600 : 400 }}>
                                 {ownFile ? ownFile.name : 'Choose PDF or image…'}
                             </span>
-                            <input
-                                type="file"
-                                accept=".pdf,image/*"
-                                className="hidden"
-                                onChange={(e) => setOwnFile(e.target.files[0] ?? null)}
-                            />
+                            <input type="file" accept=".pdf,image/*" className="hidden" onChange={(e) => setOwnFile(e.target.files[0] ?? null)} />
                         </label>
-
                         {ownFile && (
                             <button
                                 onClick={handleUploadOwnFile}
                                 disabled={uploading}
                                 className="w-full h-[46px] rounded-[100px] font-semibold text-white"
-                                style={{
-                                    background: uploading ? '#A0AEC0' : '#168C34',
-                                    fontFamily: 'Roboto, sans-serif',
-                                    fontSize: 15,
-                                }}
+                                style={{ background: uploading ? '#A0AEC0' : '#168C34', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
                             >
                                 {uploading ? 'Uploading…' : 'Upload signed copy'}
                             </button>
                         )}
-
-                        {uploadError && (
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{uploadError}</p>
-                        )}
+                        {uploadError && <p role="alert" style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{uploadError}</p>}
                     </Section>
                 )}
 
-                {/* Already uploaded — show download of signed copy */}
                 {uploadedUrl && (
                     <Section heading="Signed contract">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-secondary)' }}>
                             Your signed contract is stored securely. You can download a copy below.
                         </p>
                         <a

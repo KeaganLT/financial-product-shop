@@ -6,7 +6,8 @@ import LogoMark from '../components/LogoMark.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import KYCSuccess from '../assets/KYCSuccess.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
-import CheckIcon from '../assets/CheckIcon.jsx';
+import DotLoader from '../components/signup/DotLoader.jsx';
+import VerifiedDocRow from '../components/signup/VerifiedDocRow.jsx';
 import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
@@ -23,97 +24,43 @@ import {
     signInWithGoogle,
 } from '../services/firebase.js';
 
-// Per the BRS "Qualifying Customer Types" table:
-// 1 = Individual, 2 = Sole Prop, 3 = Non-Profit, 4 = CIPC, 5 = System-to-System.
-// This flow only onboards individual customers.
 const DEFAULT_CUSTOMER_TYPE_ID = 1;
 
-const DOT_POSITIONS = [
-    { top: 0, left: 18 },
-    { top: 13, left: 0 },
-    { top: 13, left: 36 },
-    { top: 33, left: 0 },
-    { top: 33, left: 36 },
-    { top: 46, left: 18 },
-];
-
-function DotLoader() {
-    return (
-        <div className="relative" style={{ width: 49, height: 59 }}>
-            {DOT_POSITIONS.map((pos, index) => (
-                <span
-                    key={index}
-                    className="absolute rounded-full animate-pulse"
-                    style={{
-                        top: pos.top,
-                        left: pos.left,
-                        width: 13,
-                        height: 13,
-                        backgroundColor: index === 0 ? 'var(--brand-200)' : 'var(--neutral-300)',
-                        animationDelay: `${index * 120}ms`,
-                    }}
-                />
-            ))}
-        </div>
-    );
-}
-
-function VerifiedDocRow({ label }) {
-    return (
-        <div
-            className="w-full flex items-center justify-between px-4 py-3 rounded-lg"
-            style={{ backgroundColor: 'rgba(52, 199, 89, 0.1)' }}
-        >
-            <span className="text-[15px] font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>
-            <span
-                className="flex items-center justify-center rounded-full"
-                style={{ width: 22, height: 22, backgroundColor: '#34C759' }}
-            >
-                <CheckIcon width={13} height={13} color="#FFFFFF" />
-            </span>
-        </div>
-    );
-}
-
-
-// email -> awaiting-verification -> details -> kyc -> submitting -> done
 export default function SignUpPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
     const [stage, setStage] = useState('email');
-    const stageRef = useRef('email');
-    const emailInputRef = useRef(null);
+    const stageRef          = useRef('email');
+    const emailInputRef     = useRef(null);
 
-    const [email, setEmail] = useState('');
+    const [email, setEmail]       = useState('');
     const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [idNumber, setIdNumber] = useState('');
-    const [password, setPassword] = useState('');
+    const [lastName, setLastName]   = useState('');
+    const [idNumber, setIdNumber]   = useState('');
+    const [password, setPassword]   = useState('');
 
-    const [selfieFile, setSelfieFile] = useState(null);
+    const [selfieFile, setSelfieFile]                     = useState(null);
     const [proofOfResidenceFile, setProofOfResidenceFile] = useState(null);
 
-    const [error, setError] = useState('');
+    const [error, setError]           = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const isEmailStepValid = email.includes('@');
-    const isIdNumberValid = validateSAId(idNumber);
-    const isDetailsStepValid =
-        firstName.trim().length > 0 && lastName.trim().length > 0 && isIdNumberValid;
+    const isEmailStepValid    = email.includes('@');
+    const isIdNumberValid     = validateSAId(idNumber);
+    const isDetailsStepValid  = firstName.trim().length > 0 && lastName.trim().length > 0 && isIdNumberValid;
+    const isKycStepValid      = selfieFile && proofOfResidenceFile;
 
-    const hasLower = /[a-z]/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
+    const hasLower   = /[a-z]/.test(password);
+    const hasUpper   = /[A-Z]/.test(password);
+    const hasNumber  = /[0-9]/.test(password);
     const hasSpecial = /[^A-Za-z0-9]/.test(password);
-    const hasLength = password.length >= 8;
+    const hasLength  = password.length >= 8;
     const isPasswordStepValid = hasLower && hasUpper && hasNumber && hasSpecial && hasLength;
 
-    const [pwnedCount, setPwnedCount] = useState(0);
+    const [pwnedCount, setPwnedCount]       = useState(0);
     const [isPwnedChecked, setIsPwnedChecked] = useState(false);
 
-    // Soft-warn (don't block) if the password shows up in known breaches.
-    // Debounced so we're not hashing/querying on every keystroke.
     useEffect(() => {
         const timer = setTimeout(() => {
             if (!isPasswordStepValid) {
@@ -122,45 +69,28 @@ export default function SignUpPage() {
                 return;
             }
             checkPasswordPwned(password)
-                .then((count) => {
-                    setPwnedCount(count);
-                    setIsPwnedChecked(true);
-                })
-                .catch(() => {
-                    setPwnedCount(0);
-                    setIsPwnedChecked(false);
-                });
+                .then((count) => { setPwnedCount(count); setIsPwnedChecked(true); })
+                .catch(() => { setPwnedCount(0); setIsPwnedChecked(false); });
         }, 500);
-
         return () => clearTimeout(timer);
     }, [password, isPasswordStepValid]);
 
-    const isKycStepValid = selfieFile && proofOfResidenceFile;
-
-    // On first load, check whether we got here via the verification email link.
     useEffect(() => {
-        if (!isEmailVerificationLink()) {
-            return;
-        }
-
+        if (!isEmailVerificationLink()) return;
 
         queueMicrotask(() => {
             const storedEmail = getStoredVerificationEmail();
             if (!storedEmail) {
-                // Link opened in a different browser/device than it was requested from.
                 setError('Please re-enter your email to finish verifying.');
                 return;
             }
-
             const storedPassword = getStoredVerificationPassword();
-
             setStage('awaiting-verification');
             completeEmailVerification(storedEmail)
                 .then(() => {
                     setEmail(storedEmail);
                     setPassword(storedPassword || '');
                     setStage('details');
-                    // Clear the verification params out of the URL.
                     navigate('/signup', { replace: true });
                 })
                 .catch((err) => {
@@ -170,29 +100,19 @@ export default function SignUpPage() {
         });
     }, [navigate]);
 
-    // Keep a ref in sync so the unmount cleanup can read the latest stage.
     useEffect(() => {
         stageRef.current = stage;
         trackEvent('registration_stage_view', { stage });
     }, [stage]);
 
-
-    // Once verification is complete, ask for notification permission so we can
-    // alert the user about claim/policy updates going forward.
     useEffect(() => {
-        if (stage !== 'done') {
-            return;
-        }
-        if (typeof Notification === 'undefined' || Notification.permission !== 'default') {
-            return;
-        }
+        if (stage !== 'done') return;
+        if (typeof Notification === 'undefined' || Notification.permission !== 'default') return;
         Notification.requestPermission().then((permission) => {
             trackEvent('notification_permission_responded', { permission });
         });
     }, [stage]);
 
-    // If the user closes the tab/navigates away mid-flow (before reaching "done"),
-    // record that as a drop-off. Uses a ref so we always report the actual last stage.
     useEffect(() => {
         return () => {
             if (stageRef.current !== 'done') {
@@ -201,8 +121,6 @@ export default function SignUpPage() {
         };
     }, []);
 
-    // Google already verifies the email for us, so the backend account just
-    // needs *some* password — the user will always re-enter via Google.
     function generateRandomPassword() {
         const bytes = crypto.getRandomValues(new Uint8Array(24));
         return `${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}Aa1!`;
@@ -212,23 +130,18 @@ export default function SignUpPage() {
         setError('');
         setIsSubmitting(true);
         try {
-            const googleEmail = await signInWithGoogle();
+            const googleEmail      = await signInWithGoogle();
             const generatedPassword = generateRandomPassword();
 
             let isNewAccount = true;
             try {
                 await createUser(googleEmail, generatedPassword);
             } catch (err) {
-                if (err.status !== 400) {
-                    throw err;
-                }
-                // Account already exists for this Google email — just continue.
+                if (err.status !== 400) throw err;
                 isNewAccount = false;
             }
 
             if (isNewAccount) {
-                // Only vault on the password we actually just set on the legacy
-                // account — never overwrite with a guess for a pre-existing one.
                 await vaultLegacyCredentials(googleEmail, generatedPassword);
             }
 
@@ -242,11 +155,10 @@ export default function SignUpPage() {
             setIsSubmitting(false);
         }
     }
+
     async function handleEmailSubmit(e) {
         e.preventDefault();
-        if (!isEmailStepValid || !isPasswordStepValid) {
-            return;
-        }
+        if (!isEmailStepValid || !isPasswordStepValid) return;
 
         setError('');
         setIsSubmitting(true);
@@ -255,11 +167,7 @@ export default function SignUpPage() {
                 await createUser(email, password);
                 await sendVerificationEmail(email, password);
             } catch (err) {
-                if (err.status !== 400) {
-                    throw err;
-                }
-                // Account already exists — we have no way to know its real
-                // password, so we can't continue this signup flow for it.
+                if (err.status !== 400) throw err;
                 await sendExistingAccountEmail(email);
                 setError('An account with this email already exists. Please log in instead.');
                 trackEvent('registration_error', { stage: 'email', error: 'account_exists' });
@@ -277,18 +185,14 @@ export default function SignUpPage() {
 
     function handleDetailsSubmit(e) {
         e.preventDefault();
-        if (!isDetailsStepValid) {
-            return;
-        }
+        if (!isDetailsStepValid) return;
         setError('');
         setStage('kyc');
     }
 
     async function handleKycSubmit(e) {
         e.preventDefault();
-        if (!isKycStepValid) {
-            return;
-        }
+        if (!isKycStepValid) return;
 
         setError('');
         setIsSubmitting(true);
@@ -296,23 +200,11 @@ export default function SignUpPage() {
 
         try {
             const { token } = await login(email, password);
-
-            await createProfile(
-                {
-                    email,
-                    firstName,
-                    lastName,
-                    idNumber,
-                    customerTypeId: DEFAULT_CUSTOMER_TYPE_ID,
-                },
-                token
-            );
-
+            await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
             await Promise.all([
                 uploadKycDocument(email, 'selfie', selfieFile),
                 uploadKycDocument(email, 'proof-of-residence', proofOfResidenceFile),
             ]);
-
             trackEvent('registration_completed');
             setStage('done');
         } catch (err) {
@@ -324,6 +216,8 @@ export default function SignUpPage() {
             setIsSubmitting(false);
         }
     }
+
+    const gradientBtn = { background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' };
 
     return (
         <div
@@ -398,27 +292,9 @@ export default function SignUpPage() {
                             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                         </div>
 
-
                         <div className="flex flex-col gap-4">
-                            <FormInput
-                                id="email"
-                                label="Email"
-                                type="text"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                autoComplete="email"
-                                inputRef={emailInputRef}
-                                autoFocus
-                            />
-
-                            <FormInput
-                                id="password"
-                                label="Password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                autoComplete="new-password"
-                            />
+                            <FormInput id="email" label="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputRef={emailInputRef} autoFocus />
+                            <FormInput id="password" label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
                         </div>
 
                         <div className="flex flex-row gap-2">
@@ -433,14 +309,7 @@ export default function SignUpPage() {
                                 <div
                                     key={index}
                                     className="flex-1 h-[6px] rounded-full"
-                                    style={{
-                                        background:
-                                            isMet === null
-                                                ? 'var(--neutral-400)'
-                                                : isMet
-                                                    ? '#34C759'
-                                                    : '#FF3B30',
-                                    }}
+                                    style={{ background: isMet === null ? 'var(--neutral-400)' : isMet ? '#34C759' : '#FF3B30' }}
                                 />
                             ))}
                         </div>
@@ -455,21 +324,19 @@ export default function SignUpPage() {
 
                         {pwnedCount > 0 && (
                             <p className="text-[13px] -mt-2" style={{ color: '#FFD60A' }}>
-                                This password has appeared in {pwnedCount.toLocaleString()} known data
-                                breaches. We recommend choosing a different one.
+                                This password has appeared in {pwnedCount.toLocaleString()} known data breaches. We recommend choosing a different one.
                             </p>
                         )}
 
-                        {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
+                        {error && <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>}
 
                         <button
                             type="submit"
                             disabled={!isEmailStepValid || !isPasswordStepValid || isSubmitting}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold"
                             style={{
-                                background: isEmailStepValid && isPasswordStepValid ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                ...(isEmailStepValid && isPasswordStepValid ? gradientBtn : { background: '#E5E5EA', letterSpacing: '0.0035em' }),
                                 color: isEmailStepValid && isPasswordStepValid ? '#FFFFFF' : '#AEAEB2',
-                                letterSpacing: '0.0035em',
                                 opacity: isSubmitting ? 0.6 : 1,
                             }}
                         >
@@ -478,12 +345,7 @@ export default function SignUpPage() {
 
                         <p className="text-[15px] text-center" style={{ color: 'var(--text-primary)' }}>
                             Already have an account?{' '}
-                            <button
-                                type="button"
-                                onClick={() => navigate('/login')}
-                                className="font-semibold underline"
-                                style={{ color: 'var(--brand-200)' }}
-                            >
+                            <button type="button" onClick={() => navigate('/login')} className="font-semibold underline" style={{ color: 'var(--brand-200)' }}>
                                 Log in
                             </button>
                         </p>
@@ -506,13 +368,8 @@ export default function SignUpPage() {
                         <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Open the email and click the link to continue.
                         </p>
-                        {error && <p className="text-[13px] text-red-400">{error}</p>}
-                        <button
-                            type="button"
-                            onClick={handleEmailSubmit}
-                            className="text-[15px] underline"
-                            style={{ color: 'var(--brand-200)' }}
-                        >
+                        {error && <p role="alert" className="text-[13px] text-red-400">{error}</p>}
+                        <button type="button" onClick={handleEmailSubmit} className="text-[15px] underline" style={{ color: 'var(--brand-200)' }}>
                             Resend email
                         </button>
                     </div>
@@ -521,23 +378,8 @@ export default function SignUpPage() {
                 {stage === 'details' && (
                     <form onSubmit={handleDetailsSubmit} className="w-full flex flex-col gap-6">
                         <div className="flex flex-col gap-4">
-                            <FormInput
-                                id="firstName"
-                                label="Name"
-                                type="text"
-                                value={firstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                autoComplete="given-name"
-                                autoFocus
-                            />
-                            <FormInput
-                                id="lastName"
-                                label="Surname"
-                                type="text"
-                                value={lastName}
-                                onChange={(e) => setLastName(e.target.value)}
-                                autoComplete="family-name"
-                            />
+                            <FormInput id="firstName" label="Name" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" autoFocus />
+                            <FormInput id="lastName" label="Surname" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" />
                             <FormInput
                                 id="idNumber"
                                 label="ID number"
@@ -552,15 +394,13 @@ export default function SignUpPage() {
                                 </p>
                             )}
                         </div>
-
                         <button
                             type="submit"
                             disabled={!isDetailsStepValid}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold"
                             style={{
-                                background: isDetailsStepValid ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                ...(isDetailsStepValid ? gradientBtn : { background: '#E5E5EA', letterSpacing: '0.0035em' }),
                                 color: isDetailsStepValid ? '#FFFFFF' : '#AEAEB2',
-                                letterSpacing: '0.0035em',
                             }}
                         >
                             Next
@@ -571,61 +411,36 @@ export default function SignUpPage() {
                 {stage === 'kyc' && (
                     <form onSubmit={handleKycSubmit} className="w-full flex flex-col items-center gap-6">
                         <KYCSuccess width={150} height={113} />
-
                         <div className="flex flex-col items-center gap-2">
-                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                Identity verification
-                            </h2>
+                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>Identity verification</h2>
                             <p className="text-[15px] text-center" style={{ color: 'var(--text-secondary)' }}>
-                                We are committed to providing a safe, secure experience for our
-                                community and therefore your account must be verified by
-                                completing a KYC verification.
+                                We are committed to providing a safe, secure experience for our community and therefore your account must be verified by completing a KYC verification.
                             </p>
                         </div>
-
                         <div className="w-full flex flex-col gap-2">
-                            <KycUploadRow
-                                label="Proof of residence"
-                                status={proofOfResidenceFile ? 'Uploaded' : 'Proof of identity'}
-                                isUploaded={!!proofOfResidenceFile}
-                                capture="environment"
-                                onSelect={(file) => setProofOfResidenceFile(file)}
-                            />
-                            <KycUploadRow
-                                label="Selfie upload"
-                                status={selfieFile ? 'Uploaded' : 'Proof of identity'}
-                                isUploaded={!!selfieFile}
-                                capture="user"
-                                onSelect={(file) => setSelfieFile(file)}
-                            />
+                            <KycUploadRow label="Proof of residence" status={proofOfResidenceFile ? 'Uploaded' : 'Proof of identity'} isUploaded={!!proofOfResidenceFile} capture="environment" onSelect={(file) => setProofOfResidenceFile(file)} />
+                            <KycUploadRow label="Selfie upload" status={selfieFile ? 'Uploaded' : 'Proof of identity'} isUploaded={!!selfieFile} capture="user" onSelect={(file) => setSelfieFile(file)} />
                         </div>
-
-                        {error && <p className="text-[13px] text-red-400 -mt-2">{error}</p>}
-
+                        {error && <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>}
                         <button
                             type="submit"
                             disabled={!isKycStepValid || isSubmitting}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold"
                             style={{
-                                background: isKycStepValid ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                ...(isKycStepValid ? gradientBtn : { background: '#E5E5EA', letterSpacing: '0.0035em' }),
                                 color: isKycStepValid ? '#FFFFFF' : '#AEAEB2',
-                                letterSpacing: '0.0035em',
                                 opacity: isSubmitting ? 0.6 : 1,
                             }}
                         >
                             Submit
                         </button>
-
                     </form>
                 )}
 
                 {stage === 'submitting' && (
                     <div className="flex flex-col items-center gap-5">
                         <DotLoader />
-                        <p
-                            className="text-[17px] font-semibold text-center"
-                            style={{ color: 'var(--text-secondary)', letterSpacing: '0.0035em' }}
-                        >
+                        <p className="text-[17px] font-semibold text-center" style={{ color: 'var(--text-secondary)', letterSpacing: '0.0035em' }}>
                             Completing your profile
                         </p>
                     </div>
@@ -636,28 +451,22 @@ export default function SignUpPage() {
                         <p className="text-[17px] text-center" style={{ color: 'var(--text-primary)' }}>
                             You&apos;re all set! Your account has been created.
                         </p>
-
                         <KYCSuccess width={150} height={113} verified />
-
                         <div className="flex flex-col items-center gap-2">
-                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                Identity verification successful
-                            </h2>
+                            <h2 className="text-[20px] font-semibold" style={{ color: 'var(--text-primary)' }}>Identity verification successful</h2>
                             <p className="text-[15px] text-center" style={{ color: 'var(--text-secondary)' }}>
                                 Your documents have been submitted and your identity has been verified.
                             </p>
                         </div>
-
                         <div className="w-full flex flex-col gap-2">
                             <VerifiedDocRow label="Proof of residence" />
                             <VerifiedDocRow label="Selfie upload" />
                         </div>
-
                         <button
                             type="button"
                             onClick={() => navigate('/products')}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
-                            style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' }}
+                            style={gradientBtn}
                         >
                             Continue to Home
                         </button>

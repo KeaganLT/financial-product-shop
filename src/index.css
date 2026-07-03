@@ -86,11 +86,18 @@
 }
 
 :root[data-theme='dark'] {
-    --surface-page: var(--brand-300);
-    --surface-field: #1C2435;
-    --text-primary: var(--neutral-100);
-    --text-secondary: var(--neutral-600);
-    --border-default: var(--neutral-400);
+    --neutral-100: #1C1C1E;
+    --neutral-200: #2C2C2E;
+    --neutral-300: #3A3A3C;
+    --neutral-400: #48484A;
+    --neutral-500: #636366;
+    --neutral-700: #AEAEB2;
+    --neutral-800: #F2F2F7;
+    --surface-page: #1C1C1E;
+    --surface-field: #2C2C2E;
+    --text-primary: #F2F2F7;
+    --text-secondary: #8E8E93;
+    --border-default: #48484A;
 }
 
 /* ─── Base styles ────────────────────────────────────────────────────────── */
@@ -105,6 +112,31 @@ body {
     background-color: var(--neutral-100);
     color: var(--neutral-800);
     margin: 0;
+}
+
+/* ─── Focus rings — keyboard only, never on mouse click ─────────────────── */
+*:focus { outline: none; }
+*:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(24, 96, 191, 0.35);
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    border-color: var(--brand-100) !important;
+    box-shadow: 0 0 0 3px rgba(24, 96, 191, 0.2);
+}
+
+/* ─── Page transition ────────────────────────────────────────────────────── */
+@keyframes pageFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+    animation: pageFadeIn 0.18s ease both;
+}
+@media (prefers-reduced-motion: reduce) {
+    .page-enter { animation: none; }
 }
 
 /* ─── Utility: hide scrollbars on horizontal scroll rows ─────────────────── */
