@@ -10,8 +10,20 @@ export default function ProductCard({ product, size = 'default' }) {
 
     return (
         <div
-            className={`${cardWidth} bg-white rounded-xl overflow-hidden cursor-pointer flex flex-col`}
-            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.08)' }}
+            className={`${cardWidth} rounded-xl overflow-hidden cursor-pointer flex flex-col transition-all duration-150`}
+            style={{
+                backgroundColor: 'var(--neutral-100)',
+                border: '1px solid var(--neutral-300)',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.08)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)';
+                e.currentTarget.style.transform = 'translateY(0)';
+            }}
             onClick={() => navigate(`/products/${product.id}`)}
         >
             <div className={`relative w-full overflow-hidden ${imgClasses}`}>

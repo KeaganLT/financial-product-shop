@@ -9,6 +9,7 @@ import { uploadKycDocument, trackEvent, changePassword, changeEmail, getSignInPr
 import { getKycStatus } from '../services/kycStatus.js';
 import { getProfile, getTypes, updateCustomerType, addAccount, removeAccount, postKycStatus, seedDhaData } from '../services/customerService.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 // ─── Change Password form ──────────────────────────────────────────────────────
 function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onSuccess }) {
@@ -259,6 +260,7 @@ export default function AccountPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn, logout } = useAuth();
     const { showToast } = useToast();
+    const { preference: themePref, setThemePreference } = useTheme();
 
     const [status, setStatus]             = useState(null);
     const [uploadError, setUploadError]   = useState('');
@@ -679,11 +681,47 @@ export default function AccountPage() {
                             )}
                         </div>
 
+                        {/* ── Appearance ── */}
+                        <div className="w-full flex flex-col gap-3">
+                            <h2 className="text-[13px] font-semibold uppercase" style={{ color: '#8E8E93', letterSpacing: '0.05em' }}>
+                                Appearance
+                            </h2>
+                            <div
+                                className="w-full px-4 py-3 rounded-lg flex items-center justify-between border"
+                                style={{ borderColor: 'var(--neutral-300)', backgroundColor: 'var(--neutral-100)' }}
+                            >
+                                <div>
+                                    <p className="text-[15px] font-semibold" style={{ color: 'var(--neutral-800)' }}>Theme</p>
+                                    <p className="text-[12px] mt-0.5" style={{ color: '#8E8E93' }}>
+                                        {themePref === 'dark' ? 'Dark mode' : 'Light mode'}
+                                    </p>
+                                </div>
+                                <div className="flex rounded-full overflow-hidden border" style={{ borderColor: 'var(--neutral-300)' }}>
+                                    {[
+                                        { key: 'light', label: '☀️ Light' },
+                                        { key: 'dark',  label: '🌙 Dark' },
+                                    ].map(({ key, label }) => (
+                                        <button
+                                            key={key}
+                                            onClick={() => setThemePreference(key)}
+                                            className="px-3 py-1.5 text-[13px] font-semibold transition-colors"
+                                            style={{
+                                                background: themePref === key ? 'var(--brand-100)' : 'transparent',
+                                                color: themePref === key ? '#fff' : 'var(--neutral-600)',
+                                            }}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
                         <button
                             type="button"
                             onClick={logout}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold border"
-                            style={{ borderColor: '#000000', color: '#000000', letterSpacing: '0.0035em' }}
+                            style={{ borderColor: 'var(--neutral-800)', color: 'var(--neutral-800)', letterSpacing: '0.0035em' }}
                         >
                             Log out
                         </button>
