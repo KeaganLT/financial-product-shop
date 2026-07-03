@@ -30,6 +30,24 @@ export async function takeUpProducts(productIds, token) {
     return { success: true, fulfilmentResultList: data.fulfilmentResultList ?? [] };
 }
 
+export async function probeEligibilityDetails(productId, token) {
+    try {
+        const result = await takeUpProducts([productId], token);
+        return result.fulfilmentResultList ?? [];
+    } catch {
+        return [];
+    }
+}
+
+export async function getSubscriptions(token) {
+    const response = await fetch(`${BASE_URL}/subscriptions`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to fetch subscriptions');
+    const data = await response.json();
+    return data.subscriptions ?? data ?? [];
+}
+
 export async function getSubscription(id, token) {
     const response = await fetch(`${BASE_URL}/subscriptions/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -38,4 +56,12 @@ export async function getSubscription(id, token) {
         throw new Error('Failed to fetch subscription');
     }
     return response.json();
+}
+
+export async function deleteSubscription(id, token) {
+    const response = await fetch(`${BASE_URL}/subscriptions/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!response.ok) throw new Error('Failed to cancel subscription');
 }
