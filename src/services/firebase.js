@@ -1,7 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getAnalytics, isSupported as isAnalyticsSupported, logEvent } from 'firebase/analytics';
-import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+    getAuth,
+    sendSignInLinkToEmail,
+    isSignInWithEmailLink,
+    signInWithEmailLink,
+    GoogleAuthProvider,
+    signInWithPopup,
+    reauthenticateWithCredential,
+    reauthenticateWithPopup,
+    EmailAuthProvider,
+    updatePassword,
+    verifyBeforeUpdateEmail,
+} from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
 import { getFirestore } from 'firebase/firestore';
 
@@ -110,6 +122,45 @@ export async function uploadKycDocument(customerUsername, docType, file) {
     const fileRef = ref(storage, path);
     await uploadBytes(fileRef, file);
     return getDownloadURL(fileRef);
+}
+
+// ─── Credential management ────────────────────────────────────────────────────
+
+// Returns the sign-in provider for the currently signed-in Firebase user.
+// 'google.com' | 'password' | null
+export function getSignInProvider() {
+    const user = auth.currentUser;
+    if (!user) return null;
+    return user.providerData?.[0]?.providerId ?? null;
+}
+
+// Re-authenticates the current user.
+// For email/password accounts: pass currentPassword.
+// For Google accounts: pass null — triggers a Google popup.
+export async function reAuthenticate(currentPassword) {
+    const user = auth.currentUser;
+    if (!user) throw new Error('No user signed in');
+    const provider = getSignInProvider();
+    if (provider === 'google.com') {
+        await reauthenticateWithPopup(user, googleProvider);
+    } else {
+        const credential = EmailAuthProvider.credential(user.email, currentPassword);
+        await reauthenticateWithCredential(user, credential);
+    }
+}
+
+// Changes the Firebase Auth password after re-authenticating.
+export async function changePassword(currentPassword, newPassword) {
+    await reAuthenticate(currentPassword);
+    await updatePassword(auth.currentUser, newPassword);
+}
+
+// Sends a verification email to newEmail. The change only takes effect once
+// the user clicks the link in that email. Safe: current email stays active
+// until confirmed.
+export async function changeEmail(currentPassword, newEmail) {
+    await reAuthenticate(currentPassword);
+    await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
 }
 
 // Uploads a signed contract PDF blob for a given customer + product.
