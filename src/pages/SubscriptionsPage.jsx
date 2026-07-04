@@ -5,13 +5,23 @@ import { useToast } from '../context/ToastContext';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import SubscriptionCard from '../components/subscriptions/SubscriptionCard.jsx';
-import BankDetailsSection from '../components/subscriptions/BankDetailsSection.jsx';
+import PaymentSummaryCard from '../components/subscriptions/PaymentSummaryCard.jsx';
+import AccountPickerSheet from '../components/subscriptions/AccountPickerSheet.jsx';
 import EmptyIllustration from '../components/subscriptions/EmptyIllustration.jsx';
 import UnsignedContractsBanner from '../components/subscriptions/UnsignedContractsBanner.jsx';
 import { getSubscriptions, deleteSubscription } from '../services/subscriptionService';
-import { getBankDetails } from '../services/bankingService';
 import { getContractRecord } from '../services/contractStorageService';
+import { getBankAccounts, assignAccountToProduct, resolveAccountForProduct } from '../services/bankAccountsService';
+import { getNextDebitDate } from '../utils/debitDates.js';
 import { CATEGORY_GROUPS, groupSubscriptions } from '../utils/subscriptionCategories.jsx';
+
+function subProduct(sub) {
+    return Array.isArray(sub.product) ? sub.product[0] : sub.product;
+}
+
+function subProductId(sub) {
+    return sub.productId ?? subProduct(sub)?.id ?? null;
+}
 
 export default function SubscriptionsPage() {
     const navigate = useNavigate();
@@ -23,6 +33,9 @@ export default function SubscriptionsPage() {
     const [error, setError]                   = useState('');
     const [cancellingId, setCancellingId]     = useState(null);
     const [contractStatus, setContractStatus] = useState({});
+    const [accountsData, setAccountsData]     = useState({ accounts: [], assignments: {} });
+    const [pickerFor, setPickerFor]           = useState(null);
+    const [assigning, setAssigning]           = useState(false);
 
     useEffect(() => {
         if (!isLoggedIn) return;
@@ -33,15 +46,18 @@ export default function SubscriptionsPage() {
         setLoading(true);
         setError('');
         try {
-            const data = await getSubscriptions(auth.token);
+            const [data, accounts] = await Promise.all([
+                getSubscriptions(auth.token),
+                auth?.customerId ? getBankAccounts(auth.customerId).catch(() => ({ accounts: [], assignments: {} })) : { accounts: [], assignments: {} },
+            ]);
             const list = Array.isArray(data) ? data : [];
             setSubscriptions(list);
+            setAccountsData(accounts);
 
             if (auth?.customerId && list.length > 0) {
                 const entries = await Promise.all(
                     list.map(async (sub) => {
-                        const prod      = Array.isArray(sub.product) ? sub.product[0] : sub.product;
-                        const productId = sub.productId ?? prod?.id ?? null;
+                        const productId = subProductId(sub);
                         if (!productId) return null;
                         const record = await getContractRecord(auth.customerId, productId).catch(() => null);
                         return [String(productId), { signed: !!(record?.signature || record?.downloadUrl), downloadUrl: record?.downloadUrl ?? '' }];
@@ -70,16 +86,54 @@ export default function SubscriptionsPage() {
     }
 
     function handleContract(product) {
-        const bankDetails = getBankDetails(auth?.customerId);
-        navigate('/contract', { state: { product, bankDetails } });
+        const account = resolveAccountForProduct(accountsData, product.id);
+        navigate('/contract', { state: { product, bankDetails: account } });
     }
 
     function handleView(productId) {
         navigate(`/products/${productId}`);
     }
 
+    async function handleAssignAccount(accountId) {
+        if (!pickerFor) return;
+        setAssigning(true);
+        try {
+            await assignAccountToProduct(auth.customerId, pickerFor, accountId);
+            setAccountsData((prev) => ({
+                ...prev,
+                assignments: { ...prev.assignments, [String(pickerFor)]: accountId },
+            }));
+            showToast('Debit account updated.', 'success');
+            setPickerFor(null);
+        } catch {
+            showToast('Could not update the debit account. Please try again.', 'error');
+        } finally {
+            setAssigning(false);
+        }
+    }
+
     const unsignedCount = Object.values(contractStatus).filter((s) => !s.signed).length;
     const groups = groupSubscriptions(subscriptions);
+
+    const totalMonthly = subscriptions.reduce((sum, sub) => {
+        const prod = subProduct(sub);
+        return sum + Number(sub.price ?? prod?.price ?? sub.monthlyPremium ?? 0);
+    }, 0);
+
+    const summaryRows = subscriptions.map((sub) => {
+        const prod      = subProduct(sub);
+        const productId = subProductId(sub);
+        const account   = resolveAccountForProduct(accountsData, productId);
+        return {
+            key:         sub.subscriptionId ?? sub.id,
+            productName: sub.productName ?? prod?.name ?? 'Product',
+            amount:      sub.price ?? prod?.price ?? sub.monthlyPremium ?? 0,
+            date:        account ? getNextDebitDate(account.debitDay) : null,
+            bankLabel:   account ? `${account.bankName} ••••${account.last4}` : '',
+        };
+    });
+
+    const pickerAccount = pickerFor ? resolveAccountForProduct(accountsData, pickerFor) : null;
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
@@ -90,11 +144,8 @@ export default function SubscriptionsPage() {
                     My subscriptions
                 </h1>
 
-                {isLoggedIn && (
-                    <BankDetailsSection
-                        userId={auth?.customerId}
-                        onChangeClick={() => navigate('/account/bank')}
-                    />
+                {isLoggedIn && !loading && !error && (
+                    <PaymentSummaryCard rows={summaryRows} totalMonthly={totalMonthly} count={subscriptions.length} />
                 )}
 
                 {isLoggedIn && !loading && (
@@ -185,7 +236,7 @@ export default function SubscriptionsPage() {
                                 <div className="flex flex-col gap-3 md:grid md:grid-cols-2 md:gap-4 md:items-start">
                                 {groups[group.key].map((sub) => {
                                     const subId     = sub.subscriptionId ?? sub.id;
-                                    const productId = sub.productId ?? (Array.isArray(sub.product) ? sub.product[0]?.id : sub.product?.id);
+                                    const productId = subProductId(sub);
                                     return (
                                         <SubscriptionCard
                                             key={subId}
@@ -196,6 +247,14 @@ export default function SubscriptionsPage() {
                                             onContract={handleContract}
                                             contractSigned={!!contractStatus[String(productId)]?.signed}
                                             contractUrl={contractStatus[String(productId)]?.downloadUrl ?? ''}
+                                            account={resolveAccountForProduct(accountsData, productId)}
+                                            onChangeAccount={() => {
+                                                if (accountsData.accounts.length === 0) {
+                                                    navigate('/account/bank');
+                                                } else {
+                                                    setPickerFor(productId);
+                                                }
+                                            }}
                                         />
                                     );
                                 })}
@@ -205,6 +264,16 @@ export default function SubscriptionsPage() {
                     </>
                 )}
             </main>
+
+            <AccountPickerSheet
+                open={!!pickerFor}
+                accounts={accountsData.accounts}
+                selectedId={pickerAccount?.id ?? null}
+                saving={assigning}
+                onSelect={handleAssignAccount}
+                onAddNew={() => navigate('/account/bank')}
+                onClose={() => setPickerFor(null)}
+            />
 
             <BottomNav />
         </div>

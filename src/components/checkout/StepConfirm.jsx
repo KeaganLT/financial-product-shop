@@ -35,7 +35,7 @@ export default function StepConfirm({ product, bankDetails, submitting, error, o
             </div>
 
             {error && (
-                <div className="px-4 py-3 rounded-[10px]" style={{ background: '#FFF5F5', border: '1px solid #FFB3B3' }}>
+                <div className="px-4 py-3 rounded-[10px]" style={{ background: 'var(--neutral-100)', border: '1px solid var(--neutral-300)', borderLeft: '3px solid #C51C13' }}>
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{error}</p>
                 </div>
             )}

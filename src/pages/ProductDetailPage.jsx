@@ -223,7 +223,7 @@ export default function ProductDetailPage() {
                     {!expanded && isLoggedIn && eligibility !== null && (
                         <div
                             className="flex items-center gap-2 px-3 py-2 rounded-[8px]"
-                            style={{ background: eligibility.isEligible ? '#F0FFF4' : '#FFF5F5', border: `1px solid ${eligibility.isEligible ? '#A3E9B8' : '#FFB3B3'}` }}
+                            style={{ background: 'var(--neutral-100)', border: '1px solid var(--neutral-300)', borderLeft: `3px solid ${eligibility.isEligible ? '#168C34' : '#C51C13'}` }}
                         >
                             {eligibility.isEligible ? (
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

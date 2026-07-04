@@ -6,6 +6,7 @@ import { getKycStatus } from '../services/kycStatus';
 import { useToast } from '../context/ToastContext';
 import { getEligibility } from '../services/subscriptionService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
+import InfoBanner from '../components/InfoBanner.jsx';
 
 const EmptyCartIllustration = () => (
     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
@@ -288,39 +289,27 @@ export default function CartPage() {
                             ))}
 
                             {requiresVerification && (
-                                <div className="flex flex-col gap-2 rounded-[8px] px-6 py-3" style={{ background: '#E4EFFF', border: '1px solid #A6D0FF' }}>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: 'var(--text-primary)' }}>
-                                        {kycCheckFailed ? 'We couldn\'t confirm your verification status.' : 'One or more products in your cart requires verification.'}
-                                    </p>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: 'var(--text-primary)' }}>
-                                        {kycCheckFailed
-                                            ? 'Please check your connection and try again, or complete the identity verification process.'
-                                            : 'In order to complete your purchase, please complete the identity verification process.'}
-                                    </p>
-                                    <button
-                                        onClick={() => navigate('/kyc', { state: { returnTo: '/cart' } })}
-                                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, lineHeight: '18px', letterSpacing: '0.41px', textDecoration: 'underline', color: '#1860BF', textAlign: 'left' }}
-                                    >
-                                        Verify now
-                                    </button>
-                                </div>
+                                <InfoBanner
+                                    variant="warning"
+                                    title={kycCheckFailed ? 'We couldn\'t confirm your verification status.' : 'One or more products in your cart requires verification.'}
+                                    actionLabel="Verify now"
+                                    onAction={() => navigate('/kyc', { state: { returnTo: '/cart' } })}
+                                >
+                                    {kycCheckFailed
+                                        ? 'Please check your connection and try again, or complete the identity verification process.'
+                                        : 'In order to complete your purchase, please complete the identity verification process.'}
+                                </InfoBanner>
                             )}
 
                             {needsAccount && (
-                                <div className="flex flex-col gap-2 rounded-[8px] px-6 py-3" style={{ background: '#FFF8E4', border: '1px solid #FFD980' }}>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.0035em', color: 'var(--text-primary)' }}>
-                                        Account type required
-                                    </p>
-                                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, lineHeight: '13px', letterSpacing: '0.41px', color: 'var(--text-primary)' }}>
-                                        One or more products require a specific account type. Add the required account to proceed.
-                                    </p>
-                                    <button
-                                        onClick={() => navigate('/account')}
-                                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, lineHeight: '18px', letterSpacing: '0.41px', textDecoration: 'underline', color: '#1860BF', textAlign: 'left' }}
-                                    >
-                                        Manage accounts →
-                                    </button>
-                                </div>
+                                <InfoBanner
+                                    variant="warning"
+                                    title="Account type required"
+                                    actionLabel="Manage accounts →"
+                                    onAction={() => navigate('/account')}
+                                >
+                                    One or more products require a specific account type. Add the required account to proceed.
+                                </InfoBanner>
                             )}
                         </div>
                     )}
