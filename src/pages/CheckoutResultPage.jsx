@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import InfoBanner from '../components/InfoBanner.jsx';
 
 export default function CheckoutResultPage() {
     const navigate = useNavigate();
@@ -91,18 +92,9 @@ export default function CheckoutResultPage() {
                 )}
 
                 {isSubscription && (
-                    <div
-                        className="w-full flex items-start gap-3 px-4 py-3 rounded-[10px]"
-                        style={{ background: '#F0FFF4', border: '1px solid #A3E9B8' }}
-                    >
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                            <circle cx="10" cy="10" r="10" fill="#168C34" />
-                            <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1A5C30', lineHeight: '19px' }}>
-                            Your subscription is active. You can manage it at any time from the Subscriptions page.
-                        </p>
-                    </div>
+                    <InfoBanner variant="success">
+                        Your subscription is active. You can manage it at any time from the Subscriptions page.
+                    </InfoBanner>
                 )}
             </main>
 

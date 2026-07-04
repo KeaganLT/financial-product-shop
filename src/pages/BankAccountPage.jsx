@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getBankDetails, saveBankDetails } from '../services/bankingService';
+import { upsertBankAccountByLast4 } from '../services/bankAccountsService';
 import { useToast } from '../context/ToastContext';
 import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
+import InfoBanner from '../components/InfoBanner.jsx';
 
 const BANKS = [
     'ABSA Bank', 'Capitec Bank', 'FNB (First National Bank)', 'Nedbank',
@@ -38,17 +40,19 @@ export default function BankAccountPage() {
         return e;
     }
 
-    function handleSave() {
+    async function handleSave() {
         const e = validate();
         if (Object.keys(e).length > 0) { setErrors(e); return; }
         setSaving(true);
+        const details = {
+            bankName,
+            last4: keepingExistingAccount ? existing.last4 : accountNo.slice(-4),
+            accountType,
+            debitDay,
+        };
         try {
-            saveBankDetails(auth.customerId, {
-                bankName,
-                last4: keepingExistingAccount ? existing.last4 : accountNo.slice(-4),
-                accountType,
-                debitDay,
-            });
+            saveBankDetails(auth.customerId, details);
+            await upsertBankAccountByLast4(auth.customerId, details).catch(() => {});
             showToast('Bank account updated successfully.', 'success');
             setTimeout(() => navigate(-1), 600);
         } catch {
@@ -73,24 +77,19 @@ export default function BankAccountPage() {
 
                 {/* Current account display */}
                 {existing && (
-                    <div
-                        className="flex items-center gap-3 px-4 py-3 rounded-[10px]"
-                        style={{ background: '#F0F4FF', border: '1px solid #C7D9FF' }}
+                    <InfoBanner
+                        variant="info"
+                        title={`Current: ${existing.bankName}`}
+                        icon={(
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <rect x="2" y="6" width="16" height="12" rx="2" stroke="#1860BF" strokeWidth="1.5" />
+                                <path d="M2 10h16" stroke="#1860BF" strokeWidth="1.5" />
+                                <rect x="5" y="13" width="4" height="2" rx="1" fill="#1860BF" />
+                            </svg>
+                        )}
                     >
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <rect x="2" y="6" width="16" height="12" rx="2" stroke="#1860BF" strokeWidth="1.5" />
-                            <path d="M2 10h16" stroke="#1860BF" strokeWidth="1.5" />
-                            <rect x="5" y="13" width="4" height="2" rx="1" fill="#1860BF" />
-                        </svg>
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                                Current: {existing.bankName}
-                            </p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>
-                                {existing.accountType} ••••{existing.last4} · {existing.debitDay}{existing.debitDay === 1 ? 'st' : 'th'} of month
-                            </p>
-                        </div>
-                    </div>
+                        {existing.accountType} ••••{existing.last4} · {existing.debitDay}{existing.debitDay === 1 ? 'st' : 'th'} of month
+                    </InfoBanner>
                 )}
 
                 {!isLoggedIn && (
@@ -188,19 +187,9 @@ export default function BankAccountPage() {
                             </div>
                         </div>
 
-                        <div
-                            className="flex items-start gap-2 px-3 py-2 rounded-[8px]"
-                            style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}
-                        >
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                                <circle cx="8" cy="8" r="8" fill="#F5A623" />
-                                <rect x="7" y="4" width="2" height="5" rx="1" fill="white" />
-                                <circle cx="8" cy="11.5" r="1" fill="white" />
-                            </svg>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#7A4F00' }}>
-                                Changing your bank account does not affect already-processed debit orders. New debit date applies from the next cycle.
-                            </p>
-                        </div>
+                        <InfoBanner variant="warning">
+                            Changing your bank account does not affect already-processed debit orders. New debit date applies from the next cycle.
+                        </InfoBanner>
 
                         <button
                             onClick={handleSave}

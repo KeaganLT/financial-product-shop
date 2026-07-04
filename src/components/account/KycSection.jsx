@@ -1,5 +1,6 @@
 import KycUploadRow from '../kyc/KycUploadRow.jsx';
 import KYCSuccess from '../../assets/KYCSuccess.jsx';
+import InfoBanner from '../InfoBanner.jsx';
 
 export default function KycSection({ status, uploadError, onUpload }) {
     const isVerified = status?.proofOfResidence && status?.selfie;
@@ -7,24 +8,9 @@ export default function KycSection({ status, uploadError, onUpload }) {
     return (
         <>
             {!isVerified && status !== null && (
-                <div
-                    className="w-full flex items-start gap-3 px-4 py-3 rounded-[12px]"
-                    style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                        <circle cx="10" cy="10" r="10" fill="#F5A623" />
-                        <rect x="9" y="5" width="2" height="6" rx="1" fill="white" />
-                        <circle cx="10" cy="14" r="1" fill="white" />
-                    </svg>
-                    <div className="flex-1">
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: '#7A4F00' }}>
-                            Your account is incomplete
-                        </p>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#7A4F00', marginTop: 2 }}>
-                            Upload your proof of residence and selfie below to unlock all products.
-                        </p>
-                    </div>
-                </div>
+                <InfoBanner variant="warning" title="Your account is incomplete">
+                    Upload your proof of residence and selfie below to unlock all products.
+                </InfoBanner>
             )}
 
             <div className="w-full flex flex-col items-center gap-3 text-center">

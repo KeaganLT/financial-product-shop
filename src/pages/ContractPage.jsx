@@ -9,6 +9,7 @@ import { saveContractRecord, getContractRecord } from '../services/contractStora
 import { useToast } from '../context/ToastContext';
 import Section from '../components/contract/Section.jsx';
 import ContractPreview from '../components/contract/ContractPreview.jsx';
+import InfoBanner from '../components/InfoBanner.jsx';
 
 function currentTimestamp() {
     return Date.now();
@@ -154,28 +155,13 @@ export default function ContractPage() {
 
             <div className="pt-[76px] pb-12 max-w-[480px] md:max-w-2xl mx-auto px-6 flex flex-col gap-6">
                 {uploadedUrl ? (
-                    <div className="flex items-start gap-3 px-4 py-3 rounded-[10px]" style={{ background: '#F0FFF4', border: '1px solid #A3E9B8' }}>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                            <circle cx="10" cy="10" r="10" fill="#168C34" />
-                            <path d="M6 10l3 3 5-5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#1A5C30' }}>Signed contract uploaded</p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Your signed contract has been stored securely.</p>
-                        </div>
-                    </div>
+                    <InfoBanner variant="success" title="Signed contract uploaded">
+                        Your signed contract has been stored securely.
+                    </InfoBanner>
                 ) : (
-                    <div className="flex items-start gap-3 px-4 py-3 rounded-[10px]" style={{ background: '#FFF8E6', border: '1px solid #FFD97A' }}>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                            <circle cx="10" cy="10" r="10" fill="#F5A623" />
-                            <rect x="9" y="5" width="2" height="6" rx="1" fill="white" />
-                            <circle cx="10" cy="14" r="1" fill="white" />
-                        </svg>
-                        <div>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 600, color: '#7A4F00' }}>Signature required</p>
-                            <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)' }}>Please sign this contract to complete your product agreement.</p>
-                        </div>
-                    </div>
+                    <InfoBanner variant="warning" title="Signature required">
+                        Please sign this contract to complete your product agreement.
+                    </InfoBanner>
                 )}
 
                 <ContractPreview product={product} profile={profile} profileLoading={profileLoading} resolvedBank={resolvedBank} />

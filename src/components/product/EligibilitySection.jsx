@@ -46,7 +46,7 @@ export default function EligibilitySection({ eligibility, eligibilityChecks }) {
                         <div
                             key={check.label}
                             className="flex items-start gap-3 px-3 py-2 rounded-[8px]"
-                            style={{ background: check.pass ? '#F0FFF4' : '#FFF5F5', border: `1px solid ${check.pass ? '#A3E9B8' : '#FFB3B3'}` }}
+                            style={{ background: 'var(--neutral-100)', border: '1px solid var(--neutral-300)', borderLeft: `3px solid ${check.pass ? '#168C34' : '#C51C13'}` }}
                         >
                             <CheckCircle pass={check.pass} />
                             <div className="flex flex-col gap-0.5">

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { getProductPlaceholder } from '../../assets/placeholders/index.js';
+import { ordinalDay } from '../../utils/debitDates.js';
 import StatusBadge from './StatusBadge.jsx';
 
-export default function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned, contractUrl }) {
+export default function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned, contractUrl, account, onChangeAccount }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
 
     const prod       = Array.isArray(subscription.product) ? subscription.product[0] : subscription.product;
@@ -84,10 +85,27 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                     )}
                 </div>
 
+                <div
+                    className="flex items-center justify-between pt-2"
+                    style={{ borderTop: '1px solid var(--neutral-300)' }}
+                >
+                    <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>
+                        {account
+                            ? <>Pays from <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{account.bankName} ••••{account.last4}</span> · {ordinalDay(account.debitDay)}</>
+                            : 'No debit account linked'}
+                    </span>
+                    <button
+                        onClick={onChangeAccount}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 600, color: '#1860BF', flexShrink: 0, marginLeft: 8 }}
+                    >
+                        {account ? 'Change account' : 'Link account'}
+                    </button>
+                </div>
+
                 {confirmOpen && (
                     <div
                         className="flex flex-col gap-2 mt-1 px-3 py-2 rounded-[8px]"
-                        style={{ background: '#FFF5F5', border: '1px solid #FFB3B3' }}
+                        style={{ background: 'var(--neutral-100)', border: '1px solid var(--neutral-300)', borderLeft: '3px solid #C51C13' }}
                     >
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--text-primary)' }}>
                             Are you sure you want to cancel this subscription?
