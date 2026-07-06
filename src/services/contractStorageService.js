@@ -53,6 +53,21 @@ export async function saveContractRecord(customerId, productId, {
     }, { merge: true });
 }
 
+export async function saveMandateRecord(customerId, productId, { bankName, last4, accountType, debitDay }) {
+    const ref  = contractRef(customerId, productId);
+    const snap = await getDoc(ref);
+    await setDoc(ref, {
+        productId:         String(productId),
+        mandateAcceptedAt: serverTimestamp(),
+        bankName:          bankName    ?? '',
+        last4:             last4       ?? '',
+        accountType:       accountType ?? '',
+        debitDay:          debitDay    ?? null,
+        updatedAt:         serverTimestamp(),
+        ...(snap.exists() ? {} : { createdAt: serverTimestamp() }),
+    }, { merge: true });
+}
+
 /**
  * Fetch the contract record for a customer + product.
  * Returns null if no record exists yet.

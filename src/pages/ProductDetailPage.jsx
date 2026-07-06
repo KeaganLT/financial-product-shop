@@ -7,6 +7,7 @@ import { getProducts, getProductById } from '../services/productService';
 import { getProductPlaceholder } from '../assets/placeholders/index.js';
 import { getProductDetails } from '../utils/productDetails';
 import { useEligibility } from '../hooks/useEligibility';
+import { rankRelatedProducts } from '../utils/relatedProducts';
 import RelatedProducts from '../components/product/RelatedProducts.jsx';
 import EligibilitySection from '../components/product/EligibilitySection.jsx';
 
@@ -51,10 +52,7 @@ export default function ProductDetailPage() {
     const hasDiscount = product.discount || product.discountPercent;
 
     const otherProducts = allProducts.filter((p) => String(p.id) !== String(id));
-    const sameFulfilmentType = otherProducts.filter(
-        (p) => p.fulfilmentType && p.fulfilmentType === product.fulfilmentType
-    );
-    const relatedProducts = [...sameFulfilmentType, ...otherProducts.filter((p) => !sameFulfilmentType.includes(p))].slice(0, 4);
+    const relatedProducts = rankRelatedProducts(product, otherProducts).slice(0, 4);
 
     const isPhysical   = (product.name ?? '').toLowerCase().includes('device') || (product.name ?? '').toLowerCase().includes('contract');
     const isInsurance  = (product.name ?? '').toLowerCase().includes('insurance');
