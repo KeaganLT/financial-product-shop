@@ -16,11 +16,12 @@ function getContractClauses(type, productName, price) {
     const monthly = `R${Number(price).toFixed(2)}`;
     const annual  = `R${(Number(price) * 12).toFixed(2)}`;
 
+    const definitions = {
+        heading: '1. Definitions',
+        body: '"Policyholder" means the person named in this agreement. "FinShop" means FinShop (Pty) Ltd (FSP Licence No. 12345). "Premium" means the monthly amount payable as specified herein. "Commencement Date" means the date on which this agreement is accepted and activated.',
+    };
+
     const shared = [
-        {
-            heading: '1. Definitions',
-            body: '"Policyholder" means the person named in this agreement. "FinShop" means FinShop (Pty) Ltd (FSP Licence No. 12345). "Premium" means the monthly amount payable as specified herein. "Commencement Date" means the date on which this agreement is accepted and activated.',
-        },
         {
             heading: '6. Governing Law',
             body: 'This agreement is governed by the laws of the Republic of South Africa. Any dispute arising from or in connection with this agreement shall be subject to the jurisdiction of the South African courts.',
@@ -44,6 +45,7 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'insurance') return [
+        definitions,
         {
             heading: '2. Cover Description',
             body: `This ${productName} provides cover for insured events as described in the product schedule. Cover includes accidental damage, theft, loss, and applicable liability as defined by the product terms. Cover is effective from the Commencement Date, subject to any applicable waiting periods.`,
@@ -64,6 +66,7 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'device') return [
+        definitions,
         {
             heading: '2. Device & Contract Details',
             body: `This contract covers the supply, financing, and/or maintenance of the device or service described under the product "${productName}". The device remains the property of FinShop until all amounts owing are settled in full.`,
@@ -84,6 +87,7 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'islamic') return [
+        definitions,
         {
             heading: '2. Sharia Compliance',
             body: `This ${productName} is structured in accordance with Islamic finance principles. The product is certified by the FinShop Sharia Supervisory Board. All returns are derived from permissible (halal) activities, free from interest (riba), excessive uncertainty (gharar), and gambling (maysir).`,
@@ -104,6 +108,7 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'vip') return [
+        definitions,
         {
             heading: '2. VIP Investment Terms',
             body: `This ${productName} is an exclusive, high-value investment product available to qualifying Policyholders. The monthly contribution of ${monthly} (annual: ${annual}) is invested in a diversified portfolio of high-yield instruments selected by FinShop's accredited investment managers.`,
@@ -125,6 +130,7 @@ function getContractClauses(type, productName, price) {
 
     // generic investment / fallback
     return [
+        definitions,
         {
             heading: '2. Investment Terms',
             body: `This ${productName} is a financial product offered by FinShop (Pty) Ltd. The Policyholder agrees to contribute ${monthly} per month. Funds are invested in accordance with the stated mandate of the product. Performance is market-linked and not guaranteed.`,
@@ -225,11 +231,13 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
     doc.text('PARTIES TO THIS AGREEMENT', margin, y);
     y += 5;
 
+    const partiesBoxH = 5 + 4 * LINE_H + 3;
     doc.setFillColor(245, 248, 255);
     doc.setDrawColor(200, 215, 245);
     doc.setLineWidth(0.3);
-    doc.roundedRect(margin, y, usableW, 28, 2, 2, 'FD');
-    y += 5;
+    doc.roundedRect(margin, y, usableW, partiesBoxH, 2, 2, 'FD');
+    const partiesBoxTop = y;
+    y += 5 + 3;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(BODY_SIZE);
@@ -266,17 +274,12 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
     doc.text('CUSTOMER TYPE:', margin + 110, y);
     doc.setFont('helvetica', 'normal');
     doc.text(custType, margin + 145, y);
-    y += 8;
+    y = partiesBoxTop + partiesBoxH + 10;
 
     // ── Product details box ──────────────────────────────────────────────────────
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(HEAD_SIZE);
     doc.text('PRODUCT DETAILS', margin, y);
-    y += 5;
-
-    doc.setFillColor(245, 248, 255);
-    doc.setDrawColor(200, 215, 245);
-    doc.roundedRect(margin, y, usableW, 26, 2, 2, 'FD');
     y += 5;
 
     const rows = [
@@ -287,17 +290,23 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         ['DEBIT DATE:', bankDetails ? `${bankDetails.debitDay}${bankDetails.debitDay === 1 ? 'st' : 'th'} of each month` : 'N/A'],
     ];
 
+    const productBoxH = 5 + rows.length * LINE_H + 3;
+    doc.setFillColor(245, 248, 255);
+    doc.setDrawColor(200, 215, 245);
+    doc.roundedRect(margin, y, usableW, productBoxH, 2, 2, 'FD');
+    const productBoxTop = y;
+    y += 5 + 3;
+
     const col2 = margin + 50;
     rows.forEach((row, i) => {
         const rowY = y + i * LINE_H;
-        checkPage(LINE_H);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(BODY_SIZE);
         doc.text(row[0], margin + 4, rowY);
         doc.setFont('helvetica', 'normal');
         doc.text(row[1], col2, rowY);
     });
-    y += rows.length * LINE_H + 5;
+    y = productBoxTop + productBoxH + 10;
 
     // ── Contract clauses ─────────────────────────────────────────────────────────
     const type    = detectProductType(product.name);
@@ -370,7 +379,7 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         doc.setTextColor(38, 140, 52);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text('✓ DIGITALLY SIGNED', margin + 4, y);
+        doc.text('DIGITALLY SIGNED', margin + 4, y);
         doc.setTextColor(0, 0, 0);
         y += 6;
     } else {
