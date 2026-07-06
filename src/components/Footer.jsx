@@ -42,7 +42,7 @@ export default function Footer() {
                     {/* Brand column */}
                     <div className="flex flex-col gap-4">
                         <span style={{ fontSize: '20px', fontWeight: 700, fontFamily: 'Roboto, sans-serif', color: '#FFFFFF' }}>
-                            FinShop
+                            InsureTechGuard
                         </span>
                         <p style={{ fontSize: '13px', fontFamily: 'Roboto, sans-serif', color: '#8E9AAB', lineHeight: '20px' }}>
                             Your trusted partner for insurance, investments, and financial products.
@@ -81,7 +81,7 @@ export default function Footer() {
                 {/* Bottom row */}
                 <div className="flex items-center justify-between">
                     <p style={{ fontSize: '12px', fontFamily: 'Roboto, sans-serif', color: '#5C6B7A' }}>
-                        © 2025 FinShop (Pty) Ltd. All rights reserved.
+                        © 2025 InsureTechGuard (Pty) Ltd. All rights reserved.
                     </p>
                     <div className="flex gap-4">
                         {['Privacy', 'Terms', 'Cookies'].map((item) => (

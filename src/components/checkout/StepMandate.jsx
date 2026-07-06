@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 const MANDATE_POINTS = [
-    "This instruction may be cancelled by me by giving 30 days' written notice to FinShop.",
+    "This instruction may be cancelled by me by giving 30 days' written notice to InsureTechGuard.",
     'I understand that amounts debited may not always be the same if the premium changes, and I will be notified in advance.',
     'I confirm that I am the account holder and have the authority to sign this mandate.',
 ];
@@ -47,7 +47,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         </svg>
                     </div>
                     <div>
-                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>FinShop Bank</p>
+                        <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>InsureTechGuard Bank</p>
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>FSP Licence No. 12345 | Authorised Financial Services Provider</p>
                     </div>
                 </div>
@@ -57,7 +57,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         Debit Order Mandate
                     </p>
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)', lineHeight: '18px' }}>
-                        I, the account holder, hereby authorise <strong>FinShop (Pty) Ltd</strong> to debit my account at <strong>{bankDetails.bankName}</strong> (ending <strong>••••{bankDetails.last4}</strong>) with the amount of <strong>R{Number(product.price).toFixed(2)}</strong> on the <strong>{bankDetails.debitDay}{daySuffix} of each month</strong>, commencing on the next available debit date.
+                        I, the account holder, hereby authorise <strong>InsureTechGuard (Pty) Ltd</strong> to debit my account at <strong>{bankDetails.bankName}</strong> (ending <strong>••••{bankDetails.last4}</strong>) with the amount of <strong>R{Number(product.price).toFixed(2)}</strong> on the <strong>{bankDetails.debitDay}{daySuffix} of each month</strong>, commencing on the next available debit date.
                     </p>
                 </div>
 
