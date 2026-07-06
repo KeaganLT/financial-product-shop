@@ -10,6 +10,8 @@ import { useEligibility } from '../hooks/useEligibility';
 import { rankRelatedProducts } from '../utils/relatedProducts';
 import RelatedProducts from '../components/product/RelatedProducts.jsx';
 import EligibilitySection from '../components/product/EligibilitySection.jsx';
+import ShareButton from '../components/ShareButton.jsx';
+import { downloadProductPdf } from '../services/productPdfService.js';
 
 export default function ProductDetailPage() {
     const { id }               = useParams();
@@ -34,6 +36,11 @@ export default function ProductDetailPage() {
             .catch((err) => setError(err.message))
             .finally(() => setLoading(false));
     }, [id]);
+
+    useEffect(() => {
+        if (product?.name) document.title = `${product.name} — FinShop`;
+        return () => { document.title = 'FinShop — Insurance & Investment Products'; };
+    }, [product?.name]);
 
     if (loading) return <ProductDetailSkeleton />;
 
@@ -90,6 +97,7 @@ export default function ProductDetailPage() {
                     <h1 className="flex-1 truncate" style={{ ...textStyle('20px', 400, 'var(--text-primary)'), lineHeight: '28px', letterSpacing: '0.35px' }}>
                         {product.name}
                     </h1>
+                    <ShareButton product={product} className="w-12 h-12 flex-shrink-0" />
                 </div>
             </div>
 
@@ -241,6 +249,17 @@ export default function ProductDetailPage() {
                     )}
 
                     {!expanded && <div style={{ height: '1px', backgroundColor: 'var(--neutral-300)' }} />}
+
+                    <button
+                        onClick={() => downloadProductPdf(product)}
+                        className="w-full h-[46px] rounded-[100px] flex items-center justify-center gap-2 border font-semibold"
+                        style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
+                    >
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="#1860BF" />
+                        </svg>
+                        Download fact sheet (PDF)
+                    </button>
 
                     <RelatedProducts products={relatedProducts} />
                 </div>

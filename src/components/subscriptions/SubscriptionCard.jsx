@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getProductPlaceholder } from '../../assets/placeholders/index.js';
 import { ordinalDay } from '../../utils/debitDates.js';
 import StatusBadge from './StatusBadge.jsx';
+import ShareButton from '../ShareButton.jsx';
 
 export default function SubscriptionCard({ subscription, onCancel, cancelling, onView, onContract, contractSigned, contractUrl, account, onChangeAccount }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
@@ -42,7 +43,10 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                             R{Number(price).toFixed(2)} / month
                         </p>
                     </div>
-                    <StatusBadge fulfilmentType={fulfilType} contractSigned={contractSigned} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                        <StatusBadge fulfilmentType={fulfilType} contractSigned={contractSigned} />
+                        {productId && <ShareButton product={{ id: productId, name, price }} className="w-8 h-8" />}
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4 mt-1">
