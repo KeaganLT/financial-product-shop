@@ -19,6 +19,7 @@ import BankAccountPage from './pages/BankAccountPage';
 import KycDocumentsPage from './pages/KycDocumentsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Footer from './components/Footer';
+import InstallPrompt from './components/InstallPrompt';
 
 function AuthCartBridge() {
     const { auth } = useAuth();
@@ -66,6 +67,7 @@ export default function App() {
                         <BrowserRouter>
                             <AuthCartBridge />
                             <AnimatedRoutes />
+                            <InstallPrompt />
                         </BrowserRouter>
                     </CartProvider>
                 </AuthProvider>
