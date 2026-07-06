@@ -6,6 +6,8 @@ import BottomNav from '../components/BottomNav';
 import HeroSlider from '../components/HeroSlider';
 import SectionRow from '../components/SectionRow';
 import DiscoverSection from '../components/DiscoverSection';
+import ProductGrid from '../components/ProductGrid';
+import ProductSearchBar from '../components/ProductSearchBar';
 import { HeroSliderSkeleton, SectionRowSkeleton, DiscoverSectionSkeleton } from '../components/Skeletons';
 import { getProducts } from '../services/productService';
 import { getEligibility, getSubscriptions } from '../services/subscriptionService';
@@ -138,6 +140,8 @@ export default function ProductsPage() {
     const [loading, setLoading]   = useState(true);
     const [error, setError]       = useState(null);
     const [activeCategory, setActiveCategory] = useState('all');
+    const [query, setQuery] = useState('');
+    const [viewAll, setViewAll] = useState(null);
     const [showChecklist, setShowChecklist] = useState(() => {
         // Only show once per session, not every page visit
         return sessionStorage.getItem('checklist_dismissed') !== '1';
@@ -189,6 +193,20 @@ export default function ProductsPage() {
         ? visibleProducts.filter((p) => !eligibleIds.has(p.id))
         : visibleProducts;
 
+    const trimmedQuery = query.trim().toLowerCase();
+    const searchResults = visibleProducts.filter((p) =>
+        (p.name ?? '').toLowerCase().includes(trimmedQuery) ||
+        (p.description ?? '').toLowerCase().includes(trimmedQuery)
+    );
+
+    const gridProducts = viewAll === 'recommended' ? recommended
+        : viewAll === 'newArrivals' ? newArrivals
+        : searchResults;
+    const gridTitle = viewAll === 'recommended' ? 'Recommended for you'
+        : viewAll === 'newArrivals' ? 'New arrivals'
+        : `Results for “${query.trim()}”`;
+    const showGrid = trimmedQuery.length > 0 || viewAll !== null;
+
     return (
         <div className="min-h-screen bg-white">
             <Header />
@@ -233,21 +251,28 @@ export default function ProductsPage() {
                             />
                         )}
 
-                        <div className="mt-4">
-                            <HeroSlider />
-                        </div>
+                        {!showGrid && (
+                            <div className="mt-4">
+                                <HeroSlider />
+                            </div>
+                        )}
+
+                        <ProductSearchBar
+                            value={query}
+                            onChange={(v) => { setQuery(v); if (v) setViewAll(null); }}
+                        />
 
                         {/* Category filter chips */}
-                        <div className="flex gap-2 overflow-x-auto no-scrollbar px-4 md:px-0 mt-4 pb-1">
+                        <div className="flex gap-2 overflow-x-auto no-scrollbar px-6 md:px-0 mt-4 pb-1">
                             {CATEGORIES.map(({ key, label }) => (
                                 <button
                                     key={key}
                                     onClick={() => setActiveCategory(key)}
                                     className="flex-shrink-0 px-4 h-[32px] rounded-full text-[13px] font-semibold border transition-colors"
                                     style={{
-                                        borderColor: activeCategory === key ? '#1860BF' : '#C7C7CC',
-                                        background:  activeCategory === key ? '#1860BF' : 'white',
-                                        color:       activeCategory === key ? 'white' : '#3C3C43',
+                                        borderColor: activeCategory === key ? '#1860BF' : 'var(--neutral-400)',
+                                        background:  activeCategory === key ? '#1860BF' : 'var(--neutral-100)',
+                                        color:       activeCategory === key ? '#fff' : 'var(--neutral-700)',
                                         fontFamily: 'Roboto, sans-serif',
                                     }}
                                 >
@@ -256,13 +281,33 @@ export default function ProductsPage() {
                             ))}
                         </div>
 
-                        {isLoggedIn ? (
+                        {showGrid ? (
+                            <div className="flex flex-col gap-3 mt-5 px-6 md:px-0">
+                                <div className="flex items-center justify-between">
+                                    <h2 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 20, fontWeight: 700, color: 'var(--text-primary)' }}>
+                                        {gridTitle}
+                                    </h2>
+                                    {viewAll !== null && (
+                                        <button
+                                            onClick={() => setViewAll(null)}
+                                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: '#1860BF' }}
+                                        >
+                                            ← Back
+                                        </button>
+                                    )}
+                                </div>
+                                <ProductGrid
+                                    products={gridProducts}
+                                    emptyLabel={trimmedQuery ? 'No products match your search' : 'Nothing here yet'}
+                                />
+                            </div>
+                        ) : isLoggedIn ? (
                             <>
                                 {recommended.length > 0 && (
                                     <SectionRow
                                         title="Recommended for you"
                                         products={recommended}
-                                        viewAllPath="/products"
+                                        onViewAll={() => setViewAll('recommended')}
                                     />
                                 )}
 
@@ -270,14 +315,14 @@ export default function ProductsPage() {
                                     <SectionRow
                                         title="New arrivals"
                                         products={newArrivals}
-                                        viewAllPath="/products"
+                                        onViewAll={() => setViewAll('newArrivals')}
                                     />
                                 )}
 
                                 {visibleProducts.length === 0 && (
                                     <div className="flex flex-col items-center py-16 px-6 text-center">
-                                        <p className="text-[15px] font-semibold text-black">No products yet</p>
-                                        <p className="text-[13px] text-gray-400 mt-1">Check back soon</p>
+                                        <p className="text-[15px] font-semibold" style={{ color: 'var(--text-primary)' }}>No products yet</p>
+                                        <p className="text-[13px] mt-1" style={{ color: 'var(--text-secondary)' }}>Check back soon</p>
                                     </div>
                                 )}
                             </>
