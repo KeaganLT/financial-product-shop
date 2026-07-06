@@ -18,7 +18,7 @@ export async function generateProductPdf(product) {
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(15);
-    doc.text('FinShop (Pty) Ltd', margin, 11);
+    doc.text('InsureTechGuard', margin, 11);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.text('Insurance & Investment Products', margin, 17);
@@ -101,7 +101,7 @@ export async function generateProductPdf(product) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(150, 150, 150);
-    doc.text('FinShop (Pty) Ltd | FSP Licence No. 12345 | Regulated by the FSCA', W / 2, H - 8, { align: 'center' });
+    doc.text('InsureTechGuard | FSP Licence No. 12345 | Regulated by the FSCA', W / 2, H - 8, { align: 'center' });
 
     return doc;
 }

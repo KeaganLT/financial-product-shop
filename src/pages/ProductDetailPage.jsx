@@ -38,8 +38,8 @@ export default function ProductDetailPage() {
     }, [id]);
 
     useEffect(() => {
-        if (product?.name) document.title = `${product.name} — FinShop`;
-        return () => { document.title = 'FinShop — Insurance & Investment Products'; };
+        if (product?.name) document.title = `${product.name} — InsureTechGuard`;
+        return () => { document.title = 'InsureTechGuard — Insurance & Investment Products'; };
     }, [product?.name]);
 
     if (loading) return <ProductDetailSkeleton />;

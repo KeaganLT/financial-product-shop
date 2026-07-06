@@ -1,7 +1,7 @@
 {
-  "name": "FinShop — Insurance & Investment Products",
-  "short_name": "FinShop",
-  "description": "Browse and subscribe to insurance and investment products with FinShop.",
+  "name": "InsureTechGuard — Insurance & Investment Products",
+  "short_name": "InsureTechGuard",
+  "description": "Browse and subscribe to insurance and investment products with InsureTechGuard.",
   "start_url": "/products",
   "scope": "/",
   "display": "standalone",

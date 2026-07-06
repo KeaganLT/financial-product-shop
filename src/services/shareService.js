@@ -5,13 +5,13 @@ export function getProductUrl(productId) {
 
 export function buildShareText(product) {
     const price = product?.price != null ? ` from R${Number(product.price).toFixed(0)}/month` : '';
-    return `Check out ${product?.name ?? 'this product'}${price} on FinShop`;
+    return `Check out ${product?.name ?? 'this product'}${price} on InsureTechGuard`;
 }
 
 export async function shareProduct(product) {
     const url  = getProductUrl(product.id);
     const text = buildShareText(product);
-    const title = product?.name ?? 'FinShop';
+    const title = product?.name ?? 'InsureTechGuard';
 
     if (typeof navigator !== 'undefined' && navigator.share) {
         try {
@@ -42,6 +42,6 @@ export function getSocialShareLinks(product) {
         { key: 'x',        label: 'X',        href: `https://twitter.com/intent/tweet?text=${text}&url=${url}` },
         { key: 'facebook', label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${url}` },
         { key: 'linkedin', label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${url}` },
-        { key: 'email',    label: 'Email',    href: `mailto:?subject=${encodeURIComponent(product?.name ?? 'FinShop product')}&body=${text}%20${url}` },
+        { key: 'email',    label: 'Email',    href: `mailto:?subject=${encodeURIComponent(product?.name ?? 'InsureTechGuard product')}&body=${text}%20${url}` },
     ];
 }

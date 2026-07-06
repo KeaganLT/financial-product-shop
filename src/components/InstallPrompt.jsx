@@ -42,7 +42,7 @@ export default function InstallPrompt() {
                 <img src="/icon-192.png" alt="" width="40" height="40" style={{ borderRadius: 9, flexShrink: 0 }} />
                 <div className="flex-1 min-w-0">
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
-                        Install FinShop
+                        Install InsureTechGuard
                     </p>
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--text-secondary)' }}>
                         Add to your home screen for quick access.
