@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getProductById } from '../services/productService';
 import { takeUpProducts } from '../services/subscriptionService';
 import { getBankDetails, saveBankDetails } from '../services/bankingService';
+import { upsertBankAccountByLast4, assignAccountToProduct } from '../services/bankAccountsService';
 import { useToast } from '../context/ToastContext';
 import StepIndicator from '../components/checkout/StepIndicator.jsx';
 import StepProductReview from '../components/checkout/StepProductReview.jsx';
@@ -51,6 +52,10 @@ export default function SubscribeCheckoutPage() {
             const result = await takeUpProducts([Number(productId)], auth.token);
             if (result.success) {
                 saveBankDetails(auth.customerId, bankDetails);
+                const account = await upsertBankAccountByLast4(auth.customerId, bankDetails).catch(() => null);
+                if (account) {
+                    await assignAccountToProduct(auth.customerId, productId, account.id).catch(() => {});
+                }
                 showToast(`${product.name} activated successfully!`, 'success');
                 navigate('/checkout/result?type=subscription', { state: { product, bankDetails } });
             } else {
