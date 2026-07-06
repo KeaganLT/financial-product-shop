@@ -2,14 +2,14 @@ import { useState } from 'react';
 import { auth as firebaseAuth, getSignInProvider } from '../../services/firebase.js';
 import ChangeEmailForm from './ChangeEmailForm.jsx';
 import ChangePasswordForm from './ChangePasswordForm.jsx';
+import SectionHeading from './SectionHeading.jsx';
 
-function SectionLabel({ children }) {
-    return (
-        <h2 className="text-[13px] font-semibold uppercase" style={{ color: '#8E8E93', letterSpacing: '0.05em' }}>
-            {children}
-        </h2>
-    );
-}
+const PERSON_ICON = (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="4" stroke="#1860BF" strokeWidth="2" />
+        <path d="M4 20c0-3.3 3.6-5 8-5s8 1.7 8 5" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+);
 
 export default function AccountDetailsSection({ onSuccess }) {
     const [editing, setEditing] = useState(null);
@@ -18,12 +18,12 @@ export default function AccountDetailsSection({ onSuccess }) {
 
     return (
         <div className="w-full flex flex-col gap-3">
-            <SectionLabel>Account details</SectionLabel>
+            <SectionHeading icon={PERSON_ICON}>Account details</SectionHeading>
 
-            <div className="w-full px-4 py-3 rounded-lg flex flex-col gap-2" style={{ border: '1px solid #E5E5EA' }}>
+            <div className="w-full px-4 py-3 rounded-[12px] flex flex-col gap-2" style={{ border: '1px solid var(--neutral-300)', background: 'var(--neutral-100)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-[12px]" style={{ color: '#8E8E93', fontFamily: 'Roboto, sans-serif' }}>Email / Username</p>
+                        <p className="text-[12px]" style={{ color: 'var(--text-secondary)', fontFamily: 'Roboto, sans-serif' }}>Email / Username</p>
                         <p className="text-[15px] font-semibold" style={{ color: 'var(--neutral-800)', fontFamily: 'Roboto, sans-serif' }}>{currentEmail}</p>
                     </div>
                     {editing !== 'email' && (
@@ -47,10 +47,10 @@ export default function AccountDetailsSection({ onSuccess }) {
                 )}
             </div>
 
-            <div className="w-full px-4 py-3 rounded-lg flex flex-col gap-2" style={{ border: '1px solid #E5E5EA' }}>
+            <div className="w-full px-4 py-3 rounded-[12px] flex flex-col gap-2" style={{ border: '1px solid var(--neutral-300)', background: 'var(--neutral-100)' }}>
                 <div className="flex items-center justify-between">
                     <div>
-                        <p className="text-[12px]" style={{ color: '#8E8E93', fontFamily: 'Roboto, sans-serif' }}>Password</p>
+                        <p className="text-[12px]" style={{ color: 'var(--text-secondary)', fontFamily: 'Roboto, sans-serif' }}>Password</p>
                         <p className="text-[15px] font-semibold" style={{ color: 'var(--neutral-800)', fontFamily: 'Roboto, sans-serif' }}>
                             {isGoogleUser ? 'Managed by Google' : '••••••••'}
                         </p>
@@ -76,7 +76,7 @@ export default function AccountDetailsSection({ onSuccess }) {
             </div>
 
             {isGoogleUser && (
-                <p className="text-[12px]" style={{ color: '#8E8E93', fontFamily: 'Roboto, sans-serif' }}>
+                <p className="text-[12px]" style={{ color: 'var(--text-secondary)', fontFamily: 'Roboto, sans-serif' }}>
                     Your account was created with Google. Identity changes require a Google re-authentication popup.
                 </p>
             )}

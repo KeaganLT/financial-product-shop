@@ -1,3 +1,12 @@
+import SectionHeading from './SectionHeading.jsx';
+
+const WALLET_ICON = (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="6" width="18" height="13" rx="2" stroke="#1860BF" strokeWidth="2" />
+        <path d="M3 10h18" stroke="#1860BF" strokeWidth="2" />
+    </svg>
+);
+
 export default function AccountTypesSection({ types, loading, error, currentAccountTypeIds, accountLoading, onToggle }) {
     if (loading) return null;
     if (error) return null;
@@ -5,9 +14,7 @@ export default function AccountTypesSection({ types, loading, error, currentAcco
 
     return (
         <div className="w-full flex flex-col gap-3">
-            <h2 className="text-[13px] font-semibold uppercase" style={{ color: '#8E8E93', letterSpacing: '0.05em' }}>
-                Accounts
-            </h2>
+            <SectionHeading icon={WALLET_ICON}>Accounts</SectionHeading>
             <div className="flex flex-col gap-2">
                 {types.accountTypes.map((at) => {
                     const added = currentAccountTypeIds.has(at.id);
@@ -15,13 +22,13 @@ export default function AccountTypesSection({ types, loading, error, currentAcco
                     return (
                         <div
                             key={at.id}
-                            className="w-full px-4 py-3 rounded-lg flex items-center justify-between border"
-                            style={{ borderColor: added ? '#A3E9B8' : '#C7C7CC', backgroundColor: added ? '#F0FFF4' : 'var(--neutral-100)' }}
+                            className="w-full px-4 py-3 rounded-[12px] flex items-center justify-between"
+                            style={{ border: '1px solid var(--neutral-300)', borderLeft: `3px solid ${added ? '#168C34' : 'var(--neutral-300)'}`, backgroundColor: 'var(--neutral-100)' }}
                         >
                             <div>
                                 <p className="text-[15px] font-semibold" style={{ color: 'var(--neutral-800)' }}>{at.name}</p>
                                 {at.description && (
-                                    <p className="text-[12px] mt-0.5" style={{ color: '#8E8E93' }}>{at.description}</p>
+                                    <p className="text-[12px] mt-0.5" style={{ color: 'var(--text-secondary)' }}>{at.description}</p>
                                 )}
                             </div>
                             <button
