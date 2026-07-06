@@ -42,7 +42,7 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                             R{Number(price).toFixed(2)} / month
                         </p>
                     </div>
-                    <StatusBadge fulfilmentType={fulfilType} />
+                    <StatusBadge fulfilmentType={fulfilType} contractSigned={contractSigned} />
                 </div>
 
                 <div className="flex items-center gap-4 mt-1">
