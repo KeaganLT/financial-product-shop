@@ -15,8 +15,9 @@ import {
     verifyBeforeUpdateEmail,
     sendPasswordResetEmail,
 } from 'firebase/auth';
-import { getFunctions } from 'firebase/functions';
-import { getFirestore } from 'firebase/firestore';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
+import { connectAuthEmulator } from 'firebase/auth';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -33,6 +34,12 @@ export const storage    = getStorage(firebaseApp);
 export const auth       = getAuth(firebaseApp);
 export const functions  = getFunctions(firebaseApp);
 export const db         = getFirestore(firebaseApp);
+
+if (import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === 'true') {
+    connectFunctionsEmulator(functions, 'localhost', 5001);
+    connectFirestoreEmulator(db, 'localhost', 8085);
+    connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+}
 
 const EMAIL_FOR_SIGN_IN_KEY = 'emailForSignIn';
 const PASSWORD_FOR_SIGN_IN_KEY = 'passwordForSignIn';

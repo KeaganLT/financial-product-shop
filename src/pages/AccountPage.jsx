@@ -123,14 +123,14 @@ export default function AccountPage() {
         <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
             <Header />
 
-            <main className="max-w-[411px] md:max-w-[480px] mx-auto pt-[73px] pb-[88px] md:pb-16 px-6 flex flex-col items-center gap-6">
-                <h1 className="text-[20px] font-semibold mt-6" style={{ color: 'var(--neutral-800)' }}>
+            <main className="max-w-[411px] md:max-w-3xl mx-auto pt-[73px] pb-[88px] md:pb-16 px-6 flex flex-col gap-4">
+                <h1 className="text-[20px] font-semibold mt-6" style={{ color: 'var(--neutral-800)', fontFamily: 'Roboto, sans-serif' }}>
                     Account
                 </h1>
 
                 {!isLoggedIn && (
                     <div className="w-full flex flex-col items-center gap-4 text-center">
-                        <p className="text-[15px]" style={{ color: '#8E8E93' }}>
+                        <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Sign in to view your profile and manage identity verification.
                         </p>
                         <button
@@ -140,7 +140,7 @@ export default function AccountPage() {
                         >
                             Sign in
                         </button>
-                        <p className="text-[15px]" style={{ color: '#8E8E93' }}>
+                        <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Don&apos;t have an account?{' '}
                             <button onClick={() => navigate('/signup')} className="font-semibold" style={{ color: '#1860BF' }}>
                                 Sign up
@@ -182,8 +182,8 @@ export default function AccountPage() {
                         <button
                             type="button"
                             onClick={logout}
-                            className="w-full py-[10px] rounded-full text-[17px] font-semibold border"
-                            style={{ borderColor: 'var(--neutral-800)', color: 'var(--neutral-800)' }}
+                            className="w-full py-[10px] rounded-full text-[17px] font-semibold border mt-2"
+                            style={{ borderColor: '#C51C13', color: '#C51C13' }}
                         >
                             Log out
                         </button>

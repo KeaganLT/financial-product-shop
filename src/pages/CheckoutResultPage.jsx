@@ -42,7 +42,7 @@ export default function CheckoutResultPage() {
             </div>
 
             {/* Content */}
-            <main className="flex-1 max-w-[480px] mx-auto w-full px-6 flex flex-col items-center justify-center gap-6 pb-24">
+            <main className="flex-1 max-w-[480px] mx-auto w-full px-6 flex flex-col items-center justify-center gap-6 py-10">
                 {/* Green checkmark */}
                 <svg width="100" height="100" viewBox="0 0 120 120" fill="none">
                     <circle cx="60" cy="60" r="60" fill="#168C34" />
@@ -96,11 +96,7 @@ export default function CheckoutResultPage() {
                         Your subscription is active. You can manage it at any time from the Subscriptions page.
                     </InfoBanner>
                 )}
-            </main>
-
-            {/* Footer buttons */}
-            <div className="fixed bottom-0 left-0 right-0 bg-[var(--surface-page)]" style={{ borderTop: '1px solid var(--neutral-300)' }}>
-                <div className="max-w-[480px] mx-auto px-6 pt-4 pb-6 flex flex-col gap-3">
+                <div className="w-full flex flex-col gap-3 pt-2">
                     {isSubscription && product && (
                         <button
                             onClick={() => navigate('/contract', { state: { product, bankDetails } })}
@@ -141,7 +137,7 @@ export default function CheckoutResultPage() {
                         {isSubscription ? 'Browse more products' : 'Continue browsing'}
                     </button>
                 </div>
-            </div>
+            </main>
         </div>
     );
 }

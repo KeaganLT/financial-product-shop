@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getProductById } from '../services/productService';
-import { takeUpProducts } from '../services/subscriptionService';
+import { takeUpProducts, getEligibility, getSubscriptions } from '../services/subscriptionService';
 import { getBankDetails, saveBankDetails } from '../services/bankingService';
+import { upsertBankAccountByLast4, assignAccountToProduct } from '../services/bankAccountsService';
 import { useToast } from '../context/ToastContext';
+import { saveMandateRecord } from '../services/contractStorageService';
+import InfoBanner from '../components/InfoBanner.jsx';
 import StepIndicator from '../components/checkout/StepIndicator.jsx';
 import StepProductReview from '../components/checkout/StepProductReview.jsx';
 import StepDebitSetup from '../components/checkout/StepDebitSetup.jsx';
@@ -26,6 +29,8 @@ export default function SubscribeCheckoutPage() {
     const [bankDetails, setBankDetails] = useState(null);
     const [submitting, setSubmitting]   = useState(false);
     const [submitError, setSubmitError] = useState('');
+    const [gate, setGate]               = useState(null);
+    const [gateChecking, setGateChecking] = useState(true);
 
     useEffect(() => {
         if (!isLoggedIn) { navigate('/login'); return; }
@@ -33,6 +38,29 @@ export default function SubscribeCheckoutPage() {
             .then(setProduct)
             .catch(() => navigate('/products'))
             .finally(() => setLoading(false));
+
+        Promise.all([
+            getSubscriptions(auth.token).catch(() => []),
+            getEligibility([Number(productId)], auth.token).catch(() => null),
+        ]).then(([subs, results]) => {
+            const list = Array.isArray(subs) ? subs : [];
+            const alreadySubscribed = list.some((sub) => {
+                const prod = Array.isArray(sub.product) ? sub.product[0] : sub.product;
+                return String(sub.productId ?? prod?.id) === String(productId);
+            });
+            if (alreadySubscribed) {
+                setGate({ type: 'subscribed' });
+                setGateChecking(false);
+                return;
+            }
+            const result = Array.isArray(results)
+                ? results.find((r) => String(r.productId) === String(productId))
+                : null;
+            if (result && result.isEligible === false) {
+                setGate({ type: 'ineligible' });
+            }
+            setGateChecking(false);
+        });
     }, [productId, isLoggedIn]);
 
     useEffect(() => {
@@ -51,6 +79,11 @@ export default function SubscribeCheckoutPage() {
             const result = await takeUpProducts([Number(productId)], auth.token);
             if (result.success) {
                 saveBankDetails(auth.customerId, bankDetails);
+                const account = await upsertBankAccountByLast4(auth.customerId, bankDetails).catch(() => null);
+                if (account) {
+                    await assignAccountToProduct(auth.customerId, productId, account.id).catch(() => {});
+                }
+                await saveMandateRecord(auth.customerId, productId, bankDetails).catch(() => {});
                 showToast(`${product.name} activated successfully!`, 'success');
                 navigate('/checkout/result?type=subscription', { state: { product, bankDetails } });
             } else {
@@ -72,7 +105,7 @@ export default function SubscribeCheckoutPage() {
         }
     }
 
-    if (loading) {
+    if (loading || gateChecking) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--neutral-100)' }}>
                 <div className="w-8 h-8 border-4 border-[#1860BF] border-t-transparent rounded-full animate-spin" />
@@ -81,6 +114,53 @@ export default function SubscribeCheckoutPage() {
     }
 
     if (!product) return null;
+
+    if (gate) {
+        return (
+            <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
+                <div className="max-w-[480px] md:max-w-2xl mx-auto px-6 pt-16 flex flex-col gap-5">
+                    <h1 style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {product.name}
+                    </h1>
+                    {gate.type === 'subscribed' ? (
+                        <InfoBanner variant="info" title="You already have this subscription">
+                            {product.name} is already active on your profile, so it can't be taken up again.
+                        </InfoBanner>
+                    ) : (
+                        <InfoBanner variant="warning" title="You don't currently qualify for this product">
+                            One or more eligibility checks are not passing. Review the requirements on the product page and resolve any outstanding items in your Account before trying again.
+                        </InfoBanner>
+                    )}
+                    <div className="flex flex-col gap-3">
+                        {gate.type === 'subscribed' ? (
+                            <button
+                                onClick={() => navigate('/subscriptions')}
+                                className="w-full h-[46px] rounded-[100px] font-semibold text-white"
+                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
+                            >
+                                View my subscriptions
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => navigate(`/products/${productId}`)}
+                                className="w-full h-[46px] rounded-[100px] font-semibold text-white"
+                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
+                            >
+                                View eligibility details
+                            </button>
+                        )}
+                        <button
+                            onClick={() => navigate('/products')}
+                            className="w-full h-[46px] rounded-[100px] font-semibold border"
+                            style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 16, background: 'var(--neutral-100)' }}
+                        >
+                            Browse other products
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--neutral-100)' }}>
