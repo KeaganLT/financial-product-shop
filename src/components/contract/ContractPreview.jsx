@@ -28,7 +28,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                 style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' }}
             >
                 <div>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: 'white' }}>FinShop (Pty) Ltd</p>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: 'white' }}>InsureTechGuard (Pty) Ltd</p>
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 10, color: 'rgba(255,255,255,0.8)' }}>FSP Licence No. 12345 · Authorised Financial Services Provider</p>
                 </div>
                 <div
@@ -42,7 +42,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
             <div className="border rounded-b-[10px] px-4 pb-4 flex flex-col gap-4" style={{ borderColor: 'var(--neutral-300)', borderTop: 'none' }}>
                 <div className="pt-3">
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Parties</p>
-                    <InfoRow label="Service Provider" value="FinShop (Pty) Ltd" />
+                    <InfoRow label="Service Provider" value="InsureTechGuard (Pty) Ltd" />
                     <InfoRow
                         label="Policyholder"
                         value={

@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/v1/:path*", "destination": "http://34.203.32.68:8080/v1/:path*" },
+    { "source": "/client/:path*", "destination": "http://34.203.32.68:8080/client/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

@@ -1,5 +1,11 @@
-export default function StatusBadge({ fulfilmentType }) {
+export default function StatusBadge({ fulfilmentType, contractSigned = false }) {
     const isImmediate = (fulfilmentType || '').toLowerCase().includes('immediate');
+    const isActive = contractSigned || isImmediate;
+
+    const label = isActive
+        ? 'Active'
+        : 'Active: Pending approval';
+
     return (
         <span
             style={{
@@ -10,11 +16,11 @@ export default function StatusBadge({ fulfilmentType }) {
                 fontFamily: 'Roboto, sans-serif',
                 lineHeight: '16px',
                 fontWeight: 500,
-                background: isImmediate ? '#E6F9ED' : '#FFF4E5',
-                color: isImmediate ? '#1A7A3C' : '#995900',
+                background: isActive ? '#E6F9ED' : '#FFF4E5',
+                color: isActive ? '#1A7A3C' : '#995900',
             }}
         >
-            {isImmediate ? 'Active: Immediate' : 'Active: Pending approval'}
+            {label}
         </span>
     );
 }

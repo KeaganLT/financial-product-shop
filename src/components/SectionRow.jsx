@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import ProductCard from './ProductCard';
 
 // Matches Figma section wrapper specs:
@@ -10,17 +9,15 @@ import ProductCard from './ProductCard';
 // - Item spacing between cards: 16px
 // - Cards scroll horizontally, padding-bottom 20px
 
-export default function SectionRow({ title, products, viewAllPath }) {
-    const navigate = useNavigate();
-
+export default function SectionRow({ title, products, onViewAll }) {
     return (
         // Outer wrapper: vertical, padding top 16, bottom 8, left/right 24
         <div className="flex flex-col gap-4 pt-4 pb-2">
 
             {/* Section header row — height 28px, space-between */}
             <div className="flex items-center justify-between px-6" style={{ minHeight: '28px' }}>
-                {/* Section title — #000000, Headline 3 Bold */}
-                <h2 className="text-[17px] font-bold text-black">
+                {/* Section title — Headline 3 Bold */}
+                <h2 className="text-[17px] font-bold" style={{ color: 'var(--text-primary)' }}>
                     {title}
                 </h2>
 
@@ -28,7 +25,7 @@ export default function SectionRow({ title, products, viewAllPath }) {
                 <button
                     className="flex items-center gap-1 text-[15px] font-semibold"
                     style={{ color: '#1860BF' }}
-                    onClick={() => navigate(viewAllPath || '/products')}
+                    onClick={onViewAll}
                 >
                     View all
                     {/* Arrow right — width 14 as per Figma */}

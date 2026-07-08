@@ -16,26 +16,27 @@ function getContractClauses(type, productName, price) {
     const monthly = `R${Number(price).toFixed(2)}`;
     const annual  = `R${(Number(price) * 12).toFixed(2)}`;
 
+    const definitions = {
+        heading: '1. Definitions',
+        body: '"Policyholder" means the person named in this agreement. "InsureTechGuard" means InsureTechGuard (Pty) Ltd (FSP Licence No. 12345). "Premium" means the monthly amount payable as specified herein. "Commencement Date" means the date on which this agreement is accepted and activated.',
+    };
+
     const shared = [
-        {
-            heading: '1. Definitions',
-            body: '"Policyholder" means the person named in this agreement. "FinShop" means FinShop (Pty) Ltd (FSP Licence No. 12345). "Premium" means the monthly amount payable as specified herein. "Commencement Date" means the date on which this agreement is accepted and activated.',
-        },
         {
             heading: '6. Governing Law',
             body: 'This agreement is governed by the laws of the Republic of South Africa. Any dispute arising from or in connection with this agreement shall be subject to the jurisdiction of the South African courts.',
         },
         {
             heading: '7. Regulatory Compliance',
-            body: 'FinShop (Pty) Ltd is an authorised Financial Services Provider (FSP Licence No. 12345) regulated by the Financial Sector Conduct Authority (FSCA) under the Financial Advisory and Intermediary Services (FAIS) Act, 37 of 2002.',
+            body: 'InsureTechGuard (Pty) Ltd is an authorised Financial Services Provider (FSP Licence No. 12345) regulated by the Financial Sector Conduct Authority (FSCA) under the Financial Advisory and Intermediary Services (FAIS) Act, 37 of 2002.',
         },
         {
             heading: '8. Privacy Notice',
-            body: 'Your personal information is processed in accordance with the Protection of Personal Information Act (POPIA), Act 4 of 2013. FinShop will not sell or share your personal information with third parties without your consent, except as required by law or to fulfil this agreement.',
+            body: 'Your personal information is processed in accordance with the Protection of Personal Information Act (POPIA), Act 4 of 2013. InsureTechGuard will not sell or share your personal information with third parties without your consent, except as required by law or to fulfil this agreement.',
         },
         {
             heading: '9. Cooling-Off Period',
-            body: 'You have a right to cancel this agreement within 31 days of the Commencement Date without penalty, provided no claim has been made or benefit taken. Notice of cancellation must be submitted in writing to FinShop.',
+            body: 'You have a right to cancel this agreement within 31 days of the Commencement Date without penalty, provided no claim has been made or benefit taken. Notice of cancellation must be submitted in writing to InsureTechGuard.',
         },
         {
             heading: '10. Dispute Resolution',
@@ -44,6 +45,7 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'insurance') return [
+        definitions,
         {
             heading: '2. Cover Description',
             body: `This ${productName} provides cover for insured events as described in the product schedule. Cover includes accidental damage, theft, loss, and applicable liability as defined by the product terms. Cover is effective from the Commencement Date, subject to any applicable waiting periods.`,
@@ -58,15 +60,16 @@ function getContractClauses(type, productName, price) {
         },
         {
             heading: '5. Claims Process',
-            body: 'To lodge a claim, the Policyholder must: (1) notify FinShop within 30 days of the insured event; (2) submit a completed claim form with supporting documentation; (3) provide a copy of a police report where applicable. Claims are assessed within 10 business days of receipt of all required documentation.',
+            body: 'To lodge a claim, the Policyholder must: (1) notify InsureTechGuard within 30 days of the insured event; (2) submit a completed claim form with supporting documentation; (3) provide a copy of a police report where applicable. Claims are assessed within 10 business days of receipt of all required documentation.',
         },
         ...shared,
     ];
 
     if (type === 'device') return [
+        definitions,
         {
             heading: '2. Device & Contract Details',
-            body: `This contract covers the supply, financing, and/or maintenance of the device or service described under the product "${productName}". The device remains the property of FinShop until all amounts owing are settled in full.`,
+            body: `This contract covers the supply, financing, and/or maintenance of the device or service described under the product "${productName}". The device remains the property of InsureTechGuard until all amounts owing are settled in full.`,
         },
         {
             heading: '3. Monthly Instalment',
@@ -74,7 +77,7 @@ function getContractClauses(type, productName, price) {
         },
         {
             heading: '4. Device Care & Responsibility',
-            body: 'The Policyholder is responsible for the care and safekeeping of the device. Any damage resulting from misuse, negligence, or unauthorised modification is excluded from warranty and maintenance cover. The Policyholder must report loss or theft to FinShop within 24 hours.',
+            body: 'The Policyholder is responsible for the care and safekeeping of the device. Any damage resulting from misuse, negligence, or unauthorised modification is excluded from warranty and maintenance cover. The Policyholder must report loss or theft to InsureTechGuard within 24 hours.',
         },
         {
             heading: '5. Termination',
@@ -84,9 +87,10 @@ function getContractClauses(type, productName, price) {
     ];
 
     if (type === 'islamic') return [
+        definitions,
         {
             heading: '2. Sharia Compliance',
-            body: `This ${productName} is structured in accordance with Islamic finance principles. The product is certified by the FinShop Sharia Supervisory Board. All returns are derived from permissible (halal) activities, free from interest (riba), excessive uncertainty (gharar), and gambling (maysir).`,
+            body: `This ${productName} is structured in accordance with Islamic finance principles. The product is certified by the InsureTechGuard Sharia Supervisory Board. All returns are derived from permissible (halal) activities, free from interest (riba), excessive uncertainty (gharar), and gambling (maysir).`,
         },
         {
             heading: '3. Investment Structure',
@@ -94,23 +98,24 @@ function getContractClauses(type, productName, price) {
         },
         {
             heading: '4. Risk Disclosure',
-            body: 'Investment in this product carries risk. The value of your investment may go up or down. Past performance is not a guarantee of future returns. The Policyholder acknowledges that FinShop does not guarantee returns and that participation is on the basis of shared profit and shared risk.',
+            body: 'Investment in this product carries risk. The value of your investment may go up or down. Past performance is not a guarantee of future returns. The Policyholder acknowledges that InsureTechGuard does not guarantee returns and that participation is on the basis of shared profit and shared risk.',
         },
         {
             heading: '5. Redemption & Withdrawal',
-            body: 'Withdrawals may be made on 30 calendar days notice. Early withdrawal may result in a reduced share of declared profits for that quarter. Full redemption instructions must be submitted in writing to FinShop.',
+            body: 'Withdrawals may be made on 30 calendar days notice. Early withdrawal may result in a reduced share of declared profits for that quarter. Full redemption instructions must be submitted in writing to InsureTechGuard.',
         },
         ...shared,
     ];
 
     if (type === 'vip') return [
+        definitions,
         {
             heading: '2. VIP Investment Terms',
-            body: `This ${productName} is an exclusive, high-value investment product available to qualifying Policyholders. The monthly contribution of ${monthly} (annual: ${annual}) is invested in a diversified portfolio of high-yield instruments selected by FinShop's accredited investment managers.`,
+            body: `This ${productName} is an exclusive, high-value investment product available to qualifying Policyholders. The monthly contribution of ${monthly} (annual: ${annual}) is invested in a diversified portfolio of high-yield instruments selected by InsureTechGuard's accredited investment managers.`,
         },
         {
             heading: '3. Returns & Reporting',
-            body: 'The Policyholder will receive a quarterly investment statement reflecting the value of their portfolio, contributions made, and returns earned. FinShop targets market-linked returns but does not guarantee performance. Returns are net of management fees of 1.5% per annum.',
+            body: 'The Policyholder will receive a quarterly investment statement reflecting the value of their portfolio, contributions made, and returns earned. InsureTechGuard targets market-linked returns but does not guarantee performance. Returns are net of management fees of 1.5% per annum.',
         },
         {
             heading: '4. Dedicated Relationship Manager',
@@ -125,9 +130,10 @@ function getContractClauses(type, productName, price) {
 
     // generic investment / fallback
     return [
+        definitions,
         {
             heading: '2. Investment Terms',
-            body: `This ${productName} is a financial product offered by FinShop (Pty) Ltd. The Policyholder agrees to contribute ${monthly} per month. Funds are invested in accordance with the stated mandate of the product. Performance is market-linked and not guaranteed.`,
+            body: `This ${productName} is a financial product offered by InsureTechGuard (Pty) Ltd. The Policyholder agrees to contribute ${monthly} per month. Funds are invested in accordance with the stated mandate of the product. Performance is market-linked and not guaranteed.`,
         },
         {
             heading: '3. Fees',
@@ -172,7 +178,7 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(14);
-    doc.text('FinShop (Pty) Ltd', margin, 10);
+    doc.text('InsureTechGuard (Pty) Ltd', margin, 10);
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
     doc.text('FSP Licence No. 12345 | Authorised Financial Services Provider', margin, 16);
@@ -225,17 +231,19 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
     doc.text('PARTIES TO THIS AGREEMENT', margin, y);
     y += 5;
 
+    const partiesBoxH = 5 + 4 * LINE_H + 3;
     doc.setFillColor(245, 248, 255);
     doc.setDrawColor(200, 215, 245);
     doc.setLineWidth(0.3);
-    doc.roundedRect(margin, y, usableW, 28, 2, 2, 'FD');
-    y += 5;
+    doc.roundedRect(margin, y, usableW, partiesBoxH, 2, 2, 'FD');
+    const partiesBoxTop = y;
+    y += 5 + 3;
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(BODY_SIZE);
     doc.text('SERVICE PROVIDER:', margin + 4, y);
     doc.setFont('helvetica', 'normal');
-    doc.text('FinShop (Pty) Ltd, FSP Licence No. 12345, Sandton, Johannesburg, South Africa', margin + 44, y);
+    doc.text('InsureTechGuard (Pty) Ltd, FSP Licence No. 12345, Sandton, Johannesburg, South Africa', margin + 44, y);
     y += LINE_H;
 
     const name      = profile?.name ?? profile?.firstName
@@ -266,17 +274,12 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
     doc.text('CUSTOMER TYPE:', margin + 110, y);
     doc.setFont('helvetica', 'normal');
     doc.text(custType, margin + 145, y);
-    y += 8;
+    y = partiesBoxTop + partiesBoxH + 10;
 
     // ── Product details box ──────────────────────────────────────────────────────
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(HEAD_SIZE);
     doc.text('PRODUCT DETAILS', margin, y);
-    y += 5;
-
-    doc.setFillColor(245, 248, 255);
-    doc.setDrawColor(200, 215, 245);
-    doc.roundedRect(margin, y, usableW, 26, 2, 2, 'FD');
     y += 5;
 
     const rows = [
@@ -287,17 +290,23 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         ['DEBIT DATE:', bankDetails ? `${bankDetails.debitDay}${bankDetails.debitDay === 1 ? 'st' : 'th'} of each month` : 'N/A'],
     ];
 
+    const productBoxH = 5 + rows.length * LINE_H + 3;
+    doc.setFillColor(245, 248, 255);
+    doc.setDrawColor(200, 215, 245);
+    doc.roundedRect(margin, y, usableW, productBoxH, 2, 2, 'FD');
+    const productBoxTop = y;
+    y += 5 + 3;
+
     const col2 = margin + 50;
     rows.forEach((row, i) => {
         const rowY = y + i * LINE_H;
-        checkPage(LINE_H);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(BODY_SIZE);
         doc.text(row[0], margin + 4, rowY);
         doc.setFont('helvetica', 'normal');
         doc.text(row[1], col2, rowY);
     });
-    y += rows.length * LINE_H + 5;
+    y = productBoxTop + productBoxH + 10;
 
     // ── Contract clauses ─────────────────────────────────────────────────────────
     const type    = detectProductType(product.name);
@@ -370,7 +379,7 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         doc.setTextColor(38, 140, 52);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
-        doc.text('✓ DIGITALLY SIGNED', margin + 4, y);
+        doc.text('DIGITALLY SIGNED', margin + 4, y);
         doc.setTextColor(0, 0, 0);
         y += 6;
     } else {
@@ -397,7 +406,7 @@ export function generateContractPdf({ product, bankDetails, profile, signature, 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7);
         doc.setTextColor(150, 150, 150);
-        doc.text('FinShop (Pty) Ltd | FSP Licence No. 12345 | Regulated by the FSCA', W / 2, H - 8, { align: 'center' });
+        doc.text('InsureTechGuard (Pty) Ltd | FSP Licence No. 12345 | Regulated by the FSCA', W / 2, H - 8, { align: 'center' });
         doc.text(`Page ${i} of ${totalPages}`, W - margin, H - 8, { align: 'right' });
         doc.setTextColor(0, 0, 0);
     }

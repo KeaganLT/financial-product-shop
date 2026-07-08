@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { changePassword, auth as firebaseAuth, resetPassword } from '../../services/firebase.js';
+import PasswordInput from '../PasswordInput.jsx';
 
 export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onSuccess }) {
     const [current, setCurrent]         = useState('');
@@ -73,14 +74,11 @@ export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onS
             )}
             {!isGoogleUser && (
                 <div className="flex flex-col gap-1">
-                    <input
-                        type="password"
+                    <PasswordInput
                         value={current}
                         onChange={(e) => setCurrent(e.target.value)}
                         placeholder="Current password"
                         autoComplete="current-password"
-                        className="w-full h-[44px] rounded-[10px] px-3 border"
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: '#C7C7CC' }}
                     />
                     {!resetSent ? (
                         <button
@@ -97,23 +95,17 @@ export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onS
                     )}
                 </div>
             )}
-            <input
-                type="password"
+            <PasswordInput
                 value={next}
                 onChange={(e) => setNext(e.target.value)}
                 placeholder="New password (min 8 characters)"
                 autoComplete="new-password"
-                className="w-full h-[44px] rounded-[10px] px-3 border"
-                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: '#C7C7CC' }}
             />
-            <input
-                type="password"
+            <PasswordInput
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
                 placeholder="Confirm new password"
                 autoComplete="new-password"
-                className="w-full h-[44px] rounded-[10px] px-3 border"
-                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, borderColor: '#C7C7CC' }}
             />
             {error && <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#C51C13' }}>{error}</p>}
             <div className="flex gap-2">

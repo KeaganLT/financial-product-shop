@@ -1,0 +1,16 @@
+{
+  "name": "InsureTechGuard — Insurance & Investment Products",
+  "short_name": "InsureTechGuard",
+  "description": "Browse and subscribe to insurance and investment products with InsureTechGuard.",
+  "start_url": "/products",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1860BF",
+  "theme_color": "#1860BF",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
