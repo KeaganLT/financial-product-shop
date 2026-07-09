@@ -11,6 +11,7 @@ export const features = {
     googleSignIn: import.meta.env.VITE_FEATURE_GOOGLE_SIGNIN !== 'false',
     pwaInstall:   import.meta.env.VITE_FEATURE_PWA_INSTALL   !== 'false',
     share:        import.meta.env.VITE_FEATURE_SHARE         !== 'false',
+    emailOtp:     import.meta.env.VITE_FEATURE_EMAIL_OTP     === 'true',
 };
 
 export function applyBrandTheme() {

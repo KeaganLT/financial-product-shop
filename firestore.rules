@@ -8,6 +8,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // ── Email OTP codes — Admin SDK (Cloud Functions) only ───────────────────
+    match /emailOtps/{email} {
+      allow read, write: if false;
+    }
+
     // ── Contracts — users can only read/write their own records ─────────────
     // Path: contracts/{customerId}/products/{productId}
     // We match customerId as a string; Firebase Auth UID is a string too but
