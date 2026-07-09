@@ -48,7 +48,7 @@ export default function ProductDetailPage() {
         return (
             <div className="min-h-screen bg-[var(--surface-page)] flex flex-col items-center justify-center px-6 gap-4">
                 <p className="text-red-500 text-sm text-center">{error}</p>
-                <button onClick={() => navigate('/products')} className="text-[#1860BF] text-[14px] font-semibold">
+                <button onClick={() => navigate('/products')} className="text-[var(--brand-100)] text-[14px] font-semibold">
                     ← Back to Products
                 </button>
             </div>
@@ -112,7 +112,7 @@ export default function ProductDetailPage() {
                         {hasDiscount && (
                             <div
                                 className="absolute top-[14px] left-4 flex items-center justify-center text-center"
-                                style={{ backgroundColor: '#1860BF', borderRadius: '4px', width: '43px', height: '44px', padding: '8px' }}
+                                style={{ backgroundColor: 'var(--brand-100)', borderRadius: '4px', width: '43px', height: '44px', padding: '8px' }}
                             >
                                 <span style={{ ...textStyle('12px', 700, '#F2F2F7'), lineHeight: '14px', letterSpacing: '0.41px', textAlign: 'center' }}>
                                     25%{'\n'}OFF
@@ -147,7 +147,7 @@ export default function ProductDetailPage() {
                             {!expanded && (
                                 <button
                                     onClick={() => setExpanded(true)}
-                                    style={{ ...textStyle('20px', 400, '#1860BF') }}
+                                    style={{ ...textStyle('20px', 400, 'var(--brand-100)') }}
                                 >
                                     Read more
                                 </button>
@@ -166,7 +166,7 @@ export default function ProductDetailPage() {
                             onClick={handleCta}
                             style={{
                                 height: '42px', padding: '0 32px', borderRadius: '100px',
-                                background: isLoggedIn ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                background: isLoggedIn ? 'var(--gradient-brand)' : '#E5E5EA',
                                 fontFamily: 'Roboto, sans-serif', fontSize: '17px', fontWeight: 600,
                                 color: isLoggedIn ? '#FFFFFF' : '#AEAEB2', border: 'none',
                                 cursor: isLoggedIn ? 'pointer' : 'default',
@@ -217,7 +217,7 @@ export default function ProductDetailPage() {
                                 <button
                                     onClick={() => setExpanded(false)}
                                     className="text-left"
-                                    style={{ ...textStyle('20px', 400, '#1860BF'), lineHeight: '28px', letterSpacing: '0.35px' }}
+                                    style={{ ...textStyle('20px', 400, 'var(--brand-100)'), lineHeight: '28px', letterSpacing: '0.35px' }}
                                 >
                                     Read less
                                 </button>
@@ -253,10 +253,10 @@ export default function ProductDetailPage() {
                     <button
                         onClick={() => downloadProductPdf(product)}
                         className="w-full h-[46px] rounded-[100px] flex items-center justify-center gap-2 border font-semibold"
-                        style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
+                        style={{ borderColor: 'var(--brand-100)', color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="#1860BF" />
+                            <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="var(--brand-100)" />
                         </svg>
                         Download fact sheet (PDF)
                     </button>
@@ -279,7 +279,7 @@ export default function ProductDetailPage() {
                         onClick={handleCta}
                         style={{
                             width: '177.5px', height: '42px', borderRadius: '100px',
-                            background: isLoggedIn ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                            background: isLoggedIn ? 'var(--gradient-brand)' : '#E5E5EA',
                             fontFamily: 'Roboto, sans-serif', fontSize: '17px', fontWeight: 600,
                             color: isLoggedIn ? '#FFFFFF' : '#AEAEB2', border: 'none',
                             cursor: isLoggedIn ? 'pointer' : 'default',

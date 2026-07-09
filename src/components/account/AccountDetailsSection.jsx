@@ -6,8 +6,8 @@ import SectionHeading from './SectionHeading.jsx';
 
 const PERSON_ICON = (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="4" stroke="#1860BF" strokeWidth="2" />
-        <path d="M4 20c0-3.3 3.6-5 8-5s8 1.7 8 5" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="12" cy="8" r="4" stroke="var(--brand-100)" strokeWidth="2" />
+        <path d="M4 20c0-3.3 3.6-5 8-5s8 1.7 8 5" stroke="var(--brand-100)" strokeWidth="2" strokeLinecap="round" />
     </svg>
 );
 
@@ -30,7 +30,7 @@ export default function AccountDetailsSection({ onSuccess }) {
                         <button
                             onClick={() => setEditing('email')}
                             className="px-3 py-1 rounded-full text-[13px] font-semibold border"
-                            style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif' }}
+                            style={{ borderColor: 'var(--brand-100)', color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif' }}
                         >
                             Change
                         </button>
@@ -59,7 +59,7 @@ export default function AccountDetailsSection({ onSuccess }) {
                         <button
                             onClick={() => setEditing('password')}
                             className="px-3 py-1 rounded-full text-[13px] font-semibold border"
-                            style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif' }}
+                            style={{ borderColor: 'var(--brand-100)', color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif' }}
                         >
                             {isGoogleUser ? 'Set password' : 'Change'}
                         </button>

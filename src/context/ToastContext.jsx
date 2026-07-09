@@ -40,7 +40,7 @@ const STYLES = {
     success: { bg: '#F0FFF4', border: '#A3E9B8', icon: '#168C34', text: '#1A5C30' },
     error:   { bg: '#FFF5F5', border: '#FFB3B3', icon: '#C51C13', text: '#7A1010' },
     warning: { bg: '#FFF8E6', border: '#FFD97A', icon: '#F5A623', text: '#7A4F00' },
-    info:    { bg: '#EFF4FF', border: '#C7D9FF', icon: '#1860BF', text: '#1240A0' },
+    info:    { bg: '#EFF4FF', border: '#C7D9FF', icon: 'var(--brand-100)', text: '#1240A0' },
 };
 
 const ICONS = {

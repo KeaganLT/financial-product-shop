@@ -7,14 +7,14 @@ export default function SectionHeading({ icon, children }) {
                     fontFamily: 'Roboto, sans-serif',
                     fontSize: 13,
                     fontWeight: 700,
-                    color: '#1860BF',
+                    color: 'var(--brand-100)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
                 }}
             >
                 {children}
             </span>
-            <span className="flex-1 h-px" style={{ background: '#1860BF', opacity: 0.2 }} />
+            <span className="flex-1 h-px" style={{ background: 'var(--brand-100)', opacity: 0.2 }} />
         </div>
     );
 }

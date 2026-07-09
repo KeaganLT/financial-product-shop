@@ -45,7 +45,7 @@ export default function StepConfirm({ product, bankDetails, submitting, error, o
                 disabled={submitting}
                 className="w-full h-[50px] rounded-[100px] font-semibold text-white"
                 style={{
-                    background: submitting ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                    background: submitting ? '#A0AEC0' : 'var(--gradient-brand)',
                     fontFamily: 'Roboto, sans-serif',
                     fontSize: 17,
                     cursor: submitting ? 'not-allowed' : 'pointer',

@@ -62,7 +62,7 @@ function CreditCardTile({ onClick }) {
                 </div>
             </div>
             <svg width="12" height="20" viewBox="0 0 12 20" fill="none">
-                <path d="M1 1l10 9-10 9" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M1 1l10 9-10 9" stroke="var(--brand-100)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
         </button>
     );
@@ -90,7 +90,7 @@ function CheckoutFooter({ monthlyTotal, onceOffTotal = 0, onPay, loading, disabl
                             </div>
                         </div>
                     </div>
-                    <button onClick={onPay} disabled={isBlocked} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                    <button onClick={onPay} disabled={isBlocked} className="w-full h-[42px] rounded-[100px] font-semibold text-white disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'var(--gradient-brand)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                         {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
                     </button>
                     {disabled && disabledHint && (
@@ -107,7 +107,7 @@ function CheckoutFooter({ monthlyTotal, onceOffTotal = 0, onPay, loading, disabl
                         <span className="font-bold text-[var(--text-primary)]" style={{ fontSize: 22, fontFamily: 'Roboto, sans-serif' }}>R {monthlyTotal.toFixed(2)}</span>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                        <button onClick={onPay} disabled={isBlocked} className="h-[42px] px-8 rounded-[100px] font-semibold disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
+                        <button onClick={onPay} disabled={isBlocked} className="h-[42px] px-8 rounded-[100px] font-semibold disabled:opacity-60" style={{ background: disabled ? '#E5E5EA' : 'var(--gradient-brand)', color: disabled ? '#AEAEB2' : '#fff', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                             {loading ? 'Processing…' : `Pay now (R${monthlyTotal.toFixed(2)})`}
                         </button>
                         {disabled && disabledHint && (
@@ -136,7 +136,7 @@ function CardField({ label, value, onChange, placeholder, type = 'text', half = 
                 placeholder={!hasValue && !focused ? '' : placeholder}
                 className="w-full h-full px-4 pt-4 pb-1 outline-none rounded-[4px] text-[var(--text-primary)]"
                 style={{
-                    border: `${focused ? 3 : 1}px solid ${focused ? '#1AAFDE' : 'var(--neutral-400)'}`,
+                    border: `${focused ? 3 : 1}px solid ${focused ? 'var(--brand-200)' : 'var(--neutral-400)'}`,
                     fontFamily: 'Roboto, sans-serif',
                     fontSize: 16,
                     letterSpacing: '0.5px',
@@ -150,7 +150,7 @@ function CardField({ label, value, onChange, placeholder, type = 'text', half = 
                     top: focused || hasValue ? -8 : 16,
                     fontSize: focused || hasValue ? 12 : 16,
                     lineHeight: focused || hasValue ? '16px' : '24px',
-                    color: focused ? '#1AAFDE' : 'var(--text-secondary)',
+                    color: focused ? 'var(--brand-200)' : 'var(--text-secondary)',
                     background: focused || hasValue ? 'var(--neutral-100)' : 'transparent',
                     padding: focused || hasValue ? '0 4px' : '0',
                     fontFamily: 'Roboto, sans-serif',
@@ -216,9 +216,9 @@ function OrderReviewView({ items, monthlyTotal, onceOffTotal, savedCard, onChang
                 <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3">
                         <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-                            <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="#1860BF" />
-                            <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
-                            <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
+                            <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="var(--brand-100)" />
+                            <rect x="0" y="3" width="20" height="3" fill="var(--brand-100)" />
+                            <rect x="2" y="8" width="5" height="2" rx="0.5" fill="var(--brand-100)" />
                         </svg>
                         <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                             Payment method
@@ -226,8 +226,8 @@ function OrderReviewView({ items, monthlyTotal, onceOffTotal, savedCard, onChang
                     </div>
                     {savedCard ? (
                         <div className="flex items-center gap-3 py-1">
-                            <div className="w-4 h-4 rounded-full border-2 border-[#1860BF] flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-[#1860BF]" />
+                            <div className="w-4 h-4 rounded-full border-2 border-[var(--brand-100)] flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-[var(--brand-100)]" />
                             </div>
                             <div className="flex-1">
                                 <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-primary)' }}>Visa</span>
@@ -236,15 +236,15 @@ function OrderReviewView({ items, monthlyTotal, onceOffTotal, savedCard, onChang
                             <VisaLogo />
                             <button
                                 onClick={onChangeMethod}
-                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF', marginLeft: 8 }}
+                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--brand-100)', marginLeft: 8 }}
                             >
                                 Change
                             </button>
                         </div>
                     ) : (
                         <button onClick={onChangeMethod} className="flex items-center gap-[9px] text-left">
-                            <span style={{ fontSize: 18, color: '#1AAFDE' }}>+</span>
-                            <span style={{ fontSize: 15, lineHeight: '20px', fontFamily: 'Roboto, sans-serif', color: '#1AAFDE' }}>Add payment method</span>
+                            <span style={{ fontSize: 18, color: 'var(--brand-200)' }}>+</span>
+                            <span style={{ fontSize: 15, lineHeight: '20px', fontFamily: 'Roboto, sans-serif', color: 'var(--brand-200)' }}>Add payment method</span>
                         </button>
                     )}
                 </div>
@@ -275,9 +275,9 @@ function MainView({ monthlyTotal, onceOffTotal, onAddMethod, onPay, loading, err
                     {/* Payment method heading */}
                     <div className="flex items-center gap-3">
                         <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-                            <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="#1860BF" />
-                            <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
-                            <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
+                            <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="var(--brand-100)" />
+                            <rect x="0" y="3" width="20" height="3" fill="var(--brand-100)" />
+                            <rect x="2" y="8" width="5" height="2" rx="0.5" fill="var(--brand-100)" />
                         </svg>
                         <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                             Payment method
@@ -287,8 +287,8 @@ function MainView({ monthlyTotal, onceOffTotal, onAddMethod, onPay, loading, err
                     {/* Saved card (shown after one has been added) */}
                     {savedCard && (
                         <div className="flex items-center gap-3 py-2">
-                            <div className="w-4 h-4 rounded-full border-2 border-[#1860BF] flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-[#1860BF]" />
+                            <div className="w-4 h-4 rounded-full border-2 border-[var(--brand-100)] flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-[var(--brand-100)]" />
                             </div>
                             <div className="flex-1">
                                 <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--text-primary)' }}>Visa</span>
@@ -305,8 +305,8 @@ function MainView({ monthlyTotal, onceOffTotal, onAddMethod, onPay, loading, err
                         )}
                         {!savedCard && (
                             <button onClick={onAddMethod} className="flex items-center gap-[9px] text-left">
-                                <span style={{ fontSize: 18, color: '#1AAFDE' }}>+</span>
-                                <span style={{ fontSize: 15, lineHeight: '20px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif', color: '#1AAFDE' }}>
+                                <span style={{ fontSize: 18, color: 'var(--brand-200)' }}>+</span>
+                                <span style={{ fontSize: 15, lineHeight: '20px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif', color: 'var(--brand-200)' }}>
                                     Add payment method
                                 </span>
                             </button>
@@ -337,9 +337,9 @@ function TypeSelectView({ onSelectCard }) {
             <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
                     <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-                        <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="#1860BF" />
-                        <rect x="0" y="3" width="20" height="3" fill="#1860BF" />
-                        <rect x="2" y="8" width="5" height="2" rx="0.5" fill="#1860BF" />
+                        <rect x="0.5" y="0.5" width="19" height="13" rx="1.5" stroke="var(--brand-100)" />
+                        <rect x="0" y="3" width="20" height="3" fill="var(--brand-100)" />
+                        <rect x="2" y="8" width="5" height="2" rx="0.5" fill="var(--brand-100)" />
                     </svg>
                     <span className="font-semibold text-[var(--text-primary)]" style={{ fontSize: 17, lineHeight: '22px', letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}>
                         Payment method
@@ -415,7 +415,7 @@ function CardFormView({ onNext }) {
                 disabled={!isComplete}
                 className="mt-4 w-full h-[42px] rounded-[100px] font-semibold"
                 style={{
-                    background: isComplete ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                    background: isComplete ? 'var(--gradient-brand)' : '#E5E5EA',
                     color: isComplete ? '#fff' : '#AEAEB2',
                     fontSize: 17,
                     letterSpacing: '0.0035em',

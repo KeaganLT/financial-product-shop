@@ -2,8 +2,8 @@ import SectionHeading from './SectionHeading.jsx';
 
 const WALLET_ICON = (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="6" width="18" height="13" rx="2" stroke="#1860BF" strokeWidth="2" />
-        <path d="M3 10h18" stroke="#1860BF" strokeWidth="2" />
+        <rect x="3" y="6" width="18" height="13" rx="2" stroke="var(--brand-100)" strokeWidth="2" />
+        <path d="M3 10h18" stroke="var(--brand-100)" strokeWidth="2" />
     </svg>
 );
 
@@ -36,7 +36,7 @@ export default function AccountTypesSection({ types, loading, error, currentAcco
                                 onClick={() => onToggle(at.id, added)}
                                 className="ml-3 flex-shrink-0 px-3 py-1 rounded-full text-[12px] font-semibold"
                                 style={{
-                                    background: added ? 'transparent' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                                    background: added ? 'transparent' : 'var(--gradient-brand)',
                                     color: added ? '#C51C13' : '#FFFFFF',
                                     border: added ? '1px solid #C51C13' : 'none',
                                     opacity: toggling ? 0.5 : 1,

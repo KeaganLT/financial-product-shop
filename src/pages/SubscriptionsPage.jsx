@@ -161,7 +161,7 @@ export default function SubscriptionsPage() {
                         <button
                             onClick={() => navigate('/login')}
                             className="w-full h-[42px] rounded-[100px] font-semibold text-white"
-                            style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
+                            style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
                         >
                             Sign in
                         </button>
@@ -187,7 +187,7 @@ export default function SubscriptionsPage() {
                         <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#C51C13' }}>{error}</p>
                         <button
                             onClick={load}
-                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: '#1860BF', textDecoration: 'underline' }}
+                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 15, color: 'var(--brand-100)', textDecoration: 'underline' }}
                         >
                             Try again
                         </button>
@@ -206,7 +206,7 @@ export default function SubscriptionsPage() {
                         <button
                             onClick={() => navigate('/products')}
                             className="w-full h-[42px] rounded-[100px] font-semibold text-white"
-                            style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
+                            style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
                         >
                             Browse products
                         </button>

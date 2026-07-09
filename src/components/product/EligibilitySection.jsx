@@ -58,7 +58,7 @@ export default function EligibilitySection({ eligibility, eligibilityChecks }) {
                     <button
                         onClick={() => navigate('/account')}
                         className="self-start mt-1"
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: '#1860BF', textDecoration: 'underline' }}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: '13px', fontWeight: 600, color: 'var(--brand-100)', textDecoration: 'underline' }}
                     >
                         Go to Account to resolve →
                     </button>

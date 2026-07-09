@@ -136,13 +136,13 @@ export default function AccountPage() {
                         <button
                             onClick={() => navigate('/login')}
                             className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
-                            style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' }}
+                            style={{ background: 'var(--gradient-brand)' }}
                         >
                             Sign in
                         </button>
                         <p className="text-[15px]" style={{ color: 'var(--text-secondary)' }}>
                             Don&apos;t have an account?{' '}
-                            <button onClick={() => navigate('/signup')} className="font-semibold" style={{ color: '#1860BF' }}>
+                            <button onClick={() => navigate('/signup')} className="font-semibold" style={{ color: 'var(--brand-100)' }}>
                                 Sign up
                             </button>
                         </p>

@@ -65,9 +65,9 @@ export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onS
             {isGoogleUser && (
                 <div className="flex items-start gap-2 px-3 py-2 rounded-[8px]" style={{ background: '#EFF4FF', border: '1px solid #C7D9FF' }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                        <circle cx="8" cy="8" r="8" fill="#1860BF" /><path d="M8 5v1M8 8v3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                        <circle cx="8" cy="8" r="8" fill="var(--brand-100)" /><path d="M8 5v1M8 8v3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#1860BF' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--brand-100)' }}>
                         Your account uses Google sign-in. A Google popup will appear to confirm your identity.
                     </p>
                 </div>
@@ -86,7 +86,7 @@ export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onS
                             disabled={resetLoading}
                             onClick={handleResetPassword}
                             className="self-start text-left"
-                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#1860BF', opacity: resetLoading ? 0.5 : 1 }}
+                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--brand-100)', opacity: resetLoading ? 0.5 : 1 }}
                         >
                             {resetLoading ? 'Sending…' : 'Forgot your password? Send reset email'}
                         </button>
@@ -113,7 +113,7 @@ export default function ChangePasswordForm({ isGoogleUser, onDone, onCancel, onS
                     type="submit"
                     disabled={saving}
                     className="flex-1 h-[42px] rounded-full text-white font-semibold"
-                    style={{ background: saving ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
+                    style={{ background: saving ? '#A0AEC0' : 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
                 >
                     {saving ? (isGoogleUser ? 'Opening Google…' : 'Saving…') : 'Update password'}
                 </button>

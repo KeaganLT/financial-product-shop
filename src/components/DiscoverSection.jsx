@@ -48,7 +48,7 @@ export default function DiscoverSection({ products }) {
                 flex-shrink-0 px-4 py-1.5 rounded-full text-[13px] font-medium
                 transition-colors duration-150
                 ${active
-                                    ? 'bg-[#1860BF] text-white'
+                                    ? 'bg-[var(--brand-100)] text-white'
                                     : 'bg-gray-100 text-gray-500'
                                 }
               `}

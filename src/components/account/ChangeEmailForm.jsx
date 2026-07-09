@@ -44,7 +44,7 @@ export default function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, on
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#8E8E93' }}>
                     Check <strong>{newEmail}</strong> and click the link to confirm the change. Your current email stays active until then.
                 </p>
-                <button onClick={onDone} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF', textAlign: 'left', fontWeight: 600 }}>Done</button>
+                <button onClick={onDone} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--brand-100)', textAlign: 'left', fontWeight: 600 }}>Done</button>
             </div>
         );
     }
@@ -54,9 +54,9 @@ export default function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, on
             {isGoogleUser && (
                 <div className="flex items-start gap-2 px-3 py-2 rounded-[8px]" style={{ background: '#EFF4FF', border: '1px solid #C7D9FF' }}>
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
-                        <circle cx="8" cy="8" r="8" fill="#1860BF" /><path d="M8 5v1M8 8v3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+                        <circle cx="8" cy="8" r="8" fill="var(--brand-100)" /><path d="M8 5v1M8 8v3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                     </svg>
-                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: '#1860BF' }}>
+                    <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--brand-100)' }}>
                         Your account uses Google sign-in. A Google popup will appear to confirm your identity.
                     </p>
                 </div>
@@ -90,7 +90,7 @@ export default function ChangeEmailForm({ currentEmail, isGoogleUser, onDone, on
                     type="submit"
                     disabled={saving}
                     className="flex-1 h-[42px] rounded-full text-white font-semibold"
-                    style={{ background: saving ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
+                    style={{ background: saving ? '#A0AEC0' : 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
                 >
                     {saving ? (isGoogleUser ? 'Opening Google…' : 'Sending…') : 'Update email'}
                 </button>

@@ -43,7 +43,7 @@ export default function StepProductReview({ product, onNext }) {
                         </p>
                     </div>
                     <div className="flex items-baseline gap-1">
-                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 24, fontWeight: 700, color: '#1860BF' }}>
+                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 24, fontWeight: 700, color: 'var(--brand-100)' }}>
                             R{Number(product.price).toFixed(2)}
                         </span>
                         <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, color: 'var(--text-secondary)' }}>/ month</span>
@@ -71,7 +71,7 @@ export default function StepProductReview({ product, onNext }) {
             <button
                 onClick={onNext}
                 className="w-full h-[50px] rounded-[100px] font-semibold text-white"
-                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
+                style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
             >
                 Continue
             </button>

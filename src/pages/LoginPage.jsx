@@ -6,6 +6,7 @@ import LogoMark from '../components/LogoMark.jsx';
 import SplashScreen from '../components/SplashScreen.jsx';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import { signInWithGoogle, resetPassword } from '../services/firebase.js';
+import { features } from '../config/env.js';
 import { legacyLogin } from '../services/credentialVault.js';
 
 const SPLASH_DISPLAY_MS = 1600;
@@ -124,7 +125,7 @@ export default function LoginPage() {
                                 onClick={handleStartLogin}
                                 className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
                                 style={{
-                                    background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                                    background: 'var(--gradient-brand)',
                                     letterSpacing: '0.0035em',
                                 }}
                             >
@@ -159,6 +160,7 @@ export default function LoginPage() {
                 {stage === 'form' && (
                     <>
                         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
+                            {features.googleSignIn && (
                             <button
                                 type="button"
                                 onClick={handleGoogleLogin}
@@ -174,12 +176,15 @@ export default function LoginPage() {
                                 </svg>
                                 Continue with Google
                             </button>
+                            )}
 
+                            {features.googleSignIn && (
                             <div className="flex items-center gap-3">
                                 <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                                 <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>or</span>
                                 <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                             </div>
+                            )}
 
                             <div className="flex flex-col gap-4">
                                 <FormInput
@@ -216,7 +221,7 @@ export default function LoginPage() {
                                     disabled={!canSubmit || isSubmitting}
                                     className="w-full py-[10px] rounded-full text-[17px] font-semibold"
                                     style={{
-                                        background: canSubmit ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                                        background: canSubmit ? 'var(--gradient-brand)' : '#E5E5EA',
                                         color: canSubmit ? '#FFFFFF' : '#AEAEB2',
                                         letterSpacing: '0.0035em',
                                         opacity: isSubmitting ? 0.6 : 1,

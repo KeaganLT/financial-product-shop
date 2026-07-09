@@ -51,7 +51,7 @@ export default function InstallPrompt() {
                 <button
                     onClick={install}
                     className="flex-shrink-0 px-3 py-1.5 rounded-full font-semibold text-white"
-                    style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 13 }}
+                    style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 13 }}
                 >
                     Install
                 </button>

@@ -25,7 +25,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
         <Section heading="Contract summary">
             <div
                 className="rounded-t-[10px] px-4 py-3 flex items-center justify-between"
-                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' }}
+                style={{ background: 'var(--gradient-brand)' }}
             >
                 <div>
                     <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, fontWeight: 700, color: 'white' }}>InsureTechGuard (Pty) Ltd</p>
@@ -86,7 +86,7 @@ export default function ContractPreview({ product, profile, profileLoading, reso
                     <ul className="flex flex-col gap-1.5">
                         {KEY_TERMS.map((t) => (
                             <li key={t} style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, color: 'var(--neutral-700)', paddingLeft: 12, position: 'relative' }}>
-                                <span style={{ position: 'absolute', left: 0, color: '#1860BF' }}>·</span>
+                                <span style={{ position: 'absolute', left: 0, color: 'var(--brand-100)' }}>·</span>
                                 {t}
                             </li>
                         ))}

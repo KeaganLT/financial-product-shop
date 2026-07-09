@@ -30,16 +30,16 @@ export default function AccountPickerSheet({ open, accounts, selectedId, saving,
                                 onClick={() => onSelect(account.id)}
                                 className="flex items-center gap-3 px-4 py-3 rounded-[10px] border text-left"
                                 style={{
-                                    borderColor: selected ? '#1860BF' : 'var(--neutral-400)',
+                                    borderColor: selected ? 'var(--brand-100)' : 'var(--neutral-400)',
                                     background: selected ? 'rgba(24,96,191,0.08)' : 'var(--neutral-100)',
                                     opacity: saving ? 0.6 : 1,
                                 }}
                             >
                                 <div
                                     className="w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0"
-                                    style={{ borderColor: selected ? '#1860BF' : 'var(--neutral-400)' }}
+                                    style={{ borderColor: selected ? 'var(--brand-100)' : 'var(--neutral-400)' }}
                                 >
-                                    {selected && <div className="w-2 h-2 rounded-full" style={{ background: '#1860BF' }} />}
+                                    {selected && <div className="w-2 h-2 rounded-full" style={{ background: 'var(--brand-100)' }} />}
                                 </div>
                                 <div className="flex flex-col gap-0.5 min-w-0">
                                     <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -57,7 +57,7 @@ export default function AccountPickerSheet({ open, accounts, selectedId, saving,
                 <button
                     onClick={onAddNew}
                     className="flex items-center gap-2 px-1 py-2"
-                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: '#1860BF' }}
+                    style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: 'var(--brand-100)' }}
                 >
                     <span style={{ fontSize: 18 }}>+</span> Add a new account
                 </button>

@@ -108,7 +108,7 @@ export default function SubscribeCheckoutPage() {
     if (loading || gateChecking) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--neutral-100)' }}>
-                <div className="w-8 h-8 border-4 border-[#1860BF] border-t-transparent rounded-full animate-spin" />
+                <div className="w-8 h-8 border-4 border-[var(--brand-100)] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
@@ -136,7 +136,7 @@ export default function SubscribeCheckoutPage() {
                             <button
                                 onClick={() => navigate('/subscriptions')}
                                 className="w-full h-[46px] rounded-[100px] font-semibold text-white"
-                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
+                                style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
                             >
                                 View my subscriptions
                             </button>
@@ -144,7 +144,7 @@ export default function SubscribeCheckoutPage() {
                             <button
                                 onClick={() => navigate(`/products/${productId}`)}
                                 className="w-full h-[46px] rounded-[100px] font-semibold text-white"
-                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
+                                style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 16 }}
                             >
                                 View eligibility details
                             </button>
@@ -152,7 +152,7 @@ export default function SubscribeCheckoutPage() {
                         <button
                             onClick={() => navigate('/products')}
                             className="w-full h-[46px] rounded-[100px] font-semibold border"
-                            style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 16, background: 'var(--neutral-100)' }}
+                            style={{ borderColor: 'var(--brand-100)', color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif', fontSize: 16, background: 'var(--neutral-100)' }}
                         >
                             Browse other products
                         </button>

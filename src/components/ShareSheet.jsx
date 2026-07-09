@@ -67,7 +67,7 @@ export default function ShareSheet({ product, open, onClose }) {
                     <button
                         onClick={handleCopy}
                         className="flex-shrink-0 px-3 py-1.5 rounded-full font-semibold text-white"
-                        style={{ background: copied ? '#168C34' : '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 13 }}
+                        style={{ background: copied ? '#168C34' : 'var(--brand-100)', fontFamily: 'Roboto, sans-serif', fontSize: 13 }}
                     >
                         {copied ? 'Copied ✓' : 'Copy link'}
                     </button>

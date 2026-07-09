@@ -82,9 +82,9 @@ export default function BankAccountPage() {
                         title={`Current: ${existing.bankName}`}
                         icon={(
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                <rect x="2" y="6" width="16" height="12" rx="2" stroke="#1860BF" strokeWidth="1.5" />
-                                <path d="M2 10h16" stroke="#1860BF" strokeWidth="1.5" />
-                                <rect x="5" y="13" width="4" height="2" rx="1" fill="#1860BF" />
+                                <rect x="2" y="6" width="16" height="12" rx="2" stroke="var(--brand-100)" strokeWidth="1.5" />
+                                <path d="M2 10h16" stroke="var(--brand-100)" strokeWidth="1.5" />
+                                <rect x="5" y="13" width="4" height="2" rx="1" fill="var(--brand-100)" />
                             </svg>
                         )}
                     >
@@ -100,7 +100,7 @@ export default function BankAccountPage() {
                         <button
                             onClick={() => navigate('/login')}
                             className="w-full h-[42px] rounded-full font-semibold text-white"
-                            style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
+                            style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
                         >
                             Sign in
                         </button>
@@ -155,9 +155,9 @@ export default function BankAccountPage() {
                                         style={{
                                             fontFamily: 'Roboto, sans-serif', fontSize: 12,
                                             fontWeight: accountType === type ? 700 : 400,
-                                            borderColor: accountType === type ? '#1860BF' : 'var(--neutral-400)',
+                                            borderColor: accountType === type ? 'var(--brand-100)' : 'var(--neutral-400)',
                                             background: accountType === type ? '#EFF4FF' : 'var(--neutral-100)',
-                                            color: accountType === type ? '#1860BF' : 'var(--neutral-700)',
+                                            color: accountType === type ? 'var(--brand-100)' : 'var(--neutral-700)',
                                         }}
                                     >
                                         {type}
@@ -176,11 +176,11 @@ export default function BankAccountPage() {
                                         onClick={() => setDebitDay(day)}
                                         className="w-[64px] h-[64px] rounded-[12px] flex flex-col items-center justify-center border"
                                         style={{
-                                            borderColor: debitDay === day ? '#1860BF' : 'var(--neutral-400)',
+                                            borderColor: debitDay === day ? 'var(--brand-100)' : 'var(--neutral-400)',
                                             background: debitDay === day ? '#EFF4FF' : 'var(--neutral-100)',
                                         }}
                                     >
-                                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: debitDay === day ? '#1860BF' : 'var(--text-primary)' }}>{day}</span>
+                                        <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 22, fontWeight: 700, color: debitDay === day ? 'var(--brand-100)' : 'var(--text-primary)' }}>{day}</span>
                                         <span style={{ fontFamily: 'Roboto, sans-serif', fontSize: 10, color: 'var(--text-secondary)' }}>of month</span>
                                     </button>
                                 ))}
@@ -196,7 +196,7 @@ export default function BankAccountPage() {
                             disabled={saving}
                             className="w-full h-[50px] rounded-[100px] font-semibold text-white"
                             style={{
-                                background: saving ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                                background: saving ? '#A0AEC0' : 'var(--gradient-brand)',
                                 fontFamily: 'Roboto, sans-serif', fontSize: 17,
                             }}
                         >

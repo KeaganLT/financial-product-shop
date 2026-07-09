@@ -112,7 +112,7 @@ export default function KycDocumentsPage() {
                     disabled={!isKycStepValid || isSubmitting}
                     className="w-full py-[10px] rounded-full text-[17px] font-semibold"
                     style={{
-                        background: isKycStepValid ? 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)' : '#E5E5EA',
+                        background: isKycStepValid ? 'var(--gradient-brand)' : '#E5E5EA',
                         color: isKycStepValid ? '#FFFFFF' : '#AEAEB2',
                         letterSpacing: '0.0035em',
                         opacity: isSubmitting ? 0.6 : 1,

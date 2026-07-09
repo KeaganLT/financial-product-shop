@@ -53,11 +53,11 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                     <button
                         onClick={() => onContract({ id: productId, name, price })}
                         className="flex items-center gap-1"
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: contractSigned ? '#168C34' : '#1860BF' }}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: contractSigned ? '#168C34' : 'var(--brand-100)' }}
                     >
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={contractSigned ? '#168C34' : '#1860BF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <path d="M14 2v6h6M16 13H8M16 17H8" stroke={contractSigned ? '#168C34' : '#1860BF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke={contractSigned ? '#168C34' : 'var(--brand-100)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 2v6h6M16 13H8M16 17H8" stroke={contractSigned ? '#168C34' : 'var(--brand-100)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         {contractSigned ? 'Signed ✓' : 'Sign contract'}
                     </button>
@@ -69,10 +69,10 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-1"
-                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: '#1860BF' }}
+                                style={{ fontFamily: 'Roboto, sans-serif', fontSize: 13, color: 'var(--brand-100)' }}
                             >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="#1860BF" />
+                                    <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="var(--brand-100)" />
                                 </svg>
                                 View contract
                             </a>
@@ -100,7 +100,7 @@ export default function SubscriptionCard({ subscription, onCancel, cancelling, o
                     </span>
                     <button
                         onClick={onChangeAccount}
-                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 600, color: '#1860BF', flexShrink: 0, marginLeft: 8 }}
+                        style={{ fontFamily: 'Roboto, sans-serif', fontSize: 12, fontWeight: 600, color: 'var(--brand-100)', flexShrink: 0, marginLeft: 8 }}
                     >
                         {account ? 'Change account' : 'Link account'}
                     </button>

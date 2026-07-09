@@ -32,11 +32,11 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                 </p>
             </div>
 
-            <div className="rounded-[12px] p-4 flex flex-col gap-4" style={{ border: '1.5px solid #1860BF', background: '#F8FAFF' }}>
+            <div className="rounded-[12px] p-4 flex flex-col gap-4" style={{ border: '1.5px solid var(--brand-100)', background: '#F8FAFF' }}>
                 <div className="flex items-center gap-3 pb-3" style={{ borderBottom: '1px solid #D0DDEE' }}>
                     <div
                         className="w-10 h-10 rounded-full flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg, #1860BF 0%, #1AB0DE 100%)' }}
+                        style={{ background: 'linear-gradient(135deg, var(--brand-100) 0%, var(--brand-200) 100%)' }}
                     >
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <path d="M10 2L2 7h16L10 2z" fill="white" />
@@ -66,7 +66,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         <li key={i} className="flex items-start gap-2">
                             <span
                                 className="flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-white mt-0.5"
-                                style={{ background: '#1860BF', fontSize: 9, fontFamily: 'Roboto, sans-serif', fontWeight: 700 }}
+                                style={{ background: 'var(--brand-100)', fontSize: 9, fontFamily: 'Roboto, sans-serif', fontWeight: 700 }}
                             >
                                 {i + 1}
                             </span>
@@ -89,7 +89,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
             >
                 <div
                     className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
-                    style={{ borderColor: agreed ? '#1860BF' : 'var(--neutral-400)', background: agreed ? '#1860BF' : 'var(--neutral-100)' }}
+                    style={{ borderColor: agreed ? 'var(--brand-100)' : 'var(--neutral-400)', background: agreed ? 'var(--brand-100)' : 'var(--neutral-100)' }}
                 >
                     {agreed && (
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -116,7 +116,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
                         fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif',
                         fontSize: 18,
                         borderColor: error && !signature ? '#C51C13' : 'var(--neutral-400)',
-                        color: '#1860BF',
+                        color: 'var(--brand-100)',
                     }}
                 />
                 <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>
@@ -129,7 +129,7 @@ export default function StepMandate({ product, bankDetails, onNext }) {
             <button
                 onClick={handleConfirm}
                 className="w-full h-[50px] rounded-[100px] font-semibold text-white"
-                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
+                style={{ background: 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 17 }}
             >
                 Accept & Continue
             </button>

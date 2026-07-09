@@ -3,7 +3,7 @@ import ProductCard from './ProductCard';
 // Matches Figma section wrapper specs:
 // "Recommended for you" and "New arrivals" sections share the same layout:
 // - Section heading: #000000, Headline 3 Bold
-// - "View all" link: #1860BF, Body 15/Semibold, with arrow right (width 14)
+// - "View all" link: var(--brand-100), Body 15/Semibold, with arrow right (width 14)
 // - Heading wrapper height: 28px
 // - Padding: top 16, bottom 8, left 24, right 24
 // - Item spacing between cards: 16px
@@ -21,10 +21,10 @@ export default function SectionRow({ title, products, onViewAll }) {
                     {title}
                 </h2>
 
-                {/* View all — #1860BF, Body 15/Semibold, with arrow */}
+                {/* View all — var(--brand-100), Body 15/Semibold, with arrow */}
                 <button
                     className="flex items-center gap-1 text-[15px] font-semibold"
-                    style={{ color: '#1860BF' }}
+                    style={{ color: 'var(--brand-100)' }}
                     onClick={onViewAll}
                 >
                     View all
@@ -32,7 +32,7 @@ export default function SectionRow({ title, products, onViewAll }) {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                         <path
                             d="M9 18l6-6-6-6"
-                            stroke="#1860BF"
+                            stroke="var(--brand-100)"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"

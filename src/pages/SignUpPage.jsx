@@ -12,6 +12,7 @@ import { createUser, createProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
 import { validateSAId } from '../services/saIdValidator.js';
+import { features } from '../config/env.js';
 import {
     trackEvent,
     uploadKycDocument,
@@ -217,7 +218,7 @@ export default function SignUpPage() {
         }
     }
 
-    const gradientBtn = { background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' };
+    const gradientBtn = { background: 'var(--gradient-brand)', letterSpacing: '0.0035em' };
 
     return (
         <div
@@ -270,6 +271,7 @@ export default function SignUpPage() {
 
                 {stage === 'email' && (
                     <form onSubmit={handleEmailSubmit} className="w-full flex flex-col gap-6">
+                        {features.googleSignIn && (
                         <button
                             type="button"
                             onClick={handleGoogleSignUp}
@@ -285,12 +287,15 @@ export default function SignUpPage() {
                             </svg>
                             Continue with Google
                         </button>
+                        )}
 
+                        {features.googleSignIn && (
                         <div className="flex items-center gap-3">
                             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                             <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>or</span>
                             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                         </div>
+                        )}
 
                         <div className="flex flex-col gap-4">
                             <FormInput id="email" label="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputRef={emailInputRef} autoFocus />
