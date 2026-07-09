@@ -31,7 +31,7 @@ export default function PrepView({ isSelfie, tips, cameraError, onClose, onGotIt
             <button
                 type="button"
                 className="w-full py-[10px] rounded-full text-[17px] font-semibold text-white"
-                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' }}
+                style={{ background: 'var(--gradient-brand)', letterSpacing: '0.0035em' }}
                 onClick={onGotIt}
             >
                 Got it

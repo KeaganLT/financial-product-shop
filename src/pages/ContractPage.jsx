@@ -173,10 +173,10 @@ export default function ContractPage() {
                     <button
                         onClick={handleDownloadUnsigned}
                         className="w-full h-[46px] rounded-[100px] flex items-center justify-center gap-2 border font-semibold"
-                        style={{ borderColor: '#1860BF', color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
+                        style={{ borderColor: 'var(--brand-100)', color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif', fontSize: 15 }}
                     >
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="#1860BF" />
+                            <path d="M12 16l-4-4h3V4h2v8h3l-4 4zM4 20h16v2H4v-2z" fill="var(--brand-100)" />
                         </svg>
                         Download PDF
                     </button>
@@ -197,7 +197,7 @@ export default function ContractPage() {
                             <div
                                 aria-hidden="true"
                                 className="w-5 h-5 rounded flex-shrink-0 mt-0.5 flex items-center justify-center border-2"
-                                style={{ borderColor: agreed ? '#1860BF' : 'var(--neutral-400)', background: agreed ? '#1860BF' : 'var(--neutral-100)' }}
+                                style={{ borderColor: agreed ? 'var(--brand-100)' : 'var(--neutral-400)', background: agreed ? 'var(--brand-100)' : 'var(--neutral-100)' }}
                             >
                                 {agreed && (
                                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -219,7 +219,7 @@ export default function ContractPage() {
                                 onChange={(e) => { setSignature(e.target.value); setSigError(''); }}
                                 placeholder="e.g. Keagan Truter"
                                 className="w-full h-[46px] rounded-[10px] px-3 border"
-                                style={{ fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif', fontSize: 18, borderColor: sigError && !signature ? '#C51C13' : 'var(--neutral-400)', color: '#1860BF' }}
+                                style={{ fontFamily: '"Brush Script MT", cursive, Roboto, sans-serif', fontSize: 18, borderColor: sigError && !signature ? '#C51C13' : 'var(--neutral-400)', color: 'var(--brand-100)' }}
                             />
                             <p style={{ fontFamily: 'Roboto, sans-serif', fontSize: 11, color: 'var(--text-secondary)' }}>
                                 By typing your name you are providing a legally binding digital signature.
@@ -230,7 +230,7 @@ export default function ContractPage() {
                             onClick={handleSignAndDownload}
                             disabled={uploading}
                             className="w-full h-[50px] rounded-[100px] font-semibold text-white flex items-center justify-center gap-2"
-                            style={{ background: uploading ? '#A0AEC0' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontFamily: 'Roboto, sans-serif', fontSize: 16, cursor: uploading ? 'not-allowed' : 'pointer' }}
+                            style={{ background: uploading ? '#A0AEC0' : 'var(--gradient-brand)', fontFamily: 'Roboto, sans-serif', fontSize: 16, cursor: uploading ? 'not-allowed' : 'pointer' }}
                         >
                             {uploading ? (
                                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Uploading…</>

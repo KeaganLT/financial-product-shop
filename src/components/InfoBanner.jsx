@@ -1,5 +1,5 @@
 const ACCENTS = {
-    info:    '#1860BF',
+    info:    'var(--brand-100)',
     warning: '#B96A00',
     success: '#168C34',
     error:   '#C51C13',

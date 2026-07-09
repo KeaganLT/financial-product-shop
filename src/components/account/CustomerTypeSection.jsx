@@ -2,8 +2,8 @@ import SectionHeading from './SectionHeading.jsx';
 
 const TYPE_ICON = (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="16" rx="2" stroke="#1860BF" strokeWidth="2" />
-        <path d="M3 9h18M8 14h4" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" />
+        <rect x="3" y="4" width="18" height="16" rx="2" stroke="var(--brand-100)" strokeWidth="2" />
+        <path d="M3 9h18M8 14h4" stroke="var(--brand-100)" strokeWidth="2" strokeLinecap="round" />
     </svg>
 );
 

@@ -115,10 +115,10 @@ export default function CheckoutResultPage() {
                             onClick={() => navigate('/subscriptions')}
                             className="w-full h-[46px] rounded-[100px] font-semibold"
                             style={{
-                                border: '1.5px solid #1860BF',
+                                border: '1.5px solid var(--brand-100)',
                                 fontFamily: 'Roboto, sans-serif',
                                 fontSize: 16,
-                                color: '#1860BF',
+                                color: 'var(--brand-100)',
                                 background: 'var(--neutral-100)',
                             }}
                         >
@@ -129,7 +129,7 @@ export default function CheckoutResultPage() {
                         onClick={() => navigate('/products')}
                         className="w-full h-[46px] rounded-[100px] font-semibold text-white"
                         style={{
-                            background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                            background: 'var(--gradient-brand)',
                             fontSize: 16,
                             fontFamily: 'Roboto, sans-serif',
                         }}

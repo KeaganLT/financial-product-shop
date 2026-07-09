@@ -8,15 +8,16 @@ import KYCSuccess from '../assets/KYCSuccess.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import DotLoader from '../components/signup/DotLoader.jsx';
 import VerifiedDocRow from '../components/signup/VerifiedDocRow.jsx';
-import { createUser, createProfile } from '../services/customerService.js';
+import { createUser, createProfile, getProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
 import { validateSAId } from '../services/saIdValidator.js';
+import { requestOtp, verifyOtp } from '../services/otpService.js';
+import { features } from '../config/env.js';
 import {
     trackEvent,
     uploadKycDocument,
     sendVerificationEmail,
-    sendExistingAccountEmail,
     isEmailVerificationLink,
     getStoredVerificationEmail,
     getStoredVerificationPassword,
@@ -45,6 +46,10 @@ export default function SignUpPage() {
 
     const [error, setError]           = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [verifyMethod, setVerifyMethod] = useState('link');
+    const [otpCode, setOtpCode]           = useState('');
+    const [otpError, setOtpError]         = useState('');
 
     const isEmailStepValid    = email.includes('@');
     const isIdNumberValid     = validateSAId(idNumber);
@@ -163,23 +168,48 @@ export default function SignUpPage() {
         setError('');
         setIsSubmitting(true);
         try {
-            try {
-                await createUser(email, password);
+            // Fail-safe: we do NOT create the legacy account here. Nothing is
+            // written to the backend until the user finishes the whole flow
+            // (see handleKycSubmit). This step only verifies email ownership.
+            if (features.emailOtp && verifyMethod === 'otp') {
+                await requestOtp(email);
+                setOtpCode('');
+                setOtpError('');
+                setStage('otp');
+            } else {
                 await sendVerificationEmail(email, password);
-            } catch (err) {
-                if (err.status !== 400) throw err;
-                await sendExistingAccountEmail(email);
-                setError('An account with this email already exists. Please log in instead.');
-                trackEvent('registration_error', { stage: 'email', error: 'account_exists' });
-                return;
+                setStage('awaiting-verification');
             }
-            setStage('awaiting-verification');
         } catch (err) {
-            const message = err.message || 'Failed to send verification email';
+            const message = err.message || 'Failed to send verification';
             setError(message);
             trackEvent('registration_error', { stage: 'email', error: message });
         } finally {
             setIsSubmitting(false);
+        }
+    }
+
+    async function handleVerifyOtp(e) {
+        e.preventDefault();
+        if (otpCode.trim().length !== 6) return;
+        setOtpError('');
+        setIsSubmitting(true);
+        try {
+            await verifyOtp(email, otpCode.trim());
+            setStage('details');
+        } catch (err) {
+            setOtpError(err.message || 'Incorrect or expired code.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
+    async function handleResendOtp() {
+        setOtpError('');
+        try {
+            await requestOtp(email);
+        } catch (err) {
+            setOtpError(err.message || 'Could not resend the code.');
         }
     }
 
@@ -199,12 +229,44 @@ export default function SignUpPage() {
         setStage('submitting');
 
         try {
-            const { token } = await login(email, password);
-            await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
+            // 1. Create the legacy account now — the single point where anything
+            //    is written to the backend. Resumable: if a prior attempt already
+            //    created it, a 400 is fine as long as the password matches below.
+            let accountExisted = false;
+            try {
+                await createUser(email, password);
+            } catch (err) {
+                if (err.status !== 400) throw err;
+                accountExisted = true;
+            }
+
+            // 2. Log in. If the account already existed with a different password,
+            //    this fails → it's genuinely someone else's account.
+            let token;
+            try {
+                ({ token } = await login(email, password));
+            } catch (err) {
+                if (accountExisted) {
+                    throw new Error('An account with this email already exists. Please log in instead.', { cause: err });
+                }
+                throw err;
+            }
+
+            // 3. Create the profile. Idempotent: if one already exists from a
+            //    prior incomplete attempt, continue instead of failing.
+            try {
+                await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
+            } catch (err) {
+                const existing = await getProfile(token).catch(() => null);
+                if (!existing) throw err;
+            }
+
+            // 4. Upload KYC documents (safe to overwrite on retry).
             await Promise.all([
                 uploadKycDocument(email, 'selfie', selfieFile),
                 uploadKycDocument(email, 'proof-of-residence', proofOfResidenceFile),
             ]);
+
             trackEvent('registration_completed');
             setStage('done');
         } catch (err) {
@@ -217,7 +279,7 @@ export default function SignUpPage() {
         }
     }
 
-    const gradientBtn = { background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', letterSpacing: '0.0035em' };
+    const gradientBtn = { background: 'var(--gradient-brand)', letterSpacing: '0.0035em' };
 
     return (
         <div
@@ -270,6 +332,7 @@ export default function SignUpPage() {
 
                 {stage === 'email' && (
                     <form onSubmit={handleEmailSubmit} className="w-full flex flex-col gap-6">
+                        {features.googleSignIn && (
                         <button
                             type="button"
                             onClick={handleGoogleSignUp}
@@ -285,12 +348,15 @@ export default function SignUpPage() {
                             </svg>
                             Continue with Google
                         </button>
+                        )}
 
+                        {features.googleSignIn && (
                         <div className="flex items-center gap-3">
                             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                             <span className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>or</span>
                             <div className="flex-1 h-px" style={{ backgroundColor: 'var(--neutral-400)' }} />
                         </div>
+                        )}
 
                         <div className="flex flex-col gap-4">
                             <FormInput id="email" label="Email" type="text" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" inputRef={emailInputRef} autoFocus />
@@ -326,6 +392,32 @@ export default function SignUpPage() {
                             <p className="text-[13px] -mt-2" style={{ color: '#FFD60A' }}>
                                 This password has appeared in {pwnedCount.toLocaleString()} known data breaches. We recommend choosing a different one.
                             </p>
+                        )}
+
+                        {features.emailOtp && (
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>How would you like to verify your email?</p>
+                                <div className="flex gap-2">
+                                    {[
+                                        { key: 'link', label: 'Email link' },
+                                        { key: 'otp',  label: 'Verification code' },
+                                    ].map(({ key, label }) => (
+                                        <button
+                                            key={key}
+                                            type="button"
+                                            onClick={() => setVerifyMethod(key)}
+                                            className="flex-1 py-2 rounded-full text-[13px] font-semibold border"
+                                            style={{
+                                                borderColor: verifyMethod === key ? 'var(--brand-100)' : 'var(--neutral-400)',
+                                                background:  verifyMethod === key ? 'rgba(24,96,191,0.08)' : 'transparent',
+                                                color:       verifyMethod === key ? 'var(--brand-100)' : 'var(--text-secondary)',
+                                            }}
+                                        >
+                                            {label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         )}
 
                         {error && <p role="alert" className="text-[13px] text-red-400 -mt-2">{error}</p>}
@@ -373,6 +465,41 @@ export default function SignUpPage() {
                             Resend email
                         </button>
                     </div>
+                )}
+
+                {stage === 'otp' && (
+                    <form onSubmit={handleVerifyOtp} className="w-full flex flex-col items-center gap-4 text-center">
+                        <p className="text-[17px]" style={{ color: 'var(--text-primary)' }}>
+                            Enter the 6-digit code we sent to <strong>{email}</strong>.
+                        </p>
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            value={otpCode}
+                            onChange={(e) => { setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }}
+                            placeholder="000000"
+                            autoFocus
+                            className="w-full h-[54px] rounded-[12px] text-center border"
+                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 28, letterSpacing: '10px', fontWeight: 700, borderColor: otpError ? '#C51C13' : 'var(--neutral-400)', background: 'var(--neutral-100)', color: 'var(--text-primary)' }}
+                        />
+                        {otpError && <p role="alert" className="text-[13px]" style={{ color: '#C51C13' }}>{otpError}</p>}
+                        <button
+                            type="submit"
+                            disabled={otpCode.length !== 6 || isSubmitting}
+                            className="w-full py-[10px] rounded-full text-[17px] font-semibold"
+                            style={{
+                                ...(otpCode.length === 6 ? gradientBtn : { background: '#E5E5EA', letterSpacing: '0.0035em' }),
+                                color: otpCode.length === 6 ? '#FFFFFF' : '#AEAEB2',
+                                opacity: isSubmitting ? 0.6 : 1,
+                            }}
+                        >
+                            {isSubmitting ? 'Verifying…' : 'Verify'}
+                        </button>
+                        <button type="button" onClick={handleResendOtp} className="text-[15px] underline" style={{ color: 'var(--brand-200)' }}>
+                            Resend code
+                        </button>
+                    </form>
                 )}
 
                 {stage === 'details' && (

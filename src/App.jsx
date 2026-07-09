@@ -20,6 +20,8 @@ import KycDocumentsPage from './pages/KycDocumentsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Footer from './components/Footer';
 import InstallPrompt from './components/InstallPrompt';
+import EnvRibbon from './components/EnvRibbon';
+import { features } from './config/env.js';
 
 function AuthCartBridge() {
     const { auth } = useAuth();
@@ -67,7 +69,8 @@ export default function App() {
                         <BrowserRouter>
                             <AuthCartBridge />
                             <AnimatedRoutes />
-                            <InstallPrompt />
+                            {features.pwaInstall && <InstallPrompt />}
+                            <EnvRibbon />
                         </BrowserRouter>
                     </CartProvider>
                 </AuthProvider>

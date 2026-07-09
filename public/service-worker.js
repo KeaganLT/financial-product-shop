@@ -1,4 +1,4 @@
-const CACHE = 'finshop-shell-v1';
+const CACHE = 'finshop-shell-v2';
 const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/favicon.svg', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
@@ -20,6 +20,8 @@ self.addEventListener('fetch', (event) => {
     const url = new URL(request.url);
     if (url.origin !== self.location.origin) return;
 
+    if (url.pathname.startsWith('/v1') || url.pathname.startsWith('/client')) return;
+
     if (request.mode === 'navigate') {
         event.respondWith(
             fetch(request).catch(() => caches.match('/index.html'))
@@ -27,16 +29,18 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    event.respondWith(
-        caches.match(request).then((cached) => {
-            if (cached) return cached;
-            return fetch(request).then((response) => {
-                if (response.ok && (request.destination === 'script' || request.destination === 'style' || request.destination === 'image' || request.destination === 'font')) {
-                    const copy = response.clone();
-                    caches.open(CACHE).then((cache) => cache.put(request, copy));
-                }
-                return response;
-            });
-        })
-    );
+    if (['script', 'style', 'image', 'font'].includes(request.destination)) {
+        event.respondWith(
+            caches.match(request).then((cached) => {
+                if (cached) return cached;
+                return fetch(request).then((response) => {
+                    if (response && response.ok) {
+                        const copy = response.clone();
+                        caches.open(CACHE).then((cache) => cache.put(request, copy));
+                    }
+                    return response;
+                }).catch(() => cached);
+            })
+        );
+    }
 });

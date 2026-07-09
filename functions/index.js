@@ -2,12 +2,117 @@ import { initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes, randomInt, createHash } from 'crypto';
+import sgMail from '@sendgrid/mail';
 
 initializeApp();
 const db = getFirestore();
 
 const VAULT_COLLECTION = 'credentialVault';
+const OTP_COLLECTION = 'emailOtps';
+
+const SENDGRID_API_KEY = defineSecret('SENDGRID_API_KEY');
+const OTP_FROM_EMAIL   = defineSecret('OTP_FROM_EMAIL');
+
+const OTP_TTL_MS       = 10 * 60 * 1000;
+const OTP_MAX_ATTEMPTS = 5;
+const OTP_RESEND_MS    = 30 * 1000;
+
+function hashCode(code, email) {
+    return createHash('sha256').update(`${email}:${code}`).digest('hex');
+}
+
+function otpEmailHtml(code) {
+    return `
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto;">
+            <div style="background: #1860BF; padding: 20px 24px; border-radius: 10px 10px 0 0;">
+                <span style="color: #fff; font-size: 18px; font-weight: bold;">InsureTechGuard</span>
+            </div>
+            <div style="border: 1px solid #E5E5EA; border-top: none; border-radius: 0 0 10px 10px; padding: 28px 24px;">
+                <p style="font-size: 15px; color: #1C1C1C;">Your InsureTechGuard verification code is:</p>
+                <p style="font-size: 34px; font-weight: bold; letter-spacing: 8px; color: #1860BF; margin: 16px 0;">${code}</p>
+                <p style="font-size: 13px; color: #8E8E93;">This code expires in 10 minutes. If you didn't request it, you can ignore this email.</p>
+            </div>
+        </div>
+    `;
+}
+
+// Generates a 6-digit code, stores only its hash (with a short expiry), and
+// emails the plaintext code to the address via SendGrid. The code itself is
+// never persisted or returned to the browser.
+export const requestOtp = onCall(
+    { secrets: [SENDGRID_API_KEY, OTP_FROM_EMAIL] },
+    async (request) => {
+        const email = (request.data?.email ?? '').trim().toLowerCase();
+        if (!email || !email.includes('@')) {
+            throw new HttpsError('invalid-argument', 'A valid email is required.');
+        }
+
+        const docRef = db.collection(OTP_COLLECTION).doc(email);
+        const existing = await docRef.get();
+        if (existing.exists) {
+            const lastSent = existing.data().sentAt ?? 0;
+            if (Date.now() - lastSent < OTP_RESEND_MS) {
+                throw new HttpsError('resource-exhausted', 'Please wait a moment before requesting another code.');
+            }
+        }
+
+        const code = String(randomInt(0, 1000000)).padStart(6, '0');
+
+        await docRef.set({
+            codeHash:  hashCode(code, email),
+            expiresAt: Date.now() + OTP_TTL_MS,
+            sentAt:    Date.now(),
+            attempts:  0,
+            verified:  false,
+        });
+
+        sgMail.setApiKey(SENDGRID_API_KEY.value());
+        await sgMail.send({
+            to:      email,
+            from:    OTP_FROM_EMAIL.value(),
+            subject: `${code} is your InsureTechGuard verification code`,
+            text:    `Your InsureTechGuard verification code is ${code}. It expires in 10 minutes.`,
+            html:    otpEmailHtml(code),
+        });
+
+        return { status: 'sent' };
+    }
+);
+
+// Checks a submitted code against the stored hash, enforcing expiry and a
+// max-attempt limit. On success marks the email verified and clears the code.
+export const verifyOtp = onCall(async (request) => {
+    const email = (request.data?.email ?? '').trim().toLowerCase();
+    const code  = (request.data?.code ?? '').trim();
+    if (!email || !code) {
+        throw new HttpsError('invalid-argument', 'Email and code are required.');
+    }
+
+    const docRef = db.collection(OTP_COLLECTION).doc(email);
+    const snap = await docRef.get();
+    if (!snap.exists) {
+        throw new HttpsError('not-found', 'No code was requested for this email.');
+    }
+
+    const data = snap.data();
+    if (Date.now() > data.expiresAt) {
+        await docRef.delete();
+        throw new HttpsError('deadline-exceeded', 'This code has expired. Please request a new one.');
+    }
+    if ((data.attempts ?? 0) >= OTP_MAX_ATTEMPTS) {
+        await docRef.delete();
+        throw new HttpsError('resource-exhausted', 'Too many attempts. Please request a new code.');
+    }
+
+    if (hashCode(code, email) !== data.codeHash) {
+        await docRef.update({ attempts: (data.attempts ?? 0) + 1 });
+        throw new HttpsError('invalid-argument', 'Incorrect code. Please try again.');
+    }
+
+    await docRef.delete();
+    return { status: 'verified' };
+});
 
 // 32-byte base64 key, e.g. generated with: openssl rand -base64 32
 const LEGACY_VAULT_KEY = defineSecret('LEGACY_VAULT_KEY');

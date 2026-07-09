@@ -70,7 +70,7 @@ function OnboardingChecklist({ customerId, token, onDismiss }) {
                 <div className="w-full h-1.5 rounded-full" style={{ background: '#E5E5EA' }}>
                     <div
                         className="h-full rounded-full transition-all"
-                        style={{ width: `${(done / total) * 100}%`, background: 'linear-gradient(90deg, #1860BF, #1AB0DE)' }}
+                        style={{ width: `${(done / total) * 100}%`, background: 'linear-gradient(90deg, var(--brand-100), var(--brand-200))' }}
                     />
                 </div>
             </div>
@@ -270,8 +270,8 @@ export default function ProductsPage() {
                                     onClick={() => setActiveCategory(key)}
                                     className="flex-shrink-0 px-4 h-[32px] rounded-full text-[13px] font-semibold border transition-colors"
                                     style={{
-                                        borderColor: activeCategory === key ? '#1860BF' : 'var(--neutral-400)',
-                                        background:  activeCategory === key ? '#1860BF' : 'var(--neutral-100)',
+                                        borderColor: activeCategory === key ? 'var(--brand-100)' : 'var(--neutral-400)',
+                                        background:  activeCategory === key ? 'var(--brand-100)' : 'var(--neutral-100)',
                                         color:       activeCategory === key ? '#fff' : 'var(--neutral-700)',
                                         fontFamily: 'Roboto, sans-serif',
                                     }}
@@ -290,7 +290,7 @@ export default function ProductsPage() {
                                     {viewAll !== null && (
                                         <button
                                             onClick={() => setViewAll(null)}
-                                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: '#1860BF' }}
+                                            style={{ fontFamily: 'Roboto, sans-serif', fontSize: 14, fontWeight: 600, color: 'var(--brand-100)' }}
                                         >
                                             ← Back
                                         </button>

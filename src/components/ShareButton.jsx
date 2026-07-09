@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { shareProduct } from '../services/shareService.js';
+import { features } from '../config/env.js';
 import ShareSheet from './ShareSheet.jsx';
 
 const SHARE_ICON = (
@@ -13,6 +14,8 @@ const SHARE_ICON = (
 
 export default function ShareButton({ product, variant = 'icon', className = '' }) {
     const [sheetOpen, setSheetOpen] = useState(false);
+
+    if (!features.share) return null;
 
     async function handleClick(e) {
         e.stopPropagation();
@@ -29,10 +32,10 @@ export default function ShareButton({ product, variant = 'icon', className = '' 
                 <button
                     onClick={handleClick}
                     className={`flex items-center justify-center gap-2 ${className}`}
-                    style={{ color: '#1860BF', fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600 }}
+                    style={{ color: 'var(--brand-100)', fontFamily: 'Roboto, sans-serif', fontSize: 15, fontWeight: 600 }}
                     aria-label={`Share ${product.name}`}
                 >
-                    <span style={{ color: '#1860BF' }}>{SHARE_ICON}</span>
+                    <span style={{ color: 'var(--brand-100)' }}>{SHARE_ICON}</span>
                     Share
                 </button>
             ) : (

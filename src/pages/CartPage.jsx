@@ -11,9 +11,9 @@ import InfoBanner from '../components/InfoBanner.jsx';
 const EmptyCartIllustration = () => (
     <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
         <circle cx="60" cy="60" r="56" stroke="#E5E5EA" strokeWidth="8" />
-        <path d="M38 42h5l7 30h22l6-22H48" stroke="#1860BF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="57" cy="78" r="3" fill="#1860BF" />
-        <circle cx="71" cy="78" r="3" fill="#1860BF" />
+        <path d="M38 42h5l7 30h22l6-22H48" stroke="var(--brand-100)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="57" cy="78" r="3" fill="var(--brand-100)" />
+        <circle cx="71" cy="78" r="3" fill="var(--brand-100)" />
     </svg>
 );
 
@@ -224,7 +224,7 @@ export default function CartPage() {
                 disabled={payBlocked}
                 className="w-full h-[42px] rounded-[100px] font-semibold disabled:opacity-60"
                 style={{
-                    background: payBlocked ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                    background: payBlocked ? '#E5E5EA' : 'var(--gradient-brand)',
                     color: payBlocked ? '#AEAEB2' : '#fff',
                     fontSize: 17,
                     letterSpacing: '0.0035em',
@@ -277,7 +277,7 @@ export default function CartPage() {
                             <button
                                 onClick={() => navigate('/products')}
                                 className="w-full h-[42px] rounded-[100px] font-semibold text-white"
-                                style={{ background: 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
+                                style={{ background: 'var(--gradient-brand)', fontSize: 17, letterSpacing: '0.0035em', fontFamily: 'Roboto, sans-serif' }}
                             >
                                 Continue browsing
                             </button>
@@ -345,7 +345,7 @@ export default function CartPage() {
                             disabled={payBlocked}
                             className="w-full h-[42px] rounded-[100px] font-semibold disabled:opacity-60"
                             style={{
-                                background: payBlocked ? '#E5E5EA' : 'linear-gradient(90deg, #1860BF 0%, #1AB0DE 100%)',
+                                background: payBlocked ? '#E5E5EA' : 'var(--gradient-brand)',
                                 color: payBlocked ? '#AEAEB2' : '#fff',
                                 fontSize: 17,
                                 letterSpacing: '0.0035em',

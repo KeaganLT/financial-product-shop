@@ -44,7 +44,7 @@ export default function HeroSlider() {
                         <span
                             className="self-start inline-block"
                             style={{
-                                backgroundColor: '#1AAFDE',
+                                backgroundColor: 'var(--brand-200)',
                                 borderRadius: '4px',
                                 color: '#F2F2F7',
                                 fontSize: '11px',

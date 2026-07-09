@@ -18,7 +18,7 @@ export default function KycSection({ status, uploadError, onUpload }) {
                 <SectionHeading
                     icon={(
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke="#1860BF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z" stroke="var(--brand-100)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                     )}
                 >
