@@ -8,7 +8,7 @@ import KYCSuccess from '../assets/KYCSuccess.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import DotLoader from '../components/signup/DotLoader.jsx';
 import VerifiedDocRow from '../components/signup/VerifiedDocRow.jsx';
-import { createUser, createProfile } from '../services/customerService.js';
+import { createUser, createProfile, getProfile } from '../services/customerService.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
 import { validateSAId } from '../services/saIdValidator.js';
@@ -17,7 +17,6 @@ import {
     trackEvent,
     uploadKycDocument,
     sendVerificationEmail,
-    sendExistingAccountEmail,
     isEmailVerificationLink,
     getStoredVerificationEmail,
     getStoredVerificationPassword,
@@ -164,16 +163,10 @@ export default function SignUpPage() {
         setError('');
         setIsSubmitting(true);
         try {
-            try {
-                await createUser(email, password);
-                await sendVerificationEmail(email, password);
-            } catch (err) {
-                if (err.status !== 400) throw err;
-                await sendExistingAccountEmail(email);
-                setError('An account with this email already exists. Please log in instead.');
-                trackEvent('registration_error', { stage: 'email', error: 'account_exists' });
-                return;
-            }
+            // Fail-safe: we do NOT create the legacy account here. Nothing is
+            // written to the backend until the user finishes the whole flow
+            // (see handleKycSubmit). This step only verifies email ownership.
+            await sendVerificationEmail(email, password);
             setStage('awaiting-verification');
         } catch (err) {
             const message = err.message || 'Failed to send verification email';
@@ -200,12 +193,44 @@ export default function SignUpPage() {
         setStage('submitting');
 
         try {
-            const { token } = await login(email, password);
-            await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
+            // 1. Create the legacy account now — the single point where anything
+            //    is written to the backend. Resumable: if a prior attempt already
+            //    created it, a 400 is fine as long as the password matches below.
+            let accountExisted = false;
+            try {
+                await createUser(email, password);
+            } catch (err) {
+                if (err.status !== 400) throw err;
+                accountExisted = true;
+            }
+
+            // 2. Log in. If the account already existed with a different password,
+            //    this fails → it's genuinely someone else's account.
+            let token;
+            try {
+                ({ token } = await login(email, password));
+            } catch (err) {
+                if (accountExisted) {
+                    throw new Error('An account with this email already exists. Please log in instead.', { cause: err });
+                }
+                throw err;
+            }
+
+            // 3. Create the profile. Idempotent: if one already exists from a
+            //    prior incomplete attempt, continue instead of failing.
+            try {
+                await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
+            } catch (err) {
+                const existing = await getProfile(token).catch(() => null);
+                if (!existing) throw err;
+            }
+
+            // 4. Upload KYC documents (safe to overwrite on retry).
             await Promise.all([
                 uploadKycDocument(email, 'selfie', selfieFile),
                 uploadKycDocument(email, 'proof-of-residence', proofOfResidenceFile),
             ]);
+
             trackEvent('registration_completed');
             setStage('done');
         } catch (err) {
