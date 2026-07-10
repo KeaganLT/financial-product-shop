@@ -8,7 +8,8 @@ import KYCSuccess from '../assets/KYCSuccess.jsx';
 import KycUploadRow from '../components/kyc/KycUploadRow.jsx';
 import DotLoader from '../components/signup/DotLoader.jsx';
 import VerifiedDocRow from '../components/signup/VerifiedDocRow.jsx';
-import { createUser, createProfile, getProfile } from '../services/customerService.js';
+import { createUser, createProfile, getProfile, postKycStatus, seedDhaData } from '../services/customerService.js';
+import { markKycSubmitted } from '../services/kycStatus.js';
 import { checkPasswordPwned } from '../services/passwordService.js';
 import { vaultLegacyCredentials } from '../services/credentialVault.js';
 import { validateSAId } from '../services/saIdValidator.js';
@@ -243,8 +244,9 @@ export default function SignUpPage() {
             // 2. Log in. If the account already existed with a different password,
             //    this fails → it's genuinely someone else's account.
             let token;
+            let customerId;
             try {
-                ({ token } = await login(email, password));
+                ({ token, customerId } = await login(email, password));
             } catch (err) {
                 if (accountExisted) {
                     throw new Error('An account with this email already exists. Please log in instead.', { cause: err });
@@ -254,18 +256,41 @@ export default function SignUpPage() {
 
             // 3. Create the profile. Idempotent: if one already exists from a
             //    prior incomplete attempt, continue instead of failing.
+            let profile = null;
             try {
                 await createProfile({ email, firstName, lastName, idNumber, customerTypeId: DEFAULT_CUSTOMER_TYPE_ID }, token);
             } catch (err) {
-                const existing = await getProfile(token).catch(() => null);
-                if (!existing) throw err;
+                profile = await getProfile(token).catch(() => null);
+                if (!profile) throw err;
             }
 
-            // 4. Upload KYC documents (safe to overwrite on retry).
+            // 4. Upload KYC documents (safe to overwrite on retry). Key the
+            //    storage folder by the customerId (JWT sub) — the SAME key the
+            //    Account page and KYC page read from. Keying by email here would
+            //    write to a folder those pages never look in, so the docs would
+            //    never show as uploaded.
             await Promise.all([
-                uploadKycDocument(email, 'selfie', selfieFile),
-                uploadKycDocument(email, 'proof-of-residence', proofOfResidenceFile),
+                uploadKycDocument(customerId, 'selfie', selfieFile),
+                uploadKycDocument(customerId, 'proof-of-residence', proofOfResidenceFile),
             ]);
+            markKycSubmitted(customerId);
+
+            // 5. Sync KYC status to the legacy backend using the numeric
+            //    customer ID, mirroring the standalone KYC upload flow so the
+            //    "identity verified" indicators are set. Best-effort: a backend
+            //    hiccup here shouldn't fail an otherwise-complete registration.
+            try {
+                if (!profile) profile = await getProfile(token).catch(() => null);
+                const numericCustomerId = profile?.id ?? customerId;
+                await postKycStatus(
+                    numericCustomerId,
+                    { primaryIndicator: true, secondaryIndicator: true, taxCompliance: 'amber' },
+                    token,
+                );
+                if (profile?.idNumber ?? idNumber) {
+                    await seedDhaData(profile?.idNumber ?? idNumber, token).catch(() => {});
+                }
+            } catch { /* non-fatal: registration already succeeded */ }
 
             trackEvent('registration_completed');
             setStage('done');
