@@ -180,7 +180,7 @@ function StatusBadge({ fulfilmentType }) {
                 color: isImmediate ? '#1A7A3C' : '#995900',
             }}
         >
-            {isImmediate ? 'Active: Immediate' : 'Active: Pending approval'}
+            {isImmediate ? 'Active: Immediate' : 'Active: Pending signed contract'}
         </span>
     );
 }

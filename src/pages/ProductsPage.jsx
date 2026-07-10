@@ -15,6 +15,7 @@ import { getProfile } from '../services/customerService';
 import { getKycStatus } from '../services/kycStatus';
 import { getBankDetails } from '../services/bankingService';
 
+// eslint-disable-next-line no-unused-vars -- temporarily hidden; kept for later restore
 function OnboardingChecklist({ customerId, token, onDismiss }) {
     const navigate = useNavigate();
     const [checks, setChecks] = useState(null);
@@ -142,6 +143,7 @@ export default function ProductsPage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [query, setQuery] = useState('');
     const [viewAll, setViewAll] = useState(null);
+    // eslint-disable-next-line no-unused-vars -- checklist temporarily hidden; kept for later restore
     const [showChecklist, setShowChecklist] = useState(() => {
         // Only show once per session, not every page visit
         return sessionStorage.getItem('checklist_dismissed') !== '1';
@@ -240,6 +242,8 @@ export default function ProductsPage() {
 
                 {!loading && !error && (
                     <>
+                        {/* Onboarding checklist hidden for now — doesn't fit this screen.
+                            Uncomment to restore it later.
                         {isLoggedIn && showChecklist && (
                             <OnboardingChecklist
                                 customerId={auth.customerId}
@@ -249,7 +253,7 @@ export default function ProductsPage() {
                                     sessionStorage.setItem('checklist_dismissed', '1');
                                 }}
                             />
-                        )}
+                        )} */}
 
                         {!showGrid && (
                             <div className="mt-4">

@@ -4,7 +4,7 @@ export default function StatusBadge({ fulfilmentType, contractSigned = false }) 
 
     const label = isActive
         ? 'Active'
-        : 'Active: Pending approval';
+        : 'Active: Pending signed contract';
 
     return (
         <span
