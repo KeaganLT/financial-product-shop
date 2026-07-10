@@ -13,6 +13,7 @@ import { getKycStatus } from '../services/kycStatus.js';
 import { getProfile, getTypes, updateCustomerType, addAccount, removeAccount, postKycStatus, seedDhaData } from '../services/customerService.js';
 import { useToast } from '../context/ToastContext.jsx';
 
+//account page
 export default function AccountPage() {
     const navigate = useNavigate();
     const { auth, isLoggedIn, logout } = useAuth();
