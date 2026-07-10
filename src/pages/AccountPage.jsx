@@ -45,7 +45,7 @@ export default function AccountPage() {
             setProfileLoading(false);
         }
     }
-
+//extra
     useEffect(() => {
         if (!isLoggedIn) {
             queueMicrotask(() => {
